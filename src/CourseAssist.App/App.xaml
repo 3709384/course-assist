@@ -1,0 +1,24 @@
+<Application x:Class="CourseAssist.App.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             StartupUri="MainWindow.xaml">
+    <Application.Resources>
+        <!-- Sky-blue accent palette -->
+        <SolidColorBrush x:Key="AccentBrush" Color="#3D8CAE"/>
+        <SolidColorBrush x:Key="AccentDeepBrush" Color="#2F7EA3"/>
+        <SolidColorBrush x:Key="TintBrush" Color="#EFF7FA"/>
+        <Style x:Key="AccentButton" TargetType="Button">
+            <Setter Property="Background" Value="{StaticResource AccentBrush}"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Padding" Value="14,6"/>
+            <Setter Property="Margin" Value="0,0,8,0"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="FontSize" Value="13"/>
+        </Style>
+        <Style x:Key="PlainButton" TargetType="Button">
+            <Setter Property="Padding" Value="14,6"/>
+            <Setter Property="Margin" Value="0,0,8,0"/>
+            <Setter Property="FontSize" Value="13"/>
+        </Style>
+    </Application.Resources>
+</Application>

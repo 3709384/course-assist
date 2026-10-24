@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <!-- Allow building this Windows app on non-Windows machines (CI / cross-build). -->
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <AssemblyName>CourseAssist</AssemblyName>
+    <RootNamespace>CourseAssist.App</RootNamespace>
+    <Version>0.1.0</Version>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CourseAssist.Core\CourseAssist.Core.csproj" />
+  </ItemGroup>
+
+  <!-- Ship the course bundles next to the app; new bundles dropped here are picked up at startup. -->
+  <ItemGroup>
+    <Content Include="..\..\bundles\*.yaml">
+      <Link>bundles\%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+  </ItemGroup>
+
+</Project>
