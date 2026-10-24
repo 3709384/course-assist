@@ -10,8 +10,8 @@ namespace CourseAssist.App;
 
 public partial class MainWindow : Window
 {
-    private static readonly Brush DeepBlue = new SolidColorBrush(Color.FromRgb(0x2F, 0x7E, 0xA3));
-    private static readonly Brush Tint = new SolidColorBrush(Color.FromRgb(0xEF, 0xF7, 0xFA));
+    private static readonly Brush DeepBlue = new SolidColorBrush(Color.FromRgb(0x43, 0x38, 0xCA));
+    private static readonly Brush Tint = new SolidColorBrush(Color.FromRgb(0xEE, 0xF2, 0xFF));
     private static readonly Brush Gray = new SolidColorBrush(Color.FromRgb(0x77, 0x77, 0x77));
 
     private readonly BundleRepository _repo;
@@ -91,7 +91,7 @@ public partial class MainWindow : Window
                     bundles.TryGetValue(course.Id, out var bundle);
                     var item = new ListBoxItem
                     {
-                        Content = bundle is null ? $"{course.Name}（课程包制作中）" : $"{course.Name}（{course.Status}）",
+                        Content = bundle is null ? $"{course.Name}（课程包制作中）" : course.Name,
                         Tag = bundle,
                         IsEnabled = bundle is not null,
                     };
@@ -162,7 +162,7 @@ public partial class MainWindow : Window
                 Content = tool.Name,
                 IsChecked = tool.Required,
                 FontWeight = FontWeights.Bold,
-                Foreground = new SolidColorBrush(Color.FromRgb(0x17, 0x3F, 0x4D)),
+                Foreground = new SolidColorBrush(Color.FromRgb(0x23, 0x20, 0x38)),
                 FontSize = 14.5,
                 VerticalAlignment = VerticalAlignment.Center,
             };
@@ -225,8 +225,8 @@ public partial class MainWindow : Window
             };
             panel.Children.Add(tutorialButton);
 
-            var cardBorder = new SolidColorBrush(Color.FromRgb(0xD7, 0xEA, 0xF2));
-            var cardBorderHover = new SolidColorBrush(Color.FromRgb(0x8F, 0xC3, 0xD9));
+            var cardBorder = new SolidColorBrush(Color.FromRgb(0xDE, 0xE2, 0xF2));
+            var cardBorderHover = new SolidColorBrush(Color.FromRgb(0x9A, 0xA3, 0xDC));
             var card = new Border
             {
                 Background = Brushes.White,
@@ -545,7 +545,7 @@ public partial class MainWindow : Window
                 StatusState.Good => new SolidColorBrush(Color.FromRgb(0xE3, 0xF1, 0xE6)),
                 StatusState.Bad => new SolidColorBrush(Color.FromRgb(0xFD, 0xEC, 0xEA)),
                 StatusState.Manual => new SolidColorBrush(Color.FromRgb(0xFF, 0xF4, 0xDE)),
-                _ => new SolidColorBrush(Color.FromRgb(0xEE, 0xF3, 0xF5)),
+                _ => new SolidColorBrush(Color.FromRgb(0xEC, 0xEE, 0xF4)),
             };
         }
     }

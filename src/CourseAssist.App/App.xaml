@@ -4,9 +4,9 @@
              StartupUri="MainWindow.xaml">
     <Application.Resources>
         <!-- Sky-blue accent palette -->
-        <SolidColorBrush x:Key="AccentBrush" Color="#3D8CAE"/>
-        <SolidColorBrush x:Key="AccentDeepBrush" Color="#2F7EA3"/>
-        <SolidColorBrush x:Key="TintBrush" Color="#EFF7FA"/>
+        <SolidColorBrush x:Key="AccentBrush" Color="#4F46E5"/>
+        <SolidColorBrush x:Key="AccentDeepBrush" Color="#4338CA"/>
+        <SolidColorBrush x:Key="TintBrush" Color="#EEF2FF"/>
 
         <!-- Primary action button: rounded, with hover / pressed / disabled states -->
         <Style x:Key="AccentButton" TargetType="Button">
@@ -19,18 +19,18 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
-                        <Border x:Name="Bd" Background="#3D8CAE" CornerRadius="8" Padding="{TemplateBinding Padding}">
+                        <Border x:Name="Bd" Background="#4F46E5" CornerRadius="8" Padding="{TemplateBinding Padding}">
                             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Bd" Property="Background" Value="#4CA3C4"/>
+                                <Setter TargetName="Bd" Property="Background" Value="#6366F1"/>
                             </Trigger>
                             <Trigger Property="IsPressed" Value="True">
-                                <Setter TargetName="Bd" Property="Background" Value="#2F7EA3"/>
+                                <Setter TargetName="Bd" Property="Background" Value="#4338CA"/>
                             </Trigger>
                             <Trigger Property="IsEnabled" Value="False">
-                                <Setter TargetName="Bd" Property="Background" Value="#B9CDD4"/>
+                                <Setter TargetName="Bd" Property="Background" Value="#C6C9D8"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -40,7 +40,7 @@
 
         <!-- Secondary button: white with a soft blue outline -->
         <Style x:Key="PlainButton" TargetType="Button">
-            <Setter Property="Foreground" Value="#2F7EA3"/>
+            <Setter Property="Foreground" Value="#4338CA"/>
             <Setter Property="Padding" Value="15,8"/>
             <Setter Property="Margin" Value="0,0,10,0"/>
             <Setter Property="FontSize" Value="13"/>
@@ -48,20 +48,20 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
-                        <Border x:Name="Bd" Background="White" BorderBrush="#BFDCEA" BorderThickness="1" CornerRadius="8" Padding="{TemplateBinding Padding}">
+                        <Border x:Name="Bd" Background="White" BorderBrush="#C9CEEA" BorderThickness="1" CornerRadius="8" Padding="{TemplateBinding Padding}">
                             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Bd" Property="Background" Value="#EFF7FA"/>
-                                <Setter TargetName="Bd" Property="BorderBrush" Value="#8FC3D9"/>
+                                <Setter TargetName="Bd" Property="Background" Value="#EEF2FF"/>
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="#9AA3DC"/>
                             </Trigger>
                             <Trigger Property="IsPressed" Value="True">
-                                <Setter TargetName="Bd" Property="Background" Value="#E1F0F6"/>
+                                <Setter TargetName="Bd" Property="Background" Value="#E0E7FF"/>
                             </Trigger>
                             <Trigger Property="IsEnabled" Value="False">
-                                <Setter TargetName="Bd" Property="Background" Value="#F2F6F8"/>
-                                <Setter Property="Foreground" Value="#9DB4BD"/>
+                                <Setter TargetName="Bd" Property="Background" Value="#F1F2F8"/>
+                                <Setter Property="Foreground" Value="#9AA0B5"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -71,23 +71,23 @@
 
         <!-- Small ghost button used on tool cards (tutorial entry) -->
         <Style x:Key="GhostButton" TargetType="Button">
-            <Setter Property="Foreground" Value="#2F7EA3"/>
+            <Setter Property="Foreground" Value="#4338CA"/>
             <Setter Property="Padding" Value="12,4"/>
             <Setter Property="FontSize" Value="12.5"/>
             <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
-                        <Border x:Name="Bd" Background="#EFF7FA" BorderBrush="#CDE9F4" BorderThickness="1" CornerRadius="7" Padding="{TemplateBinding Padding}">
+                        <Border x:Name="Bd" Background="#EEF2FF" BorderBrush="#C9CEEA" BorderThickness="1" CornerRadius="7" Padding="{TemplateBinding Padding}">
                             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Bd" Property="Background" Value="#E1F0F6"/>
-                                <Setter TargetName="Bd" Property="BorderBrush" Value="#8FC3D9"/>
+                                <Setter TargetName="Bd" Property="Background" Value="#E0E7FF"/>
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="#9AA3DC"/>
                             </Trigger>
                             <Trigger Property="IsPressed" Value="True">
-                                <Setter TargetName="Bd" Property="Background" Value="#D3E9F2"/>
+                                <Setter TargetName="Bd" Property="Background" Value="#C7CDF5"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -110,10 +110,10 @@
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Bd" Property="Background" Value="#2B6E8C"/>
+                                <Setter TargetName="Bd" Property="Background" Value="#3730A3"/>
                             </Trigger>
                             <Trigger Property="IsPressed" Value="True">
-                                <Setter TargetName="Bd" Property="Background" Value="#256179"/>
+                                <Setter TargetName="Bd" Property="Background" Value="#312E81"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -143,7 +143,7 @@
         <!-- Rounded text box -->
         <Style x:Key="ModernTextBox" TargetType="TextBox">
             <Setter Property="Background" Value="White"/>
-            <Setter Property="BorderBrush" Value="#C8DEE8"/>
+            <Setter Property="BorderBrush" Value="#CCD1EC"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="Padding" Value="9,5"/>
             <Setter Property="VerticalContentAlignment" Value="Center"/>
@@ -156,10 +156,10 @@
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Bd" Property="BorderBrush" Value="#9CC8DC"/>
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="#9AA3DC"/>
                             </Trigger>
                             <Trigger Property="IsKeyboardFocused" Value="True">
-                                <Setter TargetName="Bd" Property="BorderBrush" Value="#3D8CAE"/>
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="#4F46E5"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -178,10 +178,10 @@
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsHighlighted" Value="True">
-                                <Setter TargetName="Bd" Property="Background" Value="#EFF7FA"/>
+                                <Setter TargetName="Bd" Property="Background" Value="#EEF2FF"/>
                             </Trigger>
                             <Trigger Property="IsSelected" Value="True">
-                                <Setter TargetName="Bd" Property="Background" Value="#D9EEF7"/>
+                                <Setter TargetName="Bd" Property="Background" Value="#E0E7FF"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -192,7 +192,7 @@
         <!-- Rounded combo box -->
         <Style x:Key="ModernCombo" TargetType="ComboBox">
             <Setter Property="Background" Value="White"/>
-            <Setter Property="BorderBrush" Value="#C8DEE8"/>
+            <Setter Property="BorderBrush" Value="#CCD1EC"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="Padding" Value="9,4"/>
             <Setter Property="ItemContainerStyle" Value="{StaticResource ModernComboItem}"/>
@@ -206,7 +206,7 @@
                                               Content="{TemplateBinding SelectionBoxItem}"
                                               ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"/>
                             <Path IsHitTestVisible="False" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,11,0"
-                                  Data="M 0 0 L 5 5 L 10 0" Stroke="#5B7A86" StrokeThickness="1.6"/>
+                                  Data="M 0 0 L 5 5 L 10 0" Stroke="#6B6F8C" StrokeThickness="1.6"/>
                             <ToggleButton Focusable="False" ClickMode="Press"
                                           IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}">
                                 <ToggleButton.Template>
@@ -217,7 +217,7 @@
                             </ToggleButton>
                             <Popup IsOpen="{TemplateBinding IsDropDownOpen}" Placement="Bottom" AllowsTransparency="True"
                                    Focusable="False" PopupAnimation="Fade">
-                                <Border Background="White" BorderBrush="#C8DEE8" BorderThickness="1" CornerRadius="7"
+                                <Border Background="White" BorderBrush="#CCD1EC" BorderThickness="1" CornerRadius="7"
                                         MinWidth="{TemplateBinding ActualWidth}" MaxHeight="{TemplateBinding MaxDropDownHeight}" Padding="4" Margin="0,2,0,0">
                                     <ScrollViewer>
                                         <ItemsPresenter/>
@@ -227,10 +227,10 @@
                         </Grid>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Bd" Property="BorderBrush" Value="#9CC8DC"/>
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="#9AA3DC"/>
                             </Trigger>
                             <Trigger Property="IsDropDownOpen" Value="True">
-                                <Setter TargetName="Bd" Property="BorderBrush" Value="#3D8CAE"/>
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="#4F46E5"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -243,8 +243,8 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="ProgressBar">
-                        <Border x:Name="PART_Track" Background="#E1F0F6" CornerRadius="4">
-                            <Border x:Name="PART_Indicator" Background="#3D8CAE" CornerRadius="4" HorizontalAlignment="Left"/>
+                        <Border x:Name="PART_Track" Background="#E0E7FF" CornerRadius="4">
+                            <Border x:Name="PART_Indicator" Background="#4F46E5" CornerRadius="4" HorizontalAlignment="Left"/>
                         </Border>
                     </ControlTemplate>
                 </Setter.Value>
@@ -276,10 +276,10 @@
                                     <Thumb>
                                         <Thumb.Template>
                                             <ControlTemplate TargetType="Thumb">
-                                                <Border x:Name="Tb" CornerRadius="4" Background="#B9D6E2" Margin="1,0"/>
+                                                <Border x:Name="Tb" CornerRadius="4" Background="#C3C9EA" Margin="1,0"/>
                                                 <ControlTemplate.Triggers>
                                                     <Trigger Property="IsMouseOver" Value="True">
-                                                        <Setter TargetName="Tb" Property="Background" Value="#8FB9CC"/>
+                                                        <Setter TargetName="Tb" Property="Background" Value="#9AA3DC"/>
                                                     </Trigger>
                                                 </ControlTemplate.Triggers>
                                             </ControlTemplate>
@@ -341,10 +341,10 @@
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Bd" Property="Background" Value="#EFF7FA"/>
+                                <Setter TargetName="Bd" Property="Background" Value="#EEF2FF"/>
                             </Trigger>
                             <Trigger Property="IsSelected" Value="True">
-                                <Setter TargetName="Bd" Property="Background" Value="#D9EEF7"/>
+                                <Setter TargetName="Bd" Property="Background" Value="#E0E7FF"/>
                             </Trigger>
                             <Trigger Property="IsEnabled" Value="False">
                                 <Setter TargetName="Bd" Property="Background" Value="Transparent"/>
@@ -355,11 +355,11 @@
             </Setter>
             <Style.Triggers>
                 <Trigger Property="IsSelected" Value="True">
-                    <Setter Property="Foreground" Value="#1F6E8C"/>
+                    <Setter Property="Foreground" Value="#4338CA"/>
                     <Setter Property="FontWeight" Value="SemiBold"/>
                 </Trigger>
                 <Trigger Property="IsEnabled" Value="False">
-                    <Setter Property="Foreground" Value="#8AA5B0"/>
+                    <Setter Property="Foreground" Value="#8A8FA8"/>
                     <Setter Property="FontSize" Value="11.5"/>
                     <Setter Property="FontWeight" Value="Bold"/>
                 </Trigger>
