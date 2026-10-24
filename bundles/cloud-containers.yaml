@@ -1,0 +1,25 @@
+# 课程包（draft）：Docker Desktop 主线 + WSL2 基础，镜像加速按指引配置。
+id: cloud-containers
+name: 云计算与容器
+category: engineering
+summary: Docker Desktop 是核心（依赖 WSL2），装完按备注配上国内镜像加速，拉镜像不再卡住。
+status: draft
+tools:
+  - name: Docker Desktop
+    purpose: 容器引擎 + 管理界面：docker 命令和 Kubernetes 入门都靠它
+    winget: Docker.DockerDesktop
+    required: true
+  - name: Windows Terminal
+    purpose: 敲 docker / kubectl 命令的终端
+    winget: Microsoft.WindowsTerminal
+    required: false
+  - name: VS Code
+    purpose: 写 Dockerfile 和 YAML 配置的编辑器
+    winget: Microsoft.VisualStudioCode
+    required: false
+steps:
+  - type: feature
+    name: wsl
+  - type: manual
+    title: 打开 Docker Desktop 设置，在 Docker Engine 配置里加入国内镜像加速地址（如 https://docker.m.daocloud.io），保存并重启 Docker
+notes: 装 Docker Desktop 前确认 BIOS 虚拟化已开启；家庭版 Windows 用 WSL2 后端即可。镜像加速地址会随时间变化，失效时搜「Docker 国内镜像 2026」换最新可用的。

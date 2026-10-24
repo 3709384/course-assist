@@ -1,0 +1,41 @@
+# 课程包（draft）：Node 双版本 + 编辑器 + 浏览器，待实机验证。
+id: web-frontend
+name: Web 前端开发
+category: programming
+summary: Node.js（长期支持版/最新版可选）+ VS Code + Git，前端开发全套。
+status: draft
+tools:
+  - name: Node.js
+    purpose: 前端运行时与包管理（npm）。不确定选 LTS 长期支持版
+    required: true
+    default_version: "LTS 20"
+    versions:
+      - label: "LTS 20"
+        winget: OpenJS.NodeJS.LTS
+        verify:
+          command: node --version
+          expect: 'v20\.'
+      - label: "最新版"
+        winget: OpenJS.NodeJS
+        verify:
+          command: node --version
+          expect: 'v\d+\.'
+  - name: VS Code
+    purpose: 前端主力编辑器
+    winget: Microsoft.VisualStudioCode
+    required: true
+  - name: Git
+    purpose: 版本管理
+    winget: Git.Git
+    required: true
+    verify:
+      command: git --version
+      expect: 'git version'
+  - name: Google Chrome
+    purpose: 调试页面用的浏览器（已有可不装）
+    winget: Google.Chrome
+    required: false
+steps:
+  - type: command
+    run: npm config set registry https://registry.npmmirror.com
+notes: 已自动把 npm 换成国内镜像源，装包快得多。VS Code 建议装「Live Server」插件，改完页面自动刷新。

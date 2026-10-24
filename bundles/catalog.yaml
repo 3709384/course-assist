@@ -5,36 +5,36 @@ categories:
   - id: programming
     name: 编程基础类
     courses:
-      - { id: c-programming,       name: C/C++ 程序设计,   status: planned }
+      - { id: c-programming,       name: C/C++ 程序设计,   status: draft }
       - { id: java-programming,    name: Java 程序设计,    status: draft }
       - { id: python-programming,  name: Python 程序设计,  status: draft }
-      - { id: data-structures,     name: 数据结构,         status: planned }
-      - { id: web-frontend,        name: Web 前端开发,     status: planned }
+      - { id: data-structures,     name: 数据结构,         status: draft }
+      - { id: web-frontend,        name: Web 前端开发,     status: draft }
   - id: systems
     name: 系统核心类
     courses:
-      - { id: computer-organization, name: 计算机组成原理, status: planned }
-      - { id: operating-systems,     name: 操作系统,       status: planned }
-      - { id: computer-networks,     name: 计算机网络,     status: planned }
-      - { id: compiler-principles,   name: 编译原理,       status: planned }
-      - { id: linux-systems,         name: Linux 系统,     status: planned }
+      - { id: computer-organization, name: 计算机组成原理, status: draft }
+      - { id: operating-systems,     name: 操作系统,       status: draft }
+      - { id: computer-networks,     name: 计算机网络,     status: draft }
+      - { id: compiler-principles,   name: 编译原理,       status: draft }
+      - { id: linux-systems,         name: Linux 系统,     status: draft }
   - id: data-ai
     name: 数据与智能类
     courses:
       - { id: database-systems,   name: 数据库系统,           status: draft }
-      - { id: machine-learning,   name: 人工智能 / 机器学习,  status: planned }
-      - { id: big-data,           name: 大数据技术,           status: planned }
+      - { id: machine-learning,   name: 人工智能 / 机器学习,  status: draft }
+      - { id: big-data,           name: 大数据技术,           status: draft }
   - id: engineering
     name: 软件工程类
     courses:
-      - { id: software-engineering, name: 软件工程 / 项目实训, status: planned }
-      - { id: java-web,             name: Java Web 开发,       status: planned }
-      - { id: mobile-development,   name: 移动应用开发,        status: planned }
-      - { id: cloud-containers,     name: 云计算与容器,        status: planned }
+      - { id: software-engineering, name: 软件工程 / 项目实训, status: draft }
+      - { id: java-web,             name: Java Web 开发,       status: draft }
+      - { id: mobile-development,   name: 移动应用开发,        status: draft }
+      - { id: cloud-containers,     name: 云计算与容器,        status: draft }
   - id: electives
     name: 方向选修类
     courses:
-      - { id: network-security,   name: 网络安全,       status: planned }
-      - { id: embedded-systems,   name: 嵌入式系统,     status: planned }
-      - { id: computer-graphics,  name: 计算机图形学,   status: planned }
-      - { id: math-modeling,      name: 数学建模,       status: planned }
+      - { id: network-security,   name: 网络安全,       status: draft }
+      - { id: embedded-systems,   name: 嵌入式系统,     status: draft }
+      - { id: computer-graphics,  name: 计算机图形学,   status: draft }
+      - { id: math-modeling,      name: 数学建模,       status: draft }

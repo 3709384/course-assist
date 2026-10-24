@@ -1,0 +1,28 @@
+# 课程包（draft）：虚拟机双选择 + WSL2 路线，待实机验证。
+id: operating-systems
+name: 操作系统
+category: systems
+summary: 在 Windows 里跑起 Linux：虚拟机（VirtualBox / VMware 二选一）或 WSL2，两条路线任选。
+status: draft
+tools:
+  - name: VirtualBox
+    purpose: 免费虚拟机：在里面装 Ubuntu 做实验（推荐路线）
+    winget: Oracle.VirtualBox
+    required: true
+  - name: VMware Workstation Pro
+    purpose: 虚拟机替代：性能更好，现已免费（与 VirtualBox 二选一）
+    winget: VMware.WorkstationPro
+    required: false
+  - name: Git
+    purpose: 拉取实验框架代码（如 xv6、Nachos）时常用
+    winget: Git.Git
+    required: false
+    verify:
+      command: git --version
+      expect: 'git version'
+steps:
+  - type: feature
+    name: wsl
+  - type: manual
+    title: 在虚拟机里新建 Ubuntu 22.04 虚拟机（镜像从 Ubuntu 官网或学校镜像站下载），或在 WSL 中执行 wsl --install -d Ubuntu
+notes: WSL2 路线更轻量，适合只做命令行实验；要装图形界面或做内核实验，用虚拟机路线。装虚拟机前先在 BIOS 里确认虚拟化（VT-x/AMD-V）已开启。

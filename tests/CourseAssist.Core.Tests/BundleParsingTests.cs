@@ -19,11 +19,12 @@ public class BundleParsingTests
     private static BundleRepository Repo => new(FindBundlesDir());
 
     [Fact]
-    public void LoadsAllSampleBundles()
+    public void LoadsAllBundles()
     {
         var bundles = Repo.LoadBundles();
-        Assert.Equal(3, bundles.Count);
+        Assert.Equal(21, bundles.Count);
         Assert.All(bundles, b => Assert.False(string.IsNullOrWhiteSpace(b.Id)));
+        Assert.All(bundles, b => Assert.NotEmpty(b.Tools));
     }
 
     [Fact]
@@ -32,7 +33,7 @@ public class BundleParsingTests
         var java = Repo.LoadBundles().Single(b => b.Id == "java-programming");
         var jdk = java.Tools.Single(t => t.Name == "JDK");
 
-        Assert.Equal(3, jdk.Versions.Count);
+        Assert.Equal(4, jdk.Versions.Count);
         Assert.Equal("17", jdk.DefaultVersion);
         Assert.Equal("Microsoft.OpenJDK.17", jdk.Resolve(null).Winget);
         Assert.Equal("EclipseAdoptium.Temurin.8.JDK", jdk.Resolve("8").Winget);
@@ -59,7 +60,7 @@ public class BundleParsingTests
         Assert.Equal(5, catalog!.Categories.Count);
         var courses = catalog.Categories.SelectMany(c => c.Courses).ToList();
         Assert.Equal(21, courses.Count);
-        Assert.Equal(3, courses.Count(c => c.Status == "draft"));
+        Assert.Equal(21, courses.Count(c => c.Status == "draft"));
 
         var bundleIds = Repo.LoadBundles().Select(b => b.Id).ToHashSet();
         Assert.All(bundleIds, id => Assert.Contains(courses, c => c.Id == id));

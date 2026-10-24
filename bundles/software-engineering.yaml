@@ -1,0 +1,42 @@
+# 课程包（draft）：软工实训的协作全家桶：版本管理 + 接口调试 + 画图 + 编辑器。
+id: software-engineering
+name: 软件工程 / 项目实训
+category: engineering
+summary: 团队项目要用的都在这：Git、GitHub、接口调试、画图工具，装完就能开工。
+status: draft
+tools:
+  - name: Git
+    purpose: 版本管理本体：团队协作的地基
+    winget: Git.Git
+    required: true
+    verify:
+      command: git --version
+      expect: 'git version'
+  - name: VS Code
+    purpose: 通用编辑器
+    winget: Microsoft.VisualStudioCode
+    required: true
+  - name: Postman
+    purpose: 接口调试：联调后端接口时用
+    winget: Postman.Postman
+    required: true
+  - name: GitHub Desktop
+    purpose: Git 图形客户端：不熟命令行时用按钮也能完成提交、拉取（可选）
+    winget: GitHub.GitHubDesktop
+    required: false
+  - name: GitHub CLI
+    purpose: 命令行管理仓库、PR、Issue（可选）
+    winget: GitHub.cli
+    required: false
+    verify:
+      command: gh --version
+      expect: 'gh version'
+  - name: draw.io
+    purpose: 画 UML、ER 图、流程图的工具（软工文档必备）
+    winget: JGraph.Draw
+    required: false
+  - name: 7-Zip
+    purpose: 解压各种格式的作业包和素材包
+    winget: 7zip.7zip
+    required: false
+notes: 装完 Git 先在终端里执行 git config --global user.name 和 user.email 设置身份，第一次提交前必须做。

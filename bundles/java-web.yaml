@@ -1,0 +1,70 @@
+# 课程包（draft）：Java Web 全家桶：JDK 多版本 + IDEA + Maven + 数据库 + Tomcat 指引。
+id: java-web
+name: Java Web 开发
+category: engineering
+summary: 在 Java 课基础上补齐 Web 开发：数据库、构建工具、接口调试，Tomcat 按指引放好即可。
+status: draft
+tools:
+  - name: JDK
+    purpose: Java 开发工具包。Spring Boot 3 要求 17 及以上，老教材用 8 的选 8
+    required: true
+    default_version: "17"
+    versions:
+      - label: "8"
+        winget: EclipseAdoptium.Temurin.8.JDK
+        verify:
+          command: java -version
+          expect: '1\.8\.'
+      - label: "17"
+        winget: Microsoft.OpenJDK.17
+        verify:
+          command: java -version
+          expect: '17\.'
+      - label: "21"
+        winget: Microsoft.OpenJDK.21
+        verify:
+          command: java -version
+          expect: '21\.'
+    env:
+      JAVA_HOME: "{install_dir}"
+      path_additions: ["{install_dir}\\bin"]
+  - name: IntelliJ IDEA Community
+    purpose: 主力编辑器（社区版够用；终极版学校一般有教育授权）
+    winget: JetBrains.IntelliJIDEA.Community
+    required: true
+  - name: Apache Maven
+    purpose: 构建与依赖管理
+    winget: Apache.Maven
+    required: true
+    verify:
+      command: mvn -version
+      expect: 'Apache Maven'
+    env:
+      MAVEN_HOME: "{install_dir}"
+      path_additions: ["{install_dir}\\bin"]
+  - name: MySQL Server 8
+    purpose: Web 项目的数据库
+    winget: Oracle.MySQL
+    required: true
+  - name: DBeaver Community
+    purpose: 图形化管理数据库
+    winget: DBeaver.DBeaver
+    required: false
+  - name: Apache Tomcat
+    purpose: 传统 Servlet/JSP 课程需要；Spring Boot 项目自带内嵌 Tomcat，用不到它
+    manual: 到 Apache Tomcat 官网下载 10.x 的 Windows zip 包，解压到安装位置下的 Tomcat 文件夹即可（免安装）。
+    required: false
+    env:
+      CATALINA_HOME: "{install_dir}"
+  - name: Postman
+    purpose: 调试自己写的接口
+    winget: Postman.Postman
+    required: false
+  - name: Node.js LTS
+    purpose: 前后端分离项目的前端部分要用
+    winget: OpenJS.NodeJS.LTS
+    required: false
+    verify:
+      command: node --version
+      expect: 'v\d+\.'
+notes: Maven 建议在 settings.xml 里配阿里云镜像仓库，下载依赖会快很多（网上搜「Maven 阿里云镜像」按教程改一处即可）。

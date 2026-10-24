@@ -1,0 +1,34 @@
+# 课程包（draft）：Conda 环境管理 + 编辑器，PyTorch/Jupyter 以课后步骤安装（体积大，走镜像）。
+id: machine-learning
+name: 人工智能 / 机器学习
+category: data-ai
+summary: Miniconda 管环境 + VS Code 写代码，再按步骤装 PyTorch 和 Jupyter。显卡好的可走 GPU 版（见备注）。
+status: draft
+tools:
+  - name: Miniconda
+    purpose: Python 环境管理：给每个实验建独立环境，不再互相打架（推荐）
+    winget: Anaconda.Miniconda3
+    required: true
+    verify:
+      command: conda --version
+      expect: 'conda'
+  - name: Anaconda
+    purpose: 全家桶替代：自带几百个科学计算包，体积大但省事（与 Miniconda 二选一）
+    winget: Anaconda.Anaconda3
+    required: false
+  - name: VS Code
+    purpose: 写实验代码、跑 Jupyter 的编辑器
+    winget: Microsoft.VisualStudioCode
+    required: true
+  - name: PyCharm Community
+    purpose: 编辑器替代（与 VS Code 二选一）
+    winget: JetBrains.PyCharm.Community
+    required: false
+steps:
+  - type: command
+    run: pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
+  - type: command
+    run: pip install jupyterlab numpy pandas matplotlib scikit-learn
+  - type: command
+    run: pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
+notes: 第三步装的是 CPU 版 PyTorch（约 200MB，耐心等）。有 NVIDIA 显卡的同学把第三步换成官网给出的 CUDA 版命令；torch 装好后用 python -c "import torch; print(torch.__version__)" 验证。

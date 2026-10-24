@@ -1,0 +1,28 @@
+# 课程包（draft）：嵌入式工具多为厂商软件，需账号/授权，按指引获取；开源替代也备了。
+id: embedded-systems
+name: 嵌入式系统
+category: electives
+summary: STM32 方向是主流：CubeMX 生成代码 + Keil 编译；Arduino 方向更简单，按老师方向二选一。
+status: draft
+tools:
+  - name: STM32CubeMX
+    purpose: 图形化配置 STM32 芯片引脚和时钟，自动生成工程代码
+    manual: 到 ST 官网注册账号后免费下载 STM32CubeMX 并安装（需登录账号激活）。
+    required: true
+  - name: Keil MDK
+    purpose: ARM 官方编译环境：多数 STM32 教材的指定 IDE（社区版有代码大小限制，课程够用）
+    manual: 到 Keil 官网下载 MDK-Arm 社区版安装，装完在 Pack Installer 里勾选你开发板对应的芯片支持包。
+    required: true
+  - name: Arduino IDE
+    purpose: Arduino 方向的开发环境：装好就能写、就能烧录
+    winget: ArduinoSA.IDE.stable
+    required: false
+  - name: VS Code
+    purpose: 配合 PlatformIO 插件是更现代的嵌入式开发方式（可选体验）
+    winget: Microsoft.VisualStudioCode
+    required: false
+  - name: 串口调试助手
+    purpose: 看单片机串口输出、调通信协议
+    manual: 使用老师发的串口助手，或在网上搜「SSCOM 串口调试助手」下载绿色版；CH340/CP2102 驱动按开发板芯片型号安装。
+    required: false
+notes: 插上开发板没反应，八成是缺 USB 转串口驱动（CH340 最常见），先查驱动再怀疑代码。ST-Link 驱动装 STM32CubeMX 时会顺带装上。

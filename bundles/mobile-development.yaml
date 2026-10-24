@@ -1,0 +1,33 @@
+# 课程包（draft）：Android Studio 主线 + 国产跨端工具指引，待实机验证。
+id: mobile-development
+name: 移动应用开发
+category: engineering
+summary: Android Studio 是主线（含模拟器）；做微信小程序/跨端方向的同学看备注里的补充工具。
+status: draft
+tools:
+  - name: Android Studio
+    purpose: 安卓开发官方 IDE：写代码、拖界面、跑模拟器都在它里面（体积大，首次启动还要下 SDK）
+    winget: Google.AndroidStudio
+    required: true
+  - name: JDK 17
+    purpose: 某些构建脚本和跨端框架（如 React Native）需要独立 JDK；Android Studio 自带一份，这个是补充
+    winget: Microsoft.OpenJDK.17
+    required: false
+    verify:
+      command: java -version
+      expect: '17\.'
+    env:
+      JAVA_HOME: "{install_dir}"
+      path_additions: ["{install_dir}\\bin"]
+  - name: HBuilderX
+    purpose: uni-app 跨端开发：国内课程和微信小程序常用（需官网下载）
+    manual: 到 DCloud 官网下载 HBuilderX 标准版解压即用；微信小程序方向再装「微信开发者工具」（微信官方下载页）。
+    required: false
+  - name: Git
+    purpose: 版本管理
+    winget: Git.Git
+    required: false
+    verify:
+      command: git --version
+      expect: 'git version'
+notes: Android Studio 第一次打开会向导式下载 SDK 和模拟器镜像（几个 GB），找个网络好的时候做；模拟器卡的话，插数据线用真机调试更流畅。

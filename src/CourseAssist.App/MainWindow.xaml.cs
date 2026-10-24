@@ -20,6 +20,7 @@ public partial class MainWindow : Window
 
     private readonly Dictionary<string, ComboBox> _versionPickers = new();
     private readonly Dictionary<string, TextBlock> _statusLabels = new();
+    private readonly Dictionary<string, CheckBox> _includeChecks = new();
 
     private CourseBundle? _current;
     private IReadOnlyList<StepResult>? _lastResults;
@@ -92,6 +93,7 @@ public partial class MainWindow : Window
         _current = bundle;
         _versionPickers.Clear();
         _statusLabels.Clear();
+        _includeChecks.Clear();
         ToolsPanel.Children.Clear();
 
         CourseTitle.Text = bundle.Name;
@@ -102,7 +104,17 @@ public partial class MainWindow : Window
         {
             var panel = new StackPanel();
             var header = new StackPanel { Orientation = Orientation.Horizontal };
-            header.Children.Add(new TextBlock { Text = tool.Name, FontWeight = FontWeights.Bold, Foreground = DeepBlue, FontSize = 14 });
+            var include = new CheckBox
+            {
+                Content = tool.Name,
+                IsChecked = tool.Required,
+                FontWeight = FontWeights.Bold,
+                Foreground = DeepBlue,
+                FontSize = 14,
+                VerticalAlignment = VerticalAlignment.Center,
+            };
+            _includeChecks[tool.Name] = include;
+            header.Children.Add(include);
             if (tool.Versions.Count > 0)
             {
                 var picker = new ComboBox { Width = 110, Margin = new Thickness(10, 0, 0, 0) };
@@ -189,11 +201,14 @@ public partial class MainWindow : Window
                 return;
             }
 
+            var included = _includeChecks.Where(kv => kv.Value.IsChecked == true).Select(kv => kv.Key).ToHashSet();
+            if (included.Count == 0) { Log("至少勾选一项要安装的软件。"); return; }
             var plan = new InstallPlanner().BuildPlan(new InstallRequest
             {
                 Bundle = _current,
                 InstallRoot = root,
                 VersionSelections = GetSelections(),
+                IncludedTools = included,
             });
             Log($"安装计划共 {plan.Count} 步，开始执行（个别软件下载较慢，请耐心等待）…");
 

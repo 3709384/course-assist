@@ -1,0 +1,27 @@
+# 课程包（draft）：WSL2 轻量路线 + 终端/远程工具，待实机验证。
+id: linux-systems
+name: Linux 系统
+category: systems
+summary: 主线是 WSL2（在 Windows 里直接跑 Ubuntu），再配好终端和远程连接工具。
+status: draft
+tools:
+  - name: Windows Terminal
+    purpose: 现代终端：多标签、分屏，连 WSL 和 SSH 都顺手
+    winget: Microsoft.WindowsTerminal
+    required: true
+  - name: PuTTY
+    purpose: SSH 客户端经典款：连学校服务器（已有其他 SSH 工具可不装）
+    winget: PuTTY.PuTTY
+    required: false
+  - name: WinSCP
+    purpose: 图形化传文件到 Linux 服务器
+    winget: WinSCP.WinSCP
+    required: false
+  - name: VirtualBox
+    purpose: 需要完整桌面版 Ubuntu 或课程指定虚拟机时选它
+    winget: Oracle.VirtualBox
+    required: false
+steps:
+  - type: feature
+    name: wsl
+notes: 启用 WSL 后在终端执行 wsl --install -d Ubuntu 装好发行版，并按提示创建 Linux 用户名和密码（这个密码是 sudo 密码，记牢）。

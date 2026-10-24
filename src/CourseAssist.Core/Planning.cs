@@ -34,6 +34,8 @@ public sealed class InstallRequest
     public required string InstallRoot { get; init; }
     /// <summary>Tool name → chosen version label. Missing entries use the bundle default.</summary>
     public Dictionary<string, string?> VersionSelections { get; init; } = new();
+    /// <summary>Tool names to include. Null means include every tool in the bundle.</summary>
+    public ISet<string>? IncludedTools { get; init; }
 }
 
 /// <summary>Turns a course bundle + user choices into an ordered, executable plan.</summary>
@@ -46,6 +48,8 @@ public sealed class InstallPlanner
 
         foreach (var tool in bundle.Tools)
         {
+            if (request.IncludedTools is not null && !request.IncludedTools.Contains(tool.Name))
+                continue;
             request.VersionSelections.TryGetValue(tool.Name, out var label);
             var resolved = tool.Resolve(label);
             var subdir = tool.InstallSubdir ?? Sanitize(tool.Name);

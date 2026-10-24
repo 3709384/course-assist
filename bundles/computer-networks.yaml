@@ -1,0 +1,28 @@
+# 课程包（draft）：抓包工具可自动装，网络模拟器多需账号/授权，按指引获取。
+id: computer-networks
+name: 计算机网络
+category: systems
+summary: Wireshark 抓包是主线；Packet Tracer、eNSP 等模拟器按学校要求手动获取。
+status: draft
+tools:
+  - name: Wireshark
+    purpose: 抓包分析神器：看懂 TCP 三次握手、DNS、HTTP 都靠它
+    winget: WiresharkFoundation.Wireshark
+    required: true
+  - name: Cisco Packet Tracer
+    purpose: 网络拓扑模拟：配路由器、交换机做实验（需思科账号免费注册）
+    manual: 到思科 NetAcad 官网注册账号后免费下载 Packet Tracer，或使用老师发的安装包。
+    required: false
+  - name: eNSP
+    purpose: 华为网络设备模拟器：使用华为教材的学校常用（依赖 WinPcap 与 VirtualBox）
+    manual: 从华为企业支持网站或老师处获取 eNSP 安装包，安装前先装好 VirtualBox 与 Wireshark。
+    required: false
+  - name: PuTTY
+    purpose: SSH/Telnet 客户端：连实验服务器和网络设备
+    winget: PuTTY.PuTTY
+    required: false
+  - name: WinSCP
+    purpose: 图形化文件传输：往实验服务器传文件
+    winget: WinSCP.WinSCP
+    required: false
+notes: Wireshark 安装时记得勾选 Npcap，否则抓不到包。

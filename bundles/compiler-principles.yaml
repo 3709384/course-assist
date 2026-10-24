@@ -1,0 +1,26 @@
+# 课程包（draft）：以 MSYS2 工具链提供 flex/bison，待实机验证。
+id: compiler-principles
+name: 编译原理
+category: systems
+summary: 词法/语法分析工具（flex/bison）+ C 工具链，做一个小编译器的全套装备。
+status: draft
+tools:
+  - name: MSYS2
+    purpose: 提供 flex、bison、gcc 的 Unix 风格工具链（装完按下面步骤补齐组件）
+    winget: MSYS2.MSYS2
+    required: true
+  - name: VS Code
+    purpose: 写编译器代码的编辑器
+    winget: Microsoft.VisualStudioCode
+    required: true
+  - name: JDK 17
+    purpose: 课程若用 Java 版工具（如 JFlex/CUP 或 ANTLR）时需要
+    winget: Microsoft.OpenJDK.17
+    required: false
+    verify:
+      command: java -version
+      expect: '17\.'
+steps:
+  - type: command
+    run: C:\msys64\usr\bin\bash.exe -lc "pacman -S --noconfirm mingw-w64-ucrt-x86_64-gcc flex bison"
+notes: 如果 MSYS2 装到了别的盘，把步骤里的路径换成实际的 msys64 目录。ANTLR 路线的同学只需 JDK + VS Code，再按官网指引下载 antlr 的 jar 包。

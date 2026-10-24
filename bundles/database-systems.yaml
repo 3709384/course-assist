@@ -1,12 +1,12 @@
-# 样例课程包（draft）：结构完整，待维护者实机验证后升级为 verified。
+# 课程包（draft）：MySQL 主线 + PostgreSQL/SQLite 替代与附加工具，待实机验证。
 id: database-systems
 name: 数据库系统
 category: data-ai
-summary: MySQL 数据库 + DBeaver 图形化管理工具，上机实验直接开练。
+summary: MySQL 数据库 + 图形化工具是主线；老师用 PostgreSQL 或 SQLite 的话，替代项也备好了。
 status: draft
 tools:
   - name: MySQL Server 8
-    purpose: 课程实验用的关系型数据库
+    purpose: 课程实验最常用的关系型数据库（多数学校的主线选择）
     winget: Oracle.MySQL
     version: ">=8.0"
     required: true
@@ -14,4 +14,20 @@ tools:
     purpose: 图形化连数据库、写 SQL、看表结构（免费，替代收费的 Navicat）
     winget: DBeaver.DBeaver
     required: true
+  - name: MySQL Workbench
+    purpose: MySQL 官方图形工具：建模和 ER 图更顺手（与 DBeaver 二选一或都装）
+    winget: Oracle.MySQLWorkbench
+    required: false
+  - name: PostgreSQL 16
+    purpose: 替代数据库：课程使用 PostgreSQL 时选它
+    winget: PostgreSQL.PostgreSQL.16
+    required: false
+  - name: SQLite
+    purpose: 轻量数据库：免安装服务，练 SQL 语法和嵌入式场景常用
+    winget: SQLite.SQLite
+    required: false
+  - name: Redis
+    purpose: 高年级/实训拓展：缓存与键值数据库。Windows 下建议通过 Docker 或 WSL 运行，按指引操作
+    manual: 从 Docker Desktop 拉取 redis 镜像运行，或在 WSL 的 Ubuntu 里执行 sudo apt install redis-server。
+    required: false
 notes: MySQL 安装过程中设置的 root 密码请务必记牢，实验课每次都要用。

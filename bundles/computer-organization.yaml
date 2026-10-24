@@ -1,0 +1,27 @@
+# 课程包（draft）：组成原理实验工具以模拟器为主，多为绿色软件，按指引手动获取。
+id: computer-organization
+name: 计算机组成原理
+category: systems
+summary: 电路模拟 + 汇编/体系结构模拟器。这门课的工具多是老师指定版本，按指引装即可。
+status: draft
+tools:
+  - name: Logisim-evolution
+    purpose: 数字电路模拟：搭加法器、寄存器、单周期 CPU 都在它上面做
+    manual: 到 GitHub 的 logisim-evolution 项目 Releases 页下载 logisim-evolution 的 jar 或 exe（需要先装好 Java），或使用老师发的版本。
+    required: true
+  - name: RARS (RISC-V 模拟器)
+    purpose: RISC-V 汇编模拟器：体系结构实验常用（需要 Java）
+    manual: 到 GitHub 的 TheThirdOne/rars 项目 Releases 页下载 rars 的 jar 包，用 java -jar 运行，或使用老师发的版本。
+    required: false
+  - name: JDK 17
+    purpose: 上面两个模拟器的运行基础（没装 Java 的先装它）
+    winget: Microsoft.OpenJDK.17
+    required: false
+    verify:
+      command: java -version
+      expect: '17\.'
+  - name: VS Code
+    purpose: 写汇编和实验报告时的编辑器
+    winget: Microsoft.VisualStudioCode
+    required: false
+notes: 这门课各学校用的模拟器差别很大（MARS、RARS、Logisim、Proteus 都有），以老师指定为准，本包覆盖最常见的两种。

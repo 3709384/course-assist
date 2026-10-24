@@ -1,0 +1,33 @@
+# 课程包（draft）：大数据课以虚拟机+手动部署为主，本包配齐基础并给出 Hadoop 的环境变量。
+id: big-data
+name: 大数据技术
+category: data-ai
+summary: JDK 8（Hadoop 的硬要求）+ 虚拟机是基础，Hadoop 本体按指引放进安装目录，环境变量自动配好。
+status: draft
+tools:
+  - name: JDK 8
+    purpose: Hadoop 2.x/3.x 的运行基础（必须是 8，装 17 会报错）
+    winget: EclipseAdoptium.Temurin.8.JDK
+    required: true
+    verify:
+      command: java -version
+      expect: '1\.8\.'
+    env:
+      JAVA_HOME: "{install_dir}"
+      path_additions: ["{install_dir}\\bin"]
+  - name: VirtualBox
+    purpose: 多数学校的 Hadoop 集群实验在虚拟机里搭（1 主 2 从）
+    winget: Oracle.VirtualBox
+    required: true
+  - name: Hadoop
+    purpose: 大数据核心框架：从 Apache 官网或学校镜像下载 hadoop 3.3.x 的 tar.gz，解压到本工具的安装目录
+    manual: 到 Apache Hadoop 官网下载 hadoop-3.3.x.tar.gz，解压到软件为它预留的目录（安装位置下的 Hadoop 文件夹）；在 Windows 原生跑需要额外补 winutils，按老师指引操作。多数课程在 Linux 虚拟机里部署，Windows 这份可作备用。
+    required: false
+    env:
+      HADOOP_HOME: "{install_dir}"
+      path_additions: ["{install_dir}\\bin"]
+  - name: WinSCP
+    purpose: 往虚拟机/服务器传安装包和数据文件
+    winget: WinSCP.WinSCP
+    required: false
+notes: 先确认老师用的是 Hadoop 还是 Spark、版本号是多少，再动手装；集群实验强烈建议组队用同一套版本。

@@ -1,23 +1,46 @@
-# 样例课程包（draft）：结构完整，待维护者实机验证后升级为 verified。
+# 课程包（draft）：Python 多版本 + 发行版/编辑器替代选项，待实机验证。
 id: python-programming
 name: Python 程序设计
 category: programming
-summary: Python 本体 + PyCharm，并自动把 pip 换成国内镜像源，装包不再龟速。
+summary: Python 本体（多版本可选）+ 编辑器，并自动把 pip 换成国内镜像源，装包不再龟速。
 status: draft
 tools:
-  - name: Python 3.12
-    purpose: Python 解释器本体
-    winget: Python.Python.3.12
-    version: ">=3.10"
+  - name: Python
+    purpose: Python 解释器本体。按课程要求选版本，不确定选推荐的 3.12
     required: true
-    verify:
-      command: python --version
-      expect: 'Python 3\.'
+    default_version: "3.12"
+    versions:
+      - label: "3.11"
+        winget: Python.Python.3.11
+        verify:
+          command: python --version
+          expect: 'Python 3\.11'
+      - label: "3.12"
+        winget: Python.Python.3.12
+        verify:
+          command: python --version
+          expect: 'Python 3\.12'
+      - label: "3.13"
+        winget: Python.Python.3.13
+        verify:
+          command: python --version
+          expect: 'Python 3\.13'
   - name: PyCharm Community
-    purpose: 写 Python 代码的编辑器（社区版免费）
+    purpose: 写 Python 代码的主力编辑器（社区版免费）
     winget: JetBrains.PyCharm.Community
     required: true
+  - name: VS Code
+    purpose: 轻量替代编辑器（与 PyCharm 二选一即可）
+    winget: Microsoft.VisualStudioCode
+    required: false
+  - name: Miniconda
+    purpose: 环境管理替代方案：后续上机器学习课、需要隔离多套环境时选它（与官方 Python 可共存）
+    winget: Anaconda.Miniconda3
+    required: false
+    verify:
+      command: conda --version
+      expect: 'conda'
 steps:
   - type: command
     run: python -m pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
-notes: 安装时务必勾选「Add python.exe to PATH」（winget 官方包默认处理），验证步骤会自动确认。
+notes: 官方 Python 安装时务必勾选「Add python.exe to PATH」（winget 官方包默认处理），验证步骤会自动确认。

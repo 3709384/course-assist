@@ -1,0 +1,31 @@
+# 课程包（draft）：安全课工具链：虚拟机 + 抓包 + 扫描 + Web 安全，全在隔离环境里练。
+id: network-security
+name: 网络安全
+category: electives
+summary: 实验环境以虚拟机为主：靶机和攻击机都关在虚拟网络里练，不影响真实网络。
+status: draft
+tools:
+  - name: VirtualBox
+    purpose: 搭隔离实验环境的地基：Kali 和靶机都跑在里面
+    winget: Oracle.VirtualBox
+    required: true
+  - name: Kali Linux
+    purpose: 渗透测试系统：自带几百个安全工具（在虚拟机里装，或用 WSL 版）
+    manual: 到 Kali 官网下载 VirtualBox 专用镜像导入 VirtualBox；或在 Microsoft Store 装 Kali Linux（WSL 版）。默认账号 kali/kali。
+    required: true
+  - name: Wireshark
+    purpose: 抓包分析：理解协议和攻击流量
+    winget: WiresharkFoundation.Wireshark
+    required: true
+  - name: Nmap
+    purpose: 端口扫描与主机发现的经典工具
+    winget: Insecure.Nmap
+    required: false
+    verify:
+      command: nmap --version
+      expect: 'Nmap version'
+  - name: Burp Suite Community
+    purpose: Web 安全测试：抓改 HTTP 请求，Web 实验必备
+    winget: PortSwigger.BurpSuite.Community
+    required: false
+notes: 所有攻击性工具只许在自己的虚拟机和靶场环境里用，扫描别人的网络是违法的——这点老师上课也会强调。

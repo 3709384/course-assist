@@ -1,0 +1,43 @@
+# 课程包（draft）：数据结构课通常沿用语言课环境，这里按 C / Java / Python 三条线都备一份。
+id: data-structures
+name: 数据结构
+category: programming
+summary: 沿用你的语言方向：C 线、Java 线、Python 线任选其一，再加一个刷题趁手的编辑器。
+status: draft
+tools:
+  - name: VS Code
+    purpose: 三条线通用的编辑器
+    winget: Microsoft.VisualStudioCode
+    required: true
+  - name: MinGW-w64 (WinLibs GCC)
+    purpose: C 语言线：编译器本体
+    winget: BrechtSanders.WinLibs.POSIX.UCRT
+    required: false
+    verify:
+      command: gcc --version
+      expect: 'gcc'
+  - name: JDK 17
+    purpose: Java 线：开发工具包（更多版本见 Java 程序设计课程包）
+    winget: Microsoft.OpenJDK.17
+    required: false
+    verify:
+      command: java -version
+      expect: '17\.'
+    env:
+      JAVA_HOME: "{install_dir}"
+      path_additions: ["{install_dir}\\bin"]
+  - name: Python 3.12
+    purpose: Python 线：解释器本体
+    winget: Python.Python.3.12
+    required: false
+    verify:
+      command: python --version
+      expect: 'Python 3\.12'
+  - name: Git
+    purpose: 版本管理：把每次练习代码存档、方便对比修改
+    winget: Git.Git
+    required: false
+    verify:
+      command: git --version
+      expect: 'git version'
+notes: 一般只需装你这门课用的那条语言线，别三条都装。

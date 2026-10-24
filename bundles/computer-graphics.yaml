@@ -1,0 +1,35 @@
+# 课程包（draft）：图形学 = Visual Studio + OpenGL 生态，库用 vcpkg 一键装。
+id: computer-graphics
+name: 计算机图形学
+category: electives
+summary: Visual Studio 写 C++，OpenGL 的库（GLFW/GLAD/glm）用 vcpkg 一条命令装齐，告别手动配 include 和 lib。
+status: draft
+tools:
+  - name: Visual Studio 2022 Community
+    purpose: 图形学实验的主力 IDE（安装时记得勾选「使用 C++ 的桌面开发」工作负载）
+    winget: Microsoft.VisualStudio.2022.Community
+    required: true
+  - name: CMake
+    purpose: 组织图形学工程的构建工具
+    winget: Kitware.CMake
+    required: true
+    verify:
+      command: cmake --version
+      expect: 'cmake version'
+  - name: Git
+    purpose: 拉取 vcpkg 和课程框架代码
+    winget: Git.Git
+    required: true
+    verify:
+      command: git --version
+      expect: 'git version'
+  - name: vcpkg
+    purpose: 微软的 C++ 包管理器：GLFW、GLM 等图形库一条命令安装并自动配好
+    manual: 在安装位置下执行 git clone https://github.com/microsoft/vcpkg 并运行 .\\vcpkg\\bootstrap-vcpkg.bat，然后 .\\vcpkg\\vcpkg install glfw3 glm 即可。
+    required: false
+    env:
+      VCPKG_ROOT: "{install_dir}"
+steps:
+  - type: manual
+    title: Visual Studio 安装器里务必勾选「使用 C++ 的桌面开发」，没勾的话打开安装器点「修改」补上
+notes: 课程若使用固定版本的 GLUT/freeglut 老框架，以老师发的库文件为准，vcpkg 路线适合新框架（GLFW）方向。

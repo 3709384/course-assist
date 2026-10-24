@@ -1,0 +1,31 @@
+# 课程包（draft）：建模三件套方向：数值计算（Octave/Python）+ 论文写作（LaTeX）。
+id: math-modeling
+name: 数学建模
+category: electives
+summary: 写模型、跑算法、排论文：免费路线全打通，MATLAB 有学校授权的按指引装。
+status: draft
+tools:
+  - name: GNU Octave
+    purpose: MATLAB 的免费替代：语法基本一致，数值计算实验够用
+    manual: 到 GNU Octave 官网下载 Windows 安装版（也可用老师发的版本），安装时一路默认即可。
+    required: true
+  - name: MATLAB
+    purpose: 建模竞赛的主力软件：学校有机房版或校园授权的按指引装（个人付费版很贵，不必自购）
+    manual: 优先用学校机房或学校提供的正版授权；MathWorks 官网可申请学生版试用。已装 Octave 的可先用它练手。
+    required: false
+  - name: Miniconda
+    purpose: Python 路线：numpy/scipy/pandas 做建模和数据处理越来越主流
+    winget: Anaconda.Miniconda3
+    required: false
+    verify:
+      command: conda --version
+      expect: 'conda'
+  - name: MiKTeX
+    purpose: LaTeX 排版：写竞赛论文和课程论文，公式排版最专业
+    winget: MiKTeX.MiKTeX
+    required: false
+  - name: VS Code
+    purpose: 写 Python 和 LaTeX 的编辑器
+    winget: Microsoft.VisualStudioCode
+    required: false
+notes: 数学建模竞赛拼的是组队和论文，不是软件版本——工具够用就行，别在环境上耗太久。Octave 与 MATLAB 语法八成相通，代码迁移成本很低。

@@ -1,0 +1,43 @@
+# 课程包（draft）：C/C++ 工具链 + 三种编辑器选择，待实机验证。
+id: c-programming
+name: C/C++ 程序设计
+category: programming
+summary: GCC 编译器 + 编辑器三选一（VS Code / Visual Studio / Dev-C++），照顾不同学校的不同要求。
+status: draft
+tools:
+  - name: MinGW-w64 (WinLibs GCC)
+    purpose: C/C++ 编译器本体：把代码编译成可运行的程序
+    winget: BrechtSanders.WinLibs.POSIX.UCRT
+    required: true
+    verify:
+      command: gcc --version
+      expect: 'gcc'
+    env:
+      path_additions: ["{install_dir}\\bin"]
+  - name: VS Code
+    purpose: 轻量编辑器（推荐）：配 C/C++ 插件后写代码、调试都方便
+    winget: Microsoft.VisualStudioCode
+    required: true
+  - name: Visual Studio 2022 Community
+    purpose: 重量级 IDE 替代：课程使用 VS 或以后要做 Windows 开发时选它（体积大，下载久）
+    winget: Microsoft.VisualStudio.2022.Community
+    required: false
+  - name: Dev-C++
+    purpose: 老牌教学 IDE 替代：部分学校机房和教材仍以它为准
+    winget: Embarcadero.DevCpp
+    required: false
+  - name: CMake
+    purpose: 跨平台构建工具：高年级课程和开源项目常用
+    winget: Kitware.CMake
+    required: false
+    verify:
+      command: cmake --version
+      expect: 'cmake version'
+  - name: Git
+    purpose: 版本管理：交作业、拉老师代码都要用
+    winget: Git.Git
+    required: false
+    verify:
+      command: git --version
+      expect: 'git version'
+notes: 编辑器三选一即可，不必都装。VS Code 用户记得在插件市场装「C/C++」插件。
