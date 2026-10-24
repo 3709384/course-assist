@@ -40,6 +40,7 @@ public partial class MainWindow : Window
         var version = typeof(MainWindow).Assembly.GetName().Version?.ToString(3) ?? "?";
         Title = $"课程环境助手 CourseAssist v{version}";
         HeaderVersion.Text = $"v{version}";
+        StateChanged += MainWindow_StateChanged;
         _repo = new BundleRepository(Path.Combine(AppContext.BaseDirectory, "bundles"));
         _winget = new WingetService(_runner);
         _shortcutService = new ShortcutService(_runner);
@@ -95,12 +96,12 @@ public partial class MainWindow : Window
                         Content = bundle is null ? $"{course.Name}（课程包制作中）" : $"{course.Name}（{course.Status}）",
                         Tag = bundle,
                         IsEnabled = bundle is not null,
-                        Margin = new Thickness(12, 1, 0, 1),
                     };
                     if (bundle is null) item.Foreground = Gray;
                     CourseList.Items.Add(item);
                 }
             }
+            CoursesFooter.Text = $"共 {bundles.Count} 门课程 · 课程包持续完善中";
             Log($"已加载 {bundles.Count} 个课程包（{source}）。左边选一门课，先体检再一键配置。");
             foreach (var error in _repo.LastLoadErrors) Log($"课程包跳过：{error}");
         }
@@ -116,6 +117,19 @@ public partial class MainWindow : Window
             ShowBundle(bundle);
     }
 
+    private void MinBtn_Click(object sender, RoutedEventArgs e) => WindowState = WindowState.Minimized;
+
+    private void MaxBtn_Click(object sender, RoutedEventArgs e) =>
+        WindowState = WindowState == WindowState.Maximized ? WindowState.Normal : WindowState.Maximized;
+
+    private void CloseBtn_Click(object sender, RoutedEventArgs e) => Close();
+
+    private void MainWindow_StateChanged(object? sender, EventArgs e)
+    {
+        MaxGlyph.Text = WindowState == WindowState.Maximized ? "" : "";
+        RootGrid.Margin = WindowState == WindowState.Maximized ? new Thickness(7) : new Thickness(0);
+    }
+
     private void ShowBundle(CourseBundle bundle)
     {
         _current = bundle;
@@ -125,6 +139,8 @@ public partial class MainWindow : Window
         _includeChecks.Clear();
         ToolsPanel.Children.Clear();
         HideProgress();
+        EmptyState.Visibility = Visibility.Collapsed;
+        ToolsScroll.Visibility = Visibility.Visible;
 
         CourseTitle.Text = bundle.Name;
         CourseSummary.Text = bundle.Summary ?? "";
@@ -147,7 +163,7 @@ public partial class MainWindow : Window
             header.Children.Add(include);
             if (tool.Versions.Count > 0)
             {
-                var picker = new ComboBox { Width = 110, Margin = new Thickness(10, 0, 0, 0) };
+                var picker = new ComboBox { Width = 128, Margin = new Thickness(10, 0, 0, 0), Style = (Style)FindResource("ModernCombo") };
                 foreach (var v in tool.Versions) picker.Items.Add(v.Label);
                 picker.SelectedItem = tool.DefaultVersion ?? tool.Versions[0].Label;
                 _versionPickers[tool.Name] = picker;
@@ -175,12 +191,8 @@ public partial class MainWindow : Window
             {
                 Content = "📖 入门教程（版本对齐）",
                 HorizontalAlignment = HorizontalAlignment.Left,
-                Margin = new Thickness(0, 8, 0, 0),
-                Padding = new Thickness(12, 4, 12, 4),
-                Background = Tint,
-                BorderBrush = new SolidColorBrush(Color.FromRgb(0xCD, 0xE9, 0xF4)),
-                BorderThickness = new Thickness(1),
-                Foreground = DeepBlue,
+                Margin = new Thickness(0, 10, 0, 0),
+                Style = (Style)FindResource("GhostButton"),
             };
             tutorialButton.Click += (_, _) =>
             {
