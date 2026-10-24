@@ -10,14 +10,16 @@
     <EnableWindowsTargeting>true</EnableWindowsTargeting>
     <AssemblyName>CourseAssist</AssemblyName>
     <RootNamespace>CourseAssist.App</RootNamespace>
-    <Version>0.3.0</Version>
+    <Version>0.4.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\CourseAssist.Core\CourseAssist.Core.csproj" />
   </ItemGroup>
 
-  <!-- Ship the course bundles next to the app; new bundles dropped here are picked up at startup. -->
+  <!-- The bundles are compiled into the Core library (see tools/gen_bundles.py →
+       BundlesData.cs), so the exe always carries them. They are also shipped as loose
+       files next to the app as a fallback / drop-in update channel. -->
   <ItemGroup>
     <Content Include="..\..\bundles\*.yaml">
       <Link>bundles\%(Filename)%(Extension)</Link>

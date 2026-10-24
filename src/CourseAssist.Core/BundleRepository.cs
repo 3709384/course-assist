@@ -3,7 +3,8 @@ using YamlDotNet.Serialization.NamingConventions;
 
 namespace CourseAssist.Core;
 
-/// <summary>Loads the course catalog and bundle files from a bundles directory.</summary>
+/// <summary>Loads the course catalog and bundle files (from a directory, or from YAML texts
+/// supplied by the caller — e.g. resources embedded in the app executable).</summary>
 public sealed class BundleRepository
 {
     private static readonly IDeserializer Deserializer = new DeserializerBuilder()
@@ -17,16 +18,29 @@ public sealed class BundleRepository
 
     public string DirectoryPath => _directory;
 
+    /// <summary>Per-file parse problems from the last LoadBundles call (bad files are skipped, not fatal).</summary>
+    public List<string> LastLoadErrors { get; } = new();
+
+    public static Catalog? ParseCatalog(string yaml) =>
+        string.IsNullOrWhiteSpace(yaml) ? null : Deserializer.Deserialize<Catalog>(yaml);
+
+    public static CourseBundle? ParseBundle(string yaml)
+    {
+        var bundle = Deserializer.Deserialize<CourseBundle>(yaml);
+        return string.IsNullOrWhiteSpace(bundle?.Id) ? null : bundle;
+    }
+
     public Catalog? LoadCatalog()
     {
         var path = Path.Combine(_directory, "catalog.yaml");
         if (!File.Exists(path)) return null;
-        return Deserializer.Deserialize<Catalog>(File.ReadAllText(path));
+        return ParseCatalog(File.ReadAllText(path));
     }
 
     public IReadOnlyList<CourseBundle> LoadBundles()
     {
         var bundles = new List<CourseBundle>();
+        LastLoadErrors.Clear();
         if (!Directory.Exists(_directory)) return bundles;
         foreach (var file in Directory.EnumerateFiles(_directory, "*.yaml").OrderBy(f => f))
         {
@@ -34,12 +48,32 @@ public sealed class BundleRepository
                 continue;
             try
             {
-                var bundle = Deserializer.Deserialize<CourseBundle>(File.ReadAllText(file));
-                if (!string.IsNullOrWhiteSpace(bundle.Id)) bundles.Add(bundle);
+                var bundle = ParseBundle(File.ReadAllText(file));
+                if (bundle is not null) bundles.Add(bundle);
             }
             catch (Exception ex)
             {
-                throw new InvalidDataException($"课程包文件解析失败：{Path.GetFileName(file)}：{ex.Message}", ex);
+                LastLoadErrors.Add($"{Path.GetFileName(file)}：{ex.Message}");
+            }
+        }
+        return bundles;
+    }
+
+    /// <summary>Parse many bundle YAML texts (e.g. embedded resources). Bad ones are skipped and recorded.</summary>
+    public IReadOnlyList<CourseBundle> ParseBundles(IEnumerable<(string Name, string Yaml)> sources)
+    {
+        var bundles = new List<CourseBundle>();
+        LastLoadErrors.Clear();
+        foreach (var (name, yaml) in sources)
+        {
+            try
+            {
+                var bundle = ParseBundle(yaml);
+                if (bundle is not null) bundles.Add(bundle);
+            }
+            catch (Exception ex)
+            {
+                LastLoadErrors.Add($"{name}：{ex.Message}");
             }
         }
         return bundles;

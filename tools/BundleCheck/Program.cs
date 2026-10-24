@@ -26,4 +26,13 @@ var filtered = planner.BuildPlan(new InstallRequest
 if (filtered.Any(s => s.ToolName is not null && s.ToolName != "JDK"))
     throw new Exception("IncludedTools 过滤失效");
 Console.WriteLine($"勾选过滤 OK：Java 包只选 JDK 时计划 {filtered.Count} 步（装 JDK + 配环境变量 + 验证）");
-Console.WriteLine("全部课程包通过 Core 解析与计划生成。");
+// Also verify the copy compiled into the program (EmbeddedBundles) — that is the
+// exact data the shipped exe loads, independent of any loose files.
+var embeddedCatalog = BundleRepository.ParseCatalog(EmbeddedBundles.CatalogYaml ?? "");
+var embeddedBundles = repo.ParseBundles(EmbeddedBundles.Files
+    .Where(kv => !kv.Key.Equals("catalog.yaml", StringComparison.OrdinalIgnoreCase))
+    .Select(kv => (kv.Key, kv.Value)));
+Console.WriteLine($"程序内置副本：目录 {(embeddedCatalog is null ? "缺失" : "OK")}，课程包 {embeddedBundles.Count} 个");
+if (embeddedCatalog is null || embeddedBundles.Count != bundles.Count)
+    throw new Exception("内置副本与 bundles/ 文件不一致，请运行 tools/gen_bundles.py 重新生成");
+Console.WriteLine("全部课程包通过 Core 解析与计划生成（文件版 + 内置版）。");

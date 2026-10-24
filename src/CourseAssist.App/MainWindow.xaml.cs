@@ -29,11 +29,27 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
+        var version = typeof(MainWindow).Assembly.GetName().Version?.ToString(3) ?? "?";
+        Title = $"课程环境助手 CourseAssist v{version}";
         _repo = new BundleRepository(Path.Combine(AppContext.BaseDirectory, "bundles"));
         _winget = new WingetService(_runner);
         _stateStore = new StateStore(StateStore.DefaultPath());
         InstallRootBox.Text = DefaultInstallRoot();
         LoadCourses();
+    }
+
+    /// <summary>Load catalog + bundles. The bundles compiled into the program come first:
+    /// they are part of the executable itself and cannot go missing. The loose bundles
+    /// folder next to the exe is only a fallback.</summary>
+    private (Catalog? Catalog, IReadOnlyList<CourseBundle> Bundles, string Source) LoadData()
+    {
+        var catalog = EmbeddedBundles.CatalogYaml is { } yaml ? BundleRepository.ParseCatalog(yaml) : null;
+        var sources = EmbeddedBundles.Files
+            .Where(kv => !kv.Key.Equals("catalog.yaml", StringComparison.OrdinalIgnoreCase))
+            .Select(kv => (kv.Key, kv.Value));
+        var bundles = _repo.ParseBundles(sources);
+        if (catalog is not null && bundles.Count > 0) return (catalog, bundles, "程序内置");
+        return (_repo.LoadCatalog(), _repo.LoadBundles(), "本地文件");
     }
 
     private static string DefaultInstallRoot()
@@ -47,9 +63,9 @@ public partial class MainWindow : Window
     {
         try
         {
-            var catalog = _repo.LoadCatalog();
-            var bundles = _repo.LoadBundles().ToDictionary(b => b.Id);
-            if (catalog is null) { Log("未找到课程目录（bundles/catalog.yaml）"); return; }
+            var (catalog, bundleList, source) = LoadData();
+            var bundles = bundleList.ToDictionary(b => b.Id);
+            if (catalog is null) { Log("未找到课程目录（catalog.yaml）"); return; }
             foreach (var category in catalog.Categories)
             {
                 CourseList.Items.Add(new ListBoxItem
@@ -74,7 +90,8 @@ public partial class MainWindow : Window
                     CourseList.Items.Add(item);
                 }
             }
-            Log($"已加载 {bundles.Count} 个课程包。左边选一门课，先体检再一键配置。");
+            Log($"已加载 {bundles.Count} 个课程包（{source}）。左边选一门课，先体检再一键配置。");
+            foreach (var error in _repo.LastLoadErrors) Log($"课程包跳过：{error}");
         }
         catch (Exception ex)
         {
