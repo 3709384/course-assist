@@ -3,12 +3,12 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:shell="clr-namespace:System.Windows.Shell;assembly=PresentationFramework"
         Title="Course Assist · 课程环境一键配置" Width="1140" Height="740" MinWidth="980" MinHeight="620"
-        WindowStartupLocation="CenterScreen" Background="#F5FAF7" Icon="app.ico"
+        WindowStartupLocation="CenterScreen" Background="#EDF8FE" Icon="app.ico"
         FontFamily="Microsoft YaHei UI, Segoe UI" TextOptions.TextFormattingMode="Display">
     <shell:WindowChrome.WindowChrome>
         <shell:WindowChrome CaptionHeight="64" ResizeBorderThickness="6" GlassFrameThickness="0" CornerRadius="0" UseAeroCaptionButtons="False"/>
     </shell:WindowChrome.WindowChrome>
-    <Border x:Name="RootBorder" BorderBrush="#A7DCC2" BorderThickness="1">
+    <Border x:Name="RootBorder" BorderBrush="#AEDFF8" BorderThickness="1">
     <Grid x:Name="RootGrid">
         <Grid.RowDefinitions>
             <RowDefinition Height="64"/>
@@ -19,8 +19,8 @@
         <Border Grid.Row="0">
             <Border.Background>
                 <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                    <GradientStop Color="#0A7A55" Offset="0"/>
-                    <GradientStop Color="#045C40" Offset="1"/>
+                    <GradientStop Color="#0EA5E9" Offset="0"/>
+                    <GradientStop Color="#0369A1" Offset="1"/>
                 </LinearGradientBrush>
             </Border.Background>
             <Grid>
@@ -29,9 +29,9 @@
                         <TextBlock Text="课" Foreground="White" FontSize="17" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Border>
                     <TextBlock Text="Course Assist" Foreground="White" FontSize="19" FontWeight="Bold" Margin="12,0,0,0" VerticalAlignment="Center"/>
-                    <TextBlock Text="选好课，环境一键配好" Foreground="#C8EDDB" FontSize="13" Margin="12,4,0,0" VerticalAlignment="Center"/>
+                    <TextBlock Text="选好课，环境一键配好" Foreground="#E0F2FE" FontSize="13" Margin="12,4,0,0" VerticalAlignment="Center"/>
                     <Border Background="White" CornerRadius="9" Padding="8,1" Margin="12,2,0,0" VerticalAlignment="Center">
-                        <TextBlock x:Name="HeaderVersion" Text="" Foreground="#047857" FontSize="11" FontWeight="SemiBold"/>
+                        <TextBlock x:Name="HeaderVersion" Text="" Foreground="#0369A1" FontSize="11" FontWeight="SemiBold"/>
                     </Border>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Stretch">
@@ -54,10 +54,10 @@
             </Grid.ColumnDefinitions>
 
             <!-- Course list -->
-            <Border Grid.Column="0" Background="White" BorderBrush="#D3EADD" BorderThickness="0,0,1,0">
+            <Border Grid.Column="0" Background="White" BorderBrush="#CDEDFB" BorderThickness="0,0,1,0">
                 <DockPanel>
                     <TextBlock DockPanel.Dock="Top" Text="选择课程" FontWeight="Bold" FontSize="14" Foreground="{StaticResource AccentDeepBrush}" Margin="16,14,16,6"/>
-                    <TextBlock x:Name="CoursesFooter" DockPanel.Dock="Bottom" Foreground="#93A89C" FontSize="11.5" Margin="16,8,16,12"/>
+                    <TextBlock x:Name="CoursesFooter" DockPanel.Dock="Bottom" Foreground="#8FABBC" FontSize="11.5" Margin="16,8,16,12"/>
                     <ListBox x:Name="CourseList" BorderThickness="0" SelectionChanged="CourseList_SelectionChanged"
                              ItemContainerStyle="{StaticResource CourseItemStyle}">
                         <ListBox.ItemTemplate>
@@ -81,10 +81,10 @@
                 </Grid.RowDefinitions>
 
                 <StackPanel Grid.Row="0">
-                    <TextBlock x:Name="CourseTitle" Text="欢迎使用 Course Assist" FontSize="20" FontWeight="Bold" Foreground="#12211B"/>
-                    <TextBlock x:Name="CourseSummary" TextWrapping="Wrap" Foreground="#52605A" FontSize="13" Margin="0,5,0,0"
+                    <TextBlock x:Name="CourseTitle" Text="欢迎使用 Course Assist" FontSize="20" FontWeight="Bold" Foreground="#082F49"/>
+                    <TextBlock x:Name="CourseSummary" TextWrapping="Wrap" Foreground="#475E6B" FontSize="13" Margin="0,5,0,0"
                                Text="它会帮你把一门课需要的软件全部自动装好、配好，装完在桌面建好课程文件夹——你只管选课。"/>
-                    <TextBlock x:Name="CourseMeta" Foreground="#8A9A92" FontSize="12" Margin="0,3,0,0"/>
+                    <TextBlock x:Name="CourseMeta" Foreground="#7E97A6" FontSize="12" Margin="0,3,0,0"/>
                     <TextBlock x:Name="CourseNotes" TextWrapping="Wrap" Foreground="#B26A00" FontSize="12.5" Margin="0,3,0,0"/>
                 </StackPanel>
 
@@ -92,12 +92,12 @@
                     <ScrollViewer x:Name="ToolsScroll" VerticalScrollBarVisibility="Auto" Style="{StaticResource SlimScrollViewer}" Visibility="Collapsed" Padding="0,0,8,0">
                         <StackPanel x:Name="ToolsPanel"/>
                     </ScrollViewer>
-                    <Border x:Name="EmptyState" Background="White" BorderBrush="#D3EADD" BorderThickness="1" CornerRadius="14">
+                    <Border x:Name="EmptyState" Background="White" BorderBrush="#CDEDFB" BorderThickness="1" CornerRadius="14">
                         <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" MaxWidth="400">
-                            <Border Width="76" Height="76" CornerRadius="38" Background="#ECFDF5" HorizontalAlignment="Center">
+                            <Border Width="76" Height="76" CornerRadius="38" Background="#F0F9FF" HorizontalAlignment="Center">
                                 <TextBlock Text="📚" FontSize="32" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             </Border>
-                            <TextBlock Text="从左边选一门课开始" FontSize="16" FontWeight="SemiBold" Foreground="#047857"
+                            <TextBlock Text="从左边选一门课开始" FontSize="16" FontWeight="SemiBold" Foreground="#0369A1"
                                        HorizontalAlignment="Center" Margin="0,16,0,0"/>
                             <TextBlock Text="这里会列出这门课要装的软件和可选版本。点「一键配置」，剩下的都交给它：自动安装、自动配环境、桌面建好课程文件夹。"
                                        Foreground="#7A8B91" FontSize="12.5" TextWrapping="Wrap" TextAlignment="Center" Margin="0,8,0,0" LineHeight="20"/>
@@ -105,12 +105,12 @@
                     </Border>
                 </Grid>
 
-                <Border Grid.Row="2" Background="White" BorderBrush="#D3EADD" BorderThickness="1" CornerRadius="10" Padding="14,11" Margin="0,0,0,12">
+                <Border Grid.Row="2" Background="White" BorderBrush="#CDEDFB" BorderThickness="1" CornerRadius="10" Padding="14,11" Margin="0,0,0,12">
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                        <TextBlock Text="安装位置" VerticalAlignment="Center" FontWeight="SemiBold" Foreground="#047857"/>
+                        <TextBlock Text="安装位置" VerticalAlignment="Center" FontWeight="SemiBold" Foreground="#0369A1"/>
                         <TextBox x:Name="InstallRootBox" Width="330" Style="{StaticResource ModernTextBox}" Margin="10,0,0,0"/>
                         <Button Content="浏览…" Style="{StaticResource PlainButton}" Margin="10,0,0,0" Click="Browse_Click"/>
-                        <TextBlock Text="软件会装到这个目录下的子文件夹里" Foreground="#93A89C" FontSize="12" VerticalAlignment="Center"/>
+                        <TextBlock Text="软件会装到这个目录下的子文件夹里" Foreground="#8FABBC" FontSize="12" VerticalAlignment="Center"/>
                     </StackPanel>
                 </Border>
 
@@ -126,7 +126,7 @@
                 </DockPanel>
 
                 <!-- Progress: only visible while an install is actually running. -->
-                <Border x:Name="ProgressPanel" Grid.Row="4" Background="White" BorderBrush="#D3EADD" BorderThickness="1"
+                <Border x:Name="ProgressPanel" Grid.Row="4" Background="White" BorderBrush="#CDEDFB" BorderThickness="1"
                         CornerRadius="10" Padding="14,11" Margin="0,0,0,12" Visibility="Collapsed">
                     <StackPanel>
                         <TextBlock x:Name="ProgressText" FontSize="13" Foreground="{StaticResource AccentDeepBrush}"/>
@@ -134,13 +134,13 @@
                     </StackPanel>
                 </Border>
 
-                <Border Grid.Row="5" Background="White" BorderBrush="#D3EADD" BorderThickness="1" CornerRadius="10">
+                <Border Grid.Row="5" Background="White" BorderBrush="#CDEDFB" BorderThickness="1" CornerRadius="10">
                     <DockPanel>
                         <DockPanel DockPanel.Dock="Top" Margin="14,9,14,4" LastChildFill="False">
                             <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
                                 <Ellipse Width="8" Height="8" Fill="{StaticResource AccentBrush}" VerticalAlignment="Center"/>
                                 <TextBlock Text="运行日志" FontWeight="SemiBold" FontSize="13" Foreground="{StaticResource AccentDeepBrush}" Margin="7,0,0,0"/>
-                                <TextBlock Text="遇到问题时，点上方「导出诊断报告」把日志发给老师或同学" Foreground="#93A89C" FontSize="11.5" Margin="10,1,0,0"/>
+                                <TextBlock Text="遇到问题时，点上方「导出诊断报告」把日志发给老师或同学" Foreground="#8FABBC" FontSize="11.5" Margin="10,1,0,0"/>
                             </StackPanel>
                             <Button Content="清空" Style="{StaticResource GhostButton}" Padding="9,1" FontSize="11.5"
                                     DockPanel.Dock="Right" Click="ClearLog_Click"/>

@@ -11,8 +11,8 @@ namespace CourseAssist.App;
 /// 这里就打开哪个版本的教程。</summary>
 public partial class TutorialWindow : Window
 {
-    private static readonly Brush DeepBlue = new SolidColorBrush(Color.FromRgb(0x04, 0x78, 0x57));
-    private static readonly Brush Tint = new SolidColorBrush(Color.FromRgb(0xEC, 0xFD, 0xF5));
+    private static readonly Brush DeepBlue = new SolidColorBrush(Color.FromRgb(0x03, 0x69, 0xA1));
+    private static readonly Brush Tint = new SolidColorBrush(Color.FromRgb(0xF0, 0xF9, 0xFF));
 
     private readonly string? _tutorialUrl;
 

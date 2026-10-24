@@ -6,8 +6,8 @@ from PIL import Image, ImageDraw
 S = 256
 img = Image.new("RGBA", (S, S), (0, 0, 0, 0))
 d = ImageDraw.Draw(img)
-top = (16, 185, 129)   # #10B981
-bottom = (4, 120, 87)   # #047857
+top = (56, 189, 248)   # #38BDF8
+bottom = (2, 132, 199)   # #0284C7
 for y in range(S):
     t = y / (S - 1)
     c = tuple(int(top[i] + (bottom[i] - top[i]) * t) for i in range(3))
