@@ -10,8 +10,8 @@ namespace CourseAssist.App;
 
 public partial class MainWindow : Window
 {
-    private static readonly Brush DeepBlue = new SolidColorBrush(Color.FromRgb(0x43, 0x38, 0xCA));
-    private static readonly Brush Tint = new SolidColorBrush(Color.FromRgb(0xEE, 0xF2, 0xFF));
+    private static readonly Brush DeepBlue = new SolidColorBrush(Color.FromRgb(0x04, 0x78, 0x57));
+    private static readonly Brush Tint = new SolidColorBrush(Color.FromRgb(0xEC, 0xFD, 0xF5));
     private static readonly Brush Gray = new SolidColorBrush(Color.FromRgb(0x77, 0x77, 0x77));
 
     private readonly BundleRepository _repo;
@@ -162,7 +162,7 @@ public partial class MainWindow : Window
                 Content = tool.Name,
                 IsChecked = tool.Required,
                 FontWeight = FontWeights.Bold,
-                Foreground = new SolidColorBrush(Color.FromRgb(0x23, 0x20, 0x38)),
+                Foreground = new SolidColorBrush(Color.FromRgb(0x12, 0x21, 0x1B)),
                 FontSize = 14.5,
                 VerticalAlignment = VerticalAlignment.Center,
             };
@@ -225,8 +225,8 @@ public partial class MainWindow : Window
             };
             panel.Children.Add(tutorialButton);
 
-            var cardBorder = new SolidColorBrush(Color.FromRgb(0xDE, 0xE2, 0xF2));
-            var cardBorderHover = new SolidColorBrush(Color.FromRgb(0x9A, 0xA3, 0xDC));
+            var cardBorder = new SolidColorBrush(Color.FromRgb(0xD3, 0xEA, 0xDD));
+            var cardBorderHover = new SolidColorBrush(Color.FromRgb(0x7C, 0xC7, 0xA5));
             var card = new Border
             {
                 Background = Brushes.White,
@@ -545,7 +545,7 @@ public partial class MainWindow : Window
                 StatusState.Good => new SolidColorBrush(Color.FromRgb(0xE3, 0xF1, 0xE6)),
                 StatusState.Bad => new SolidColorBrush(Color.FromRgb(0xFD, 0xEC, 0xEA)),
                 StatusState.Manual => new SolidColorBrush(Color.FromRgb(0xFF, 0xF4, 0xDE)),
-                _ => new SolidColorBrush(Color.FromRgb(0xEC, 0xEE, 0xF4)),
+                _ => new SolidColorBrush(Color.FromRgb(0xE9, 0xF2, 0xED)),
             };
         }
     }
