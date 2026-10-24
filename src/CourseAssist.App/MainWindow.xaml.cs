@@ -83,10 +83,8 @@ public partial class MainWindow : Window
                 CourseList.Items.Add(new ListBoxItem
                 {
                     Content = category.Name,
-                    FontWeight = FontWeights.Bold,
-                    Foreground = DeepBlue,
                     IsEnabled = false,
-                    Margin = new Thickness(4, 8, 0, 2),
+                    Margin = new Thickness(6, 10, 6, 1),
                 });
                 foreach (var course in category.Courses)
                 {
@@ -97,7 +95,12 @@ public partial class MainWindow : Window
                         Tag = bundle,
                         IsEnabled = bundle is not null,
                     };
-                    if (bundle is null) item.Foreground = Gray;
+                    if (bundle is null)
+                    {
+                        item.Foreground = Gray;
+                        item.FontWeight = FontWeights.Normal;
+                        item.FontSize = 13;
+                    }
                     CourseList.Items.Add(item);
                 }
             }
@@ -124,10 +127,12 @@ public partial class MainWindow : Window
 
     private void CloseBtn_Click(object sender, RoutedEventArgs e) => Close();
 
+    private void ClearLog_Click(object sender, RoutedEventArgs e) => LogList.Items.Clear();
+
     private void MainWindow_StateChanged(object? sender, EventArgs e)
     {
         MaxGlyph.Text = WindowState == WindowState.Maximized ? "" : "";
-        RootGrid.Margin = WindowState == WindowState.Maximized ? new Thickness(7) : new Thickness(0);
+        RootBorder.Margin = WindowState == WindowState.Maximized ? new Thickness(7) : new Thickness(0);
     }
 
     private void ShowBundle(CourseBundle bundle)
@@ -145,33 +150,50 @@ public partial class MainWindow : Window
         CourseTitle.Text = bundle.Name;
         CourseSummary.Text = bundle.Summary ?? "";
         CourseNotes.Text = bundle.Notes is null ? "" : $"注意：{bundle.Notes}";
+        var requiredCount = bundle.Tools.Count(t => t.Required);
+        CourseMeta.Text = $"共 {bundle.Tools.Count} 个软件 · 必装 {requiredCount} · 可选 {bundle.Tools.Count - requiredCount} —— 勾选框决定装哪些，版本可在每张卡片右上角切换";
 
         foreach (var tool in bundle.Tools)
         {
             var panel = new StackPanel();
-            var header = new StackPanel { Orientation = Orientation.Horizontal };
+            var header = new DockPanel { LastChildFill = false };
             var include = new CheckBox
             {
                 Content = tool.Name,
                 IsChecked = tool.Required,
                 FontWeight = FontWeights.Bold,
-                Foreground = DeepBlue,
-                FontSize = 14,
+                Foreground = new SolidColorBrush(Color.FromRgb(0x17, 0x3F, 0x4D)),
+                FontSize = 14.5,
                 VerticalAlignment = VerticalAlignment.Center,
             };
             _includeChecks[tool.Name] = include;
+            DockPanel.SetDock(include, Dock.Left);
             header.Children.Add(include);
+            if (!tool.Required)
+            {
+                var opt = new TextBlock
+                {
+                    Text = "可选",
+                    Foreground = Gray,
+                    FontSize = 11.5,
+                    Margin = new Thickness(8, 0, 0, 0),
+                    VerticalAlignment = VerticalAlignment.Center,
+                };
+                DockPanel.SetDock(opt, Dock.Left);
+                header.Children.Add(opt);
+            }
             if (tool.Versions.Count > 0)
             {
-                var picker = new ComboBox { Width = 128, Margin = new Thickness(10, 0, 0, 0), Style = (Style)FindResource("ModernCombo") };
+                var rightSide = new StackPanel { Orientation = Orientation.Horizontal, VerticalAlignment = VerticalAlignment.Center };
+                rightSide.Children.Add(new TextBlock { Text = "版本", Foreground = Gray, VerticalAlignment = VerticalAlignment.Center });
+                var picker = new ComboBox { Width = 128, Margin = new Thickness(6, 0, 0, 0), Style = (Style)FindResource("ModernCombo") };
                 foreach (var v in tool.Versions) picker.Items.Add(v.Label);
                 picker.SelectedItem = tool.DefaultVersion ?? tool.Versions[0].Label;
                 _versionPickers[tool.Name] = picker;
-                header.Children.Add(picker);
-                header.Children.Add(new TextBlock { Text = "版本", Foreground = Gray, Margin = new Thickness(4, 2, 0, 0) });
+                rightSide.Children.Add(picker);
+                DockPanel.SetDock(rightSide, Dock.Right);
+                header.Children.Add(rightSide);
             }
-            if (!tool.Required)
-                header.Children.Add(new TextBlock { Text = "（可选）", Foreground = Gray, Margin = new Thickness(8, 1, 0, 0) });
             panel.Children.Add(header);
             panel.Children.Add(new TextBlock { Text = tool.Purpose, TextWrapping = TextWrapping.Wrap, Foreground = Gray, Margin = new Thickness(0, 3, 0, 0) });
             var status = new TextBlock { Text = "未体检", FontSize = 12 };
@@ -203,16 +225,21 @@ public partial class MainWindow : Window
             };
             panel.Children.Add(tutorialButton);
 
-            ToolsPanel.Children.Add(new Border
+            var cardBorder = new SolidColorBrush(Color.FromRgb(0xD7, 0xEA, 0xF2));
+            var cardBorderHover = new SolidColorBrush(Color.FromRgb(0x8F, 0xC3, 0xD9));
+            var card = new Border
             {
                 Background = Brushes.White,
-                BorderBrush = new SolidColorBrush(Color.FromRgb(0xD7, 0xEA, 0xF2)),
+                BorderBrush = cardBorder,
                 BorderThickness = new Thickness(1),
-                CornerRadius = new CornerRadius(10),
-                Padding = new Thickness(14, 12, 14, 12),
+                CornerRadius = new CornerRadius(12),
+                Padding = new Thickness(16, 13, 16, 13),
                 Margin = new Thickness(0, 0, 0, 10),
                 Child = panel,
-            });
+            };
+            card.MouseEnter += (_, _) => card.BorderBrush = cardBorderHover;
+            card.MouseLeave += (_, _) => card.BorderBrush = cardBorder;
+            ToolsPanel.Children.Add(card);
         }
         Log($"已选择《{bundle.Name}》，共 {bundle.Tools.Count} 项软件。");
     }

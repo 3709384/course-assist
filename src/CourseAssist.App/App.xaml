@@ -11,7 +11,7 @@
         <!-- Primary action button: rounded, with hover / pressed / disabled states -->
         <Style x:Key="AccentButton" TargetType="Button">
             <Setter Property="Foreground" Value="White"/>
-            <Setter Property="Padding" Value="20,9"/>
+            <Setter Property="Padding" Value="22,10"/>
             <Setter Property="Margin" Value="0,0,10,0"/>
             <Setter Property="FontSize" Value="13.5"/>
             <Setter Property="FontWeight" Value="SemiBold"/>
