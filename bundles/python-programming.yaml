@@ -1,0 +1,23 @@
+# 样例课程包（draft）：结构完整，待维护者实机验证后升级为 verified。
+id: python-programming
+name: Python 程序设计
+category: programming
+summary: Python 本体 + PyCharm，并自动把 pip 换成国内镜像源，装包不再龟速。
+status: draft
+tools:
+  - name: Python 3.12
+    purpose: Python 解释器本体
+    winget: Python.Python.3.12
+    version: ">=3.10"
+    required: true
+    verify:
+      command: python --version
+      expect: 'Python 3\.'
+  - name: PyCharm Community
+    purpose: 写 Python 代码的编辑器（社区版免费）
+    winget: JetBrains.PyCharm.Community
+    required: true
+steps:
+  - type: command
+    run: python -m pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
+notes: 安装时务必勾选「Add python.exe to PATH」（winget 官方包默认处理），验证步骤会自动确认。

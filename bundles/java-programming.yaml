@@ -1,0 +1,27 @@
+# 样例课程包（draft）：结构完整，winget 包 ID 待维护者实机验证后升级为 verified。
+id: java-programming
+name: Java 程序设计
+category: programming
+summary: JDK + IntelliJ IDEA + Maven，Java 入门课的标准三件套。
+status: draft
+tools:
+  - name: OpenJDK 17
+    purpose: Java 开发工具包：编译、运行 Java 程序
+    winget: Microsoft.OpenJDK.17
+    version: ">=17"
+    required: true
+    verify:
+      command: java -version
+      expect: '17\.'
+  - name: IntelliJ IDEA Community
+    purpose: 写 Java 代码的主力编辑器（社区版免费）
+    winget: JetBrains.IntelliJIDEA.Community
+    required: true
+  - name: Apache Maven
+    purpose: Java 项目构建与依赖管理（高年级课程与实训常用）
+    winget: Apache.Maven
+    required: false
+    verify:
+      command: mvn -version
+      expect: 'Apache Maven'
+notes: 部分学校课程指定 JDK 8，体检时会提示并可改选 Temurin 8 的课程包变体（待补充）。

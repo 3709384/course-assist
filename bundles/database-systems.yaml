@@ -1,0 +1,17 @@
+# 样例课程包（draft）：结构完整，待维护者实机验证后升级为 verified。
+id: database-systems
+name: 数据库系统
+category: data-ai
+summary: MySQL 数据库 + DBeaver 图形化管理工具，上机实验直接开练。
+status: draft
+tools:
+  - name: MySQL Server 8
+    purpose: 课程实验用的关系型数据库
+    winget: Oracle.MySQL
+    version: ">=8.0"
+    required: true
+  - name: DBeaver Community
+    purpose: 图形化连数据库、写 SQL、看表结构（免费，替代收费的 Navicat）
+    winget: DBeaver.DBeaver
+    required: true
+notes: MySQL 安装过程中设置的 root 密码请务必记牢，实验课每次都要用。
