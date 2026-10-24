@@ -1,7 +1,7 @@
 namespace CourseAssist.Core;
 
-/// <summary>安装完成后，在桌面建一个以课程命名的文件夹，把这门课装好的软件的
-/// 快捷方式放进去——初学者不用再满电脑找软件在哪。</summary>
+/// <summary>桌面课程文件夹：一键配置一开始就在桌面建好以课程命名的文件夹，
+/// 每装好一个软件就立刻把它的快捷方式放进去——装完不怕找不到软件在哪。</summary>
 public sealed class ShortcutService
 {
     private readonly IProcessRunner _runner;
@@ -9,54 +9,89 @@ public sealed class ShortcutService
 
     public sealed record Request(string ToolName, string? Hint, string? InstallDir);
 
-    /// <summary>Stock the desktop course folder. Returns a log line per tool.
-    /// Never throws: a missing shortcut must not fail an otherwise good install.</summary>
-    public async Task<IReadOnlyList<string>> PlaceCourseShortcutsAsync(
-        string courseName, IReadOnlyList<Request> requests, CancellationToken ct = default)
+    /// <summary>Resolve the user's real desktop folder (respects OneDrive redirection).</summary>
+    public static string? ResolveDesktop()
     {
-        var lines = new List<string>();
+        var desktop = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
+        if (desktop.Length > 0) return desktop;
+        var home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+        if (home.Length > 0)
+        {
+            var plain = Path.Combine(home, "Desktop");
+            if (Directory.Exists(plain)) return plain;
+            var oneDrive = Environment.GetEnvironmentVariable("OneDrive");
+            if (!string.IsNullOrWhiteSpace(oneDrive))
+            {
+                var od = Path.Combine(oneDrive, "Desktop");
+                if (Directory.Exists(od)) return od;
+            }
+            return plain;
+        }
+        return null;
+    }
+
+    /// <summary>Create (or reuse) the desktop folder for a course. Returns its full path,
+    /// or null when no desktop could be located.</summary>
+    public string? EnsureCourseFolder(string courseName)
+    {
+        var desktop = ResolveDesktop();
+        if (desktop is null) return null;
+        var folder = Path.Combine(desktop, Sanitize(courseName));
+        Directory.CreateDirectory(folder);
+        return folder;
+    }
+
+    /// <summary>Put one tool's shortcut into the course folder right after it installs.
+    /// Returns a log line, or null when this tool intentionally has no shortcut.
+    /// Never throws.</summary>
+    public async Task<string?> PlaceOneAsync(string folder, Request req, CancellationToken ct = default)
+    {
+        if (string.Equals(req.Hint, "none", StringComparison.OrdinalIgnoreCase))
+            return null; // command-line / service tool: no icon to give, by design
         try
         {
-            var desktop = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
-            if (desktop.Length == 0) return new[] { "快捷方式：找不到桌面位置，已跳过" };
-            var folder = Path.Combine(desktop, Sanitize(courseName));
-            Directory.CreateDirectory(folder);
-
-            var startMenuLinks = EnumerateStartMenuLinks();
-            var createScript = new List<(string LinkPath, string Target, string WorkDir)>();
-
-            foreach (var req in requests)
+            var dest = Path.Combine(folder, Sanitize(req.ToolName) + ".lnk");
+            var found = FindStartMenuLink(EnumerateStartMenuLinks(), req.Hint ?? req.ToolName);
+            if (found is not null)
             {
-                if (string.Equals(req.Hint, "none", StringComparison.OrdinalIgnoreCase))
-                    continue; // command-line / service tool: no icon to give
-                var dest = Path.Combine(folder, Sanitize(req.ToolName) + ".lnk");
-                var found = FindStartMenuLink(startMenuLinks, req.Hint ?? req.ToolName);
-                if (found is not null)
-                {
-                    File.Copy(found, dest, overwrite: true);
-                    lines.Add($"快捷方式 · {req.ToolName}：已放进桌面「{courseName}」文件夹");
-                    continue;
-                }
-                var exe = FindExeInInstallDir(req);
-                if (exe is not null)
-                {
-                    createScript.Add((dest, exe, Path.GetDirectoryName(exe)!));
-                    lines.Add($"快捷方式 · {req.ToolName}：已放进桌面「{courseName}」文件夹");
-                    continue;
-                }
-                lines.Add($"快捷方式 · {req.ToolName}：没找到它的快捷方式，可以在开始菜单里搜「{req.ToolName}」");
+                File.Copy(found, dest, overwrite: true);
+                return $"快捷方式 · {req.ToolName}：已放进桌面课程文件夹";
             }
-
-            if (createScript.Count > 0)
-                await CreateShortcutsAsync(createScript, ct);
-            if (requests.Any(r => !string.Equals(r.Hint, "none", StringComparison.OrdinalIgnoreCase)))
-                lines.Insert(0, $"桌面已建文件夹「{courseName}」，这门课的软件都在里面，点开就能用");
+            var exe = FindExeInInstallDir(req);
+            if (exe is not null)
+            {
+                await CreateShortcutsAsync(new[] { (dest, exe, Path.GetDirectoryName(exe)!) }, ct);
+                if (File.Exists(dest))
+                    return $"快捷方式 · {req.ToolName}：已放进桌面课程文件夹";
+            }
+            return $"快捷方式 · {req.ToolName}：没找到现成快捷方式，可在开始菜单里搜「{req.ToolName}」（文件夹里有说明文件）";
         }
         catch (Exception ex)
         {
-            lines.Add($"快捷方式：创建时出了点问题（{ex.Message}），不影响软件本身使用");
+            return $"快捷方式 · {req.ToolName}：创建时出了点问题（{ex.Message}），不影响软件使用";
         }
-        return lines;
+    }
+
+    /// <summary>When no shortcut could be placed at all, leave a plain-language note in
+    /// the folder so the folder is never a confusing empty box.</summary>
+    public void WriteReadmeIfNoShortcuts(string folder, string courseName, IEnumerable<string> toolNames)
+    {
+        try
+        {
+            if (Directory.EnumerateFiles(folder, "*.lnk").Any()) return;
+            var lines = new List<string>
+            {
+                $"《{courseName}》的软件已经装好了。",
+                "",
+                "这门课包含的软件：",
+            };
+            lines.AddRange(toolNames.Select(t => $"  · {t}"));
+            lines.Add("");
+            lines.Add("怎么打开它们：在屏幕左下角的开始菜单里搜索软件名（比如 VS Code、DBeaver），点开就能用。");
+            lines.Add("每个软件的入门教程在 Course Assist 软件里：选这门课，点软件下面的「📖 入门教程」。");
+            File.WriteAllLines(Path.Combine(folder, "软件在哪儿打开.txt"), lines);
+        }
+        catch { /* a note file must never break the flow */ }
     }
 
     /// <summary>Remove the desktop course folder (used on uninstall). Returns a log line or null.</summary>
@@ -64,7 +99,8 @@ public sealed class ShortcutService
     {
         try
         {
-            var desktop = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
+            var desktop = ResolveDesktop();
+            if (desktop is null) return null;
             var folder = Path.Combine(desktop, Sanitize(courseName));
             if (!Directory.Exists(folder)) return null;
             Directory.Delete(folder, recursive: true);
@@ -97,7 +133,6 @@ public sealed class ShortcutService
     {
         var needle = hint.Trim();
         if (needle.Length == 0) return null;
-        // Exact-ish match first (file name without extension), then "contains".
         var exact = links.FirstOrDefault(l =>
             string.Equals(Path.GetFileNameWithoutExtension(l), needle, StringComparison.OrdinalIgnoreCase));
         if (exact is not null) return exact;
@@ -121,7 +156,7 @@ public sealed class ShortcutService
         return match ?? (exes.Count == 1 ? exes[0] : null);
     }
 
-    private async Task CreateShortcutsAsync(List<(string LinkPath, string Target, string WorkDir)> items, CancellationToken ct)
+    private async Task CreateShortcutsAsync(IReadOnlyList<(string LinkPath, string Target, string WorkDir)> items, CancellationToken ct)
     {
         var dir = Path.Combine(Path.GetTempPath(), "CourseAssist");
         Directory.CreateDirectory(dir);

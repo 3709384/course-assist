@@ -2,6 +2,7 @@ using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows.Threading;
 using CourseAssist.Core;
 using Microsoft.Win32;
 
@@ -17,6 +18,12 @@ public partial class MainWindow : Window
     private readonly SystemProcessRunner _runner = new();
     private readonly WingetService _winget;
     private readonly StateStore _stateStore;
+    private readonly ShortcutService _shortcutService;
+    private readonly DispatcherTimer _progressTimer = new() { Interval = TimeSpan.FromSeconds(1) };
+    private int _progressTotalWeight, _progressDoneWeight, _progressDoneSteps, _progressTotalSteps;
+    private string _currentStepTitle = "";
+    private string _currentSubProgress = "";
+    private DateTime _stepStartedAt;
 
     private readonly Dictionary<string, ComboBox> _versionPickers = new();
     private readonly Dictionary<string, TextBlock> _statusLabels = new();
@@ -33,6 +40,8 @@ public partial class MainWindow : Window
         Title = $"课程环境助手 CourseAssist v{version}";
         _repo = new BundleRepository(Path.Combine(AppContext.BaseDirectory, "bundles"));
         _winget = new WingetService(_runner);
+        _shortcutService = new ShortcutService(_runner);
+        _progressTimer.Tick += (_, _) => UpdateProgressText();
         _stateStore = new StateStore(StateStore.DefaultPath());
         InstallRootBox.Text = DefaultInstallRoot();
         LoadCourses();
@@ -275,31 +284,59 @@ public partial class MainWindow : Window
             });
             Log($"安装计划共 {plan.Count} 步，开始执行（个别软件下载较慢，请耐心等待）…");
 
+            // 桌面课程文件夹先建好：装好一个放一个快捷方式，中途失败也不至于全丢。
+            var desktopFolder = _shortcutService.EnsureCourseFolder(_current.Name);
+            if (desktopFolder is not null) Log($"桌面课程文件夹已建好：{desktopFolder}（装好的软件快捷方式会陆续放进去）");
+            else Log("没找到桌面位置，这次先跳过快捷方式（不影响安装本身）");
+
+            _progressTotalWeight = plan.Sum(StepWeight);
+            _progressDoneWeight = 0;
+            _progressDoneSteps = 0;
+            _progressTotalSteps = plan.Count;
+            _currentStepTitle = "准备开始";
+            _currentSubProgress = "";
+            _stepStartedAt = DateTime.Now;
+            BusyBar.Value = 0;
+            UpdateProgressText();
+            _progressTimer.Start();
+
             var executor = new InstallExecutor(_runner, _winget, new SystemEnvironmentStore(), _stateStore);
             var results = await executor.ExecuteAsync(_current, plan,
-                r => Dispatcher.Invoke(() => LogStep(r)));
+                r => Dispatcher.Invoke(() =>
+                {
+                    LogStep(r);
+                    _progressDoneWeight += StepWeight(r.Step);
+                    _progressDoneSteps++;
+                    UpdateProgressText();
+                    if (desktopFolder is not null && r.Step.ToolName is not null
+                        && r.Outcome is StepOutcome.Succeeded or StepOutcome.Skipped
+                        && (r.Step.Kind is PlanStepKind.WingetInstall or PlanStepKind.DownloadInstall))
+                        _ = PlaceShortcutAsync(desktopFolder, r.Step);
+                }),
+                onStepStart: step => Dispatcher.Invoke(() =>
+                {
+                    _currentStepTitle = step.Title;
+                    _currentSubProgress = "";
+                    _stepStartedAt = DateTime.Now;
+                    UpdateProgressText();
+                }),
+                onProgress: text => Dispatcher.Invoke(() =>
+                {
+                    _currentSubProgress = text;
+                    UpdateProgressText();
+                }));
             _lastResults = results;
             DiagButton.IsEnabled = true;
+
+            _progressTimer.Stop();
+            BusyBar.Value = _progressTotalWeight == 0 ? 100 : _progressDoneWeight * 100.0 / _progressTotalWeight;
+            ProgressText.Text = $"总进度 {(int)BusyBar.Value}% · 全部 {_progressTotalSteps} 步已结束";
+            if (desktopFolder is not null)
+                _shortcutService.WriteReadmeIfNoShortcuts(desktopFolder, _current.Name, _current.Tools.Select(t => t.Name));
 
             var ok = results.Count(r => r.Outcome is StepOutcome.Succeeded or StepOutcome.Skipped);
             var failed = results.Count(r => r.Outcome == StepOutcome.Failed);
             Log($"执行完毕：完成 {ok} 步，失败 {failed} 步" + (failed > 0 ? "。失败不怕——点「导出诊断报告」发给老师或同学帮你看。" : "。全部搞定！"));
-
-            // 在桌面建「课程名」文件夹，把这门课装好的软件快捷方式放进去，方便初学者找。
-            var shortcutRequests = results
-                .Where(r => r.Outcome is StepOutcome.Succeeded or StepOutcome.Skipped)
-                .Where(r => r.Step.Kind is PlanStepKind.WingetInstall or PlanStepKind.DownloadInstall && r.Step.ToolName is not null)
-                .Select(r => new ShortcutService.Request(
-                    r.Step.ToolName!,
-                    _current.Tools.FirstOrDefault(t => t.Name == r.Step.ToolName)?.Shortcut,
-                    r.Step.Location))
-                .ToList();
-            if (shortcutRequests.Count > 0)
-            {
-                var shortcutLines = await new ShortcutService(_runner)
-                    .PlaceCourseShortcutsAsync(_current.Name, shortcutRequests);
-                foreach (var line in shortcutLines) Log(line);
-            }
             Check_Click(sender, e);
         }
         catch (Exception ex) { Log($"配置过程出错：{ex.Message}"); DiagButton.IsEnabled = true; }
@@ -360,7 +397,38 @@ public partial class MainWindow : Window
         CheckButton.IsEnabled = !busy;
         InstallButton.IsEnabled = !busy;
         UninstallButton.IsEnabled = !busy;
-        BusyBar.IsIndeterminate = busy;
+        if (!busy) _progressTimer.Stop();
+    }
+
+    /// <summary>Step weights for the overall percentage: installs dominate, instant
+    /// bookkeeping steps barely count, manual pointers don't count as machine work.</summary>
+    private static int StepWeight(PlanStep step) => step.Kind switch
+    {
+        PlanStepKind.WingetInstall => 10,
+        PlanStepKind.DownloadInstall => 10,
+        PlanStepKind.RunCommand => 4,
+        PlanStepKind.WindowsFeature => 4,
+        PlanStepKind.ApplyEnv => 1,
+        PlanStepKind.Verify => 1,
+        _ => 0,
+    };
+
+    private void UpdateProgressText()
+    {
+        if (_progressTotalSteps == 0) { ProgressText.Text = ""; return; }
+        var pct = _progressTotalWeight == 0 ? 0 : _progressDoneWeight * 100 / _progressTotalWeight;
+        BusyBar.Value = pct;
+        var elapsed = _stepStartedAt == default ? "" : $" · 本步已用 {(DateTime.Now - _stepStartedAt).ToString(@"m\:ss")}";
+        var sub = _currentSubProgress.Length == 0 ? "" : $" · {_currentSubProgress}";
+        ProgressText.Text = $"总进度 {pct}% · 第 {_progressDoneSteps}/{_progressTotalSteps} 步 · 正在：{_currentStepTitle}{sub}{elapsed}";
+    }
+
+    private async Task PlaceShortcutAsync(string folder, PlanStep step)
+    {
+        var tool = _current?.Tools.FirstOrDefault(t => t.Name == step.ToolName);
+        var line = await _shortcutService.PlaceOneAsync(folder,
+            new ShortcutService.Request(step.ToolName!, tool?.Shortcut, step.Location));
+        if (line is not null) Log(line);
     }
 
     private void Log(string message)

@@ -13,20 +13,21 @@ public sealed record ProcessResult(int ExitCode, string Output)
 public interface IProcessRunner
 {
     /// <summary>Run a command line like <c>java -version</c> (first token is the program).</summary>
-    Task<ProcessResult> RunAsync(string commandLine, CancellationToken ct = default);
+    Task<ProcessResult> RunAsync(string commandLine, CancellationToken ct = default, Action<string>? onOutput = null);
 
-    Task<ProcessResult> RunAsync(string fileName, string arguments, CancellationToken ct = default);
+    /// <param name="onOutput">Optional live-output callback (raw chunks) for progress display.</param>
+    Task<ProcessResult> RunAsync(string fileName, string arguments, CancellationToken ct = default, Action<string>? onOutput = null);
 }
 
 public sealed class SystemProcessRunner : IProcessRunner
 {
-    public Task<ProcessResult> RunAsync(string commandLine, CancellationToken ct = default)
+    public Task<ProcessResult> RunAsync(string commandLine, CancellationToken ct = default, Action<string>? onOutput = null)
     {
         var (file, args) = Split(commandLine);
-        return RunAsync(file, args, ct);
+        return RunAsync(file, args, ct, onOutput);
     }
 
-    public async Task<ProcessResult> RunAsync(string fileName, string arguments, CancellationToken ct = default)
+    public async Task<ProcessResult> RunAsync(string fileName, string arguments, CancellationToken ct = default, Action<string>? onOutput = null)
     {
         var psi = new ProcessStartInfo
         {
@@ -48,11 +49,31 @@ public sealed class SystemProcessRunner : IProcessRunner
         }
         using var process = new Process { StartInfo = psi };
         process.Start();
-        var stdout = process.StandardOutput.ReadToEndAsync(ct);
-        var stderr = process.StandardError.ReadToEndAsync(ct);
+        if (onOutput is null)
+        {
+            var stdout = process.StandardOutput.ReadToEndAsync(ct);
+            var stderr = process.StandardError.ReadToEndAsync(ct);
+            await process.WaitForExitAsync(ct);
+            var output = (await stdout) + (await stderr);
+            return new ProcessResult(process.ExitCode, output);
+        }
+        // Streaming mode: pump both streams in chunks so the UI can show live progress.
+        var buffer = new System.Text.StringBuilder();
+        async Task Pump(StreamReader reader)
+        {
+            var chunk = new char[1024];
+            int read;
+            while ((read = await reader.ReadAsync(chunk, ct)) > 0)
+            {
+                var text = new string(chunk, 0, read);
+                lock (buffer) buffer.Append(text);
+                try { onOutput(text); } catch { /* a broken progress callback must not kill the install */ }
+            }
+        }
+        var pumps = Task.WhenAll(Pump(process.StandardOutput), Pump(process.StandardError));
         await process.WaitForExitAsync(ct);
-        var output = (await stdout) + (await stderr);
-        return new ProcessResult(process.ExitCode, output);
+        await pumps;
+        return new ProcessResult(process.ExitCode, buffer.ToString());
     }
 
     internal static (string File, string Args) Split(string commandLine)

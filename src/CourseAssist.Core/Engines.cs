@@ -110,32 +110,68 @@ public sealed class InstallExecutor
 
     public async Task<IReadOnlyList<StepResult>> ExecuteAsync(
         CourseBundle bundle, IReadOnlyList<PlanStep> plan,
-        Action<StepResult>? onStep = null, CancellationToken ct = default)
+        Action<StepResult>? onStep = null, CancellationToken ct = default,
+        Action<PlanStep>? onStepStart = null, Action<string>? onProgress = null)
     {
         var results = new List<StepResult>();
         var state = _stateStore.Load();
 
         foreach (var step in plan)
         {
-            var result = step.Kind switch
+            onStepStart?.Invoke(step);
+            StepResult result;
+            try
             {
-                PlanStepKind.WingetInstall => await InstallWithWingetAsync(bundle, step, state, ct),
-                PlanStepKind.DownloadInstall => await InstallFromDownloadAsync(step, ct),
-                PlanStepKind.ManualTool => new StepResult(step, StepOutcome.Manual, step.ManualText ?? "请按课程包说明手动安装。"),
-                PlanStepKind.ManualInstruction => new StepResult(step, StepOutcome.Manual, step.ManualText ?? step.Title),
-                PlanStepKind.ApplyEnv => ApplyEnvStep(bundle, step, state),
-                PlanStepKind.RunCommand => await RunCommandStepAsync(step, ct),
-                PlanStepKind.WindowsFeature => await RunCommandStepAsync(step, ct),
-                PlanStepKind.Verify => await VerifyStepAsync(step, ct),
-                _ => new StepResult(step, StepOutcome.Skipped, "未知步骤类型"),
-            };
+                result = step.Kind switch
+                {
+                    PlanStepKind.WingetInstall => await InstallWithWingetAsync(bundle, step, state, ct, onProgress),
+                    PlanStepKind.DownloadInstall => await InstallFromDownloadAsync(step, ct, onProgress),
+                    PlanStepKind.ManualTool => new StepResult(step, StepOutcome.Manual, step.ManualText ?? "请按课程包说明手动安装。"),
+                    PlanStepKind.ManualInstruction => new StepResult(step, StepOutcome.Manual, step.ManualText ?? step.Title),
+                    PlanStepKind.ApplyEnv => ApplyEnvStep(bundle, step, state),
+                    PlanStepKind.RunCommand => await RunCommandStepAsync(step, ct, onProgress),
+                    PlanStepKind.WindowsFeature => await RunCommandStepAsync(step, ct, onProgress),
+                    PlanStepKind.Verify => await VerifyStepAsync(step, ct),
+                    _ => new StepResult(step, StepOutcome.Skipped, "未知步骤类型"),
+                };
+            }
+            catch (Exception ex)
+            {
+                // One bad step must never abort the whole run: the remaining tools,
+                // the desktop shortcuts and the final report still matter.
+                result = new StepResult(step, StepOutcome.Failed, $"执行时出错（已跳过这一步，继续后面的）：{ex.Message}");
+            }
             results.Add(result);
             onStep?.Invoke(result);
         }
         return results;
     }
 
-    private async Task<StepResult> InstallWithWingetAsync(CourseBundle bundle, PlanStep step, AppState state, CancellationToken ct)
+    /// <summary>Turn a process's raw output stream into "label NN%" progress reports
+    /// whenever the underlying installer prints a percentage (winget and pip do).</summary>
+    private static Action<string> PercentProgress(Action<string>? onProgress, string label)
+    {
+        var last = -1;
+        var recent = new StringBuilder();
+        return chunk =>
+        {
+            if (onProgress is null) return;
+            lock (recent)
+            {
+                recent.Append(chunk);
+                if (recent.Length > 400) recent.Remove(0, recent.Length - 400);
+                var matches = Regex.Matches(recent.ToString(), @"(\d{1,3})\s*%");
+                if (matches.Count == 0) return;
+                if (int.TryParse(matches[^1].Groups[1].Value, out var pct) && pct <= 100 && pct != last)
+                {
+                    last = pct;
+                    onProgress($"{label} {pct}%");
+                }
+            }
+        };
+    }
+
+    private async Task<StepResult> InstallWithWingetAsync(CourseBundle bundle, PlanStep step, AppState state, CancellationToken ct, Action<string>? onProgress = null)
     {
         var id = step.WingetId!;
         if (await _winget.IsInstalledAsync(id, ct))
@@ -144,7 +180,8 @@ public sealed class InstallExecutor
             _stateStore.Save(state);
             return new StepResult(step, StepOutcome.Skipped, "已安装，跳过（断点续装）");
         }
-        var r = await _runner.RunAsync(_winget.Executable, WingetCommands.InstallArgs(id, step.Location), ct);
+        var r = await _runner.RunAsync(_winget.Executable, WingetCommands.InstallArgs(id, step.Location), ct,
+            PercentProgress(onProgress, "下载/安装"));
         if (r.Success || r.Output.Contains("Successfully installed", StringComparison.OrdinalIgnoreCase))
         {
             UpsertRecord(bundle, step, state);
@@ -154,7 +191,7 @@ public sealed class InstallExecutor
         return new StepResult(step, StepOutcome.Failed, $"winget 退出码 {r.ExitCode}：{r.Tail()}");
     }
 
-    private async Task<StepResult> InstallFromDownloadAsync(PlanStep step, CancellationToken ct)
+    private async Task<StepResult> InstallFromDownloadAsync(PlanStep step, CancellationToken ct, Action<string>? onProgress = null)
     {
         var download = step.Download!;
         try
@@ -163,9 +200,27 @@ public sealed class InstallExecutor
             var dir = Path.Combine(Path.GetTempPath(), "CourseAssist", "downloads");
             Directory.CreateDirectory(dir);
             var file = Path.Combine(dir, fileName);
-            await using (var stream = await Http.GetStreamAsync(download.Url, ct))
-            await using (var fs = File.Create(file))
-                await stream.CopyToAsync(fs, ct);
+            using (var response = await Http.GetAsync(download.Url, HttpCompletionOption.ResponseHeadersRead, ct))
+            {
+                response.EnsureSuccessStatusCode();
+                var total = response.Content.Headers.ContentLength;
+                await using var stream = await response.Content.ReadAsStreamAsync(ct);
+                await using var fs = File.Create(file);
+                var buf = new byte[81920];
+                long done = 0;
+                var lastPct = -1;
+                int read;
+                while ((read = await stream.ReadAsync(buf, ct)) > 0)
+                {
+                    await fs.WriteAsync(buf.AsMemory(0, read), ct);
+                    done += read;
+                    if (total is > 0 && onProgress is not null)
+                    {
+                        var pct = (int)(done * 100 / total.Value);
+                        if (pct != lastPct) { lastPct = pct; onProgress($"下载 {pct}%"); }
+                    }
+                }
+            }
 
             await using (var fs = File.OpenRead(file))
             {
@@ -199,9 +254,9 @@ public sealed class InstallExecutor
         }
     }
 
-    private async Task<StepResult> RunCommandStepAsync(PlanStep step, CancellationToken ct)
+    private async Task<StepResult> RunCommandStepAsync(PlanStep step, CancellationToken ct, Action<string>? onProgress = null)
     {
-        var r = await _runner.RunAsync(step.Command!, ct);
+        var r = await _runner.RunAsync(step.Command!, ct, PercentProgress(onProgress, "运行中"));
         return r.Success
             ? new StepResult(step, StepOutcome.Succeeded, r.Tail(200))
             : new StepResult(step, StepOutcome.Failed, $"退出码 {r.ExitCode}：{r.Tail()}");

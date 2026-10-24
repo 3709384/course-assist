@@ -67,7 +67,10 @@
 
                 <Border Grid.Row="4" BorderBrush="#CDE9F4" BorderThickness="1" CornerRadius="6">
                     <DockPanel>
-                        <ProgressBar x:Name="BusyBar" DockPanel.Dock="Bottom" Height="4" IsIndeterminate="False" Foreground="{StaticResource AccentBrush}" BorderThickness="0"/>
+                        <StackPanel DockPanel.Dock="Bottom">
+                            <TextBlock x:Name="ProgressText" FontSize="12" Foreground="{StaticResource AccentDeepBrush}" Margin="6,4,6,2"/>
+                            <ProgressBar x:Name="BusyBar" Height="6" Maximum="100" Value="0" Foreground="{StaticResource AccentBrush}" BorderThickness="0"/>
+                        </StackPanel>
                         <ListBox x:Name="LogList" BorderThickness="0" FontSize="12"/>
                     </DockPanel>
                 </Border>
