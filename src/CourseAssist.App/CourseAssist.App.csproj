@@ -10,7 +10,7 @@
     <EnableWindowsTargeting>true</EnableWindowsTargeting>
     <AssemblyName>CourseAssist</AssemblyName>
     <RootNamespace>CourseAssist.App</RootNamespace>
-    <Version>0.7.0</Version>
+    <Version>0.8.0</Version>
   </PropertyGroup>
 
   <ItemGroup>

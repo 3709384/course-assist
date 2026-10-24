@@ -27,6 +27,7 @@ public partial class MainWindow : Window
 
     private readonly Dictionary<string, ComboBox> _versionPickers = new();
     private readonly Dictionary<string, TextBlock> _statusLabels = new();
+    private readonly Dictionary<string, Border> _statusPills = new();
     private readonly Dictionary<string, CheckBox> _includeChecks = new();
 
     private CourseBundle? _current;
@@ -38,6 +39,7 @@ public partial class MainWindow : Window
         InitializeComponent();
         var version = typeof(MainWindow).Assembly.GetName().Version?.ToString(3) ?? "?";
         Title = $"课程环境助手 CourseAssist v{version}";
+        HeaderVersion.Text = $"v{version}";
         _repo = new BundleRepository(Path.Combine(AppContext.BaseDirectory, "bundles"));
         _winget = new WingetService(_runner);
         _shortcutService = new ShortcutService(_runner);
@@ -119,8 +121,10 @@ public partial class MainWindow : Window
         _current = bundle;
         _versionPickers.Clear();
         _statusLabels.Clear();
+        _statusPills.Clear();
         _includeChecks.Clear();
         ToolsPanel.Children.Clear();
+        HideProgress();
 
         CourseTitle.Text = bundle.Name;
         CourseSummary.Text = bundle.Summary ?? "";
@@ -153,16 +157,30 @@ public partial class MainWindow : Window
             if (!tool.Required)
                 header.Children.Add(new TextBlock { Text = "（可选）", Foreground = Gray, Margin = new Thickness(8, 1, 0, 0) });
             panel.Children.Add(header);
-            panel.Children.Add(new TextBlock { Text = tool.Purpose, TextWrapping = TextWrapping.Wrap, Foreground = Gray, Margin = new Thickness(0, 2, 0, 0) });
-            var status = new TextBlock { Text = "状态：未体检", Margin = new Thickness(0, 3, 0, 0) };
+            panel.Children.Add(new TextBlock { Text = tool.Purpose, TextWrapping = TextWrapping.Wrap, Foreground = Gray, Margin = new Thickness(0, 3, 0, 0) });
+            var status = new TextBlock { Text = "未体检", FontSize = 12 };
             _statusLabels[tool.Name] = status;
-            panel.Children.Add(status);
+            var pill = new Border
+            {
+                CornerRadius = new CornerRadius(9),
+                Padding = new Thickness(9, 2, 9, 2),
+                HorizontalAlignment = HorizontalAlignment.Left,
+                Margin = new Thickness(0, 7, 0, 0),
+                Child = status,
+            };
+            _statusPills[tool.Name] = pill;
+            panel.Children.Add(pill);
+            SetStatus(tool.Name, "未体检", StatusState.Neutral);
             var tutorialButton = new Button
             {
                 Content = "📖 入门教程（版本对齐）",
                 HorizontalAlignment = HorizontalAlignment.Left,
-                Margin = new Thickness(0, 6, 0, 0),
-                Padding = new Thickness(10, 3, 10, 3),
+                Margin = new Thickness(0, 8, 0, 0),
+                Padding = new Thickness(12, 4, 12, 4),
+                Background = Tint,
+                BorderBrush = new SolidColorBrush(Color.FromRgb(0xCD, 0xE9, 0xF4)),
+                BorderThickness = new Thickness(1),
+                Foreground = DeepBlue,
             };
             tutorialButton.Click += (_, _) =>
             {
@@ -175,10 +193,12 @@ public partial class MainWindow : Window
 
             ToolsPanel.Children.Add(new Border
             {
-                Background = Tint,
-                CornerRadius = new CornerRadius(8),
-                Padding = new Thickness(12, 10, 12, 10),
-                Margin = new Thickness(0, 0, 0, 8),
+                Background = Brushes.White,
+                BorderBrush = new SolidColorBrush(Color.FromRgb(0xD7, 0xEA, 0xF2)),
+                BorderThickness = new Thickness(1),
+                CornerRadius = new CornerRadius(10),
+                Padding = new Thickness(14, 12, 14, 12),
+                Margin = new Thickness(0, 0, 0, 10),
                 Child = panel,
             });
         }
@@ -201,7 +221,7 @@ public partial class MainWindow : Window
         var preflight = await new Preflight(_winget).CheckAsync(root);
         _lastPreflight = preflight;
         foreach (var item in preflight)
-            Log($"预检 · {(item.Passed ? "✅" : "❌")} {item.Name}：{item.Detail}");
+            Log($"预检 · {(item.Passed ? "✅" : "❌")} {item.Name}：{item.Detail}", item.Passed ? LogKind.Success : LogKind.Error);
         return preflight;
     }
 
@@ -215,16 +235,21 @@ public partial class MainWindow : Window
             var results = await engine.CheckAsync(_current, GetSelections());
             foreach (var r in results)
             {
-                if (_statusLabels.TryGetValue(r.ToolName, out var label))
+                switch (r.Status)
                 {
-                    label.Text = r.Status switch
-                    {
-                        ToolCheckStatus.Installed => $"状态：✅ 已安装 — {r.Detail}",
-                        ToolCheckStatus.Missing => $"状态：❌ 未安装 — {r.Detail}",
-                        _ => $"状态：✋ 需人工确认 — {r.Detail}",
-                    };
+                    case ToolCheckStatus.Installed:
+                        SetStatus(r.ToolName, r.Detail.Length > 0 ? $"✅ 已装好 · {r.Detail}" : "✅ 已装好", StatusState.Good);
+                        Log($"体检 · {r.ToolName}：已装好（{r.Detail}）", LogKind.Success);
+                        break;
+                    case ToolCheckStatus.Missing:
+                        SetStatus(r.ToolName, "❌ 还没装", StatusState.Bad);
+                        Log($"体检 · {r.ToolName}：还没装 —— {r.Detail}", LogKind.Warn);
+                        break;
+                    default:
+                        SetStatus(r.ToolName, "✋ 需手动确认", StatusState.Manual);
+                        Log($"体检 · {r.ToolName}：需手动确认 —— {r.Detail}");
+                        break;
                 }
-                Log($"体检 · {r.ToolName}：{r.Status}（{r.Detail}）");
             }
         }
         catch (Exception ex) { Log($"体检失败：{ex.Message}"); }
@@ -243,14 +268,14 @@ public partial class MainWindow : Window
             if (preflight.Any(p => !p.Passed))
             {
                 // 产品原则：发现问题先自己修，不把问题甩给用户。
-                Log("发现问题，正在自动处理，不用你动手…");
+                Log("发现问题，正在自动处理，不用你动手…", LogKind.Warn);
                 var healer = new SelfHealService(_runner, _winget);
                 foreach (var item in preflight.Where(p => !p.Passed))
                 {
                     if (item.Name.Contains("winget"))
                     {
                         var heal = await healer.EnsureWingetAsync(m => Log($"修复 · {m}"));
-                        Log($"修复 · winget：{(heal.Fixed ? "✅ 已解决" : "❌ " + heal.Detail)}");
+                        Log($"修复 · winget：{(heal.Fixed ? "✅ 已解决" : "❌ " + heal.Detail)}", heal.Fixed ? LogKind.Success : LogKind.Error);
                     }
                     else if (item.Name.Contains("可写") || item.Name.Contains("磁盘"))
                     {
@@ -297,6 +322,7 @@ public partial class MainWindow : Window
             _currentSubProgress = "";
             _stepStartedAt = DateTime.Now;
             BusyBar.Value = 0;
+            ShowProgress();
             UpdateProgressText();
             _progressTimer.Start();
 
@@ -329,17 +355,17 @@ public partial class MainWindow : Window
             DiagButton.IsEnabled = true;
 
             _progressTimer.Stop();
-            BusyBar.Value = _progressTotalWeight == 0 ? 100 : _progressDoneWeight * 100.0 / _progressTotalWeight;
-            ProgressText.Text = $"总进度 {(int)BusyBar.Value}% · 全部 {_progressTotalSteps} 步已结束";
+            HideProgress();
             if (desktopFolder is not null)
                 _shortcutService.WriteReadmeIfNoShortcuts(desktopFolder, _current.Name, _current.Tools.Select(t => t.Name));
 
             var ok = results.Count(r => r.Outcome is StepOutcome.Succeeded or StepOutcome.Skipped);
             var failed = results.Count(r => r.Outcome == StepOutcome.Failed);
-            Log($"执行完毕：完成 {ok} 步，失败 {failed} 步" + (failed > 0 ? "。失败不怕——点「导出诊断报告」发给老师或同学帮你看。" : "。全部搞定！"));
+            Log($"执行完毕：完成 {ok} 步，失败 {failed} 步" + (failed > 0 ? "。失败不怕——点「导出诊断报告」发给老师或同学帮你看。" : "。全部搞定！"),
+                failed > 0 ? LogKind.Warn : LogKind.Success);
             Check_Click(sender, e);
         }
-        catch (Exception ex) { Log($"配置过程出错：{ex.Message}"); DiagButton.IsEnabled = true; }
+        catch (Exception ex) { HideProgress(); Log($"配置过程出错：{ex.Message}", LogKind.Error); DiagButton.IsEnabled = true; }
         finally { SetBusy(false); }
     }
 
@@ -377,18 +403,20 @@ public partial class MainWindow : Window
 
     private void LogStep(StepResult r)
     {
-        var mark = r.Outcome switch
+        var (mark, kind) = r.Outcome switch
         {
-            StepOutcome.Succeeded => "✅",
-            StepOutcome.Skipped => "⏭️",
-            StepOutcome.Manual => "✋",
-            _ => "❌",
+            StepOutcome.Succeeded => ("✅", LogKind.Success),
+            StepOutcome.Skipped => ("⏭️", LogKind.Info),
+            StepOutcome.Manual => ("✋", LogKind.Warn),
+            _ => ("❌", LogKind.Error),
         };
-        Log($"{mark} {r.Step.Title}：{r.Detail}");
-        if (r.Step.ToolName is not null && _statusLabels.TryGetValue(r.Step.ToolName, out var label)
-            && r.Step.Kind is PlanStepKind.Verify)
+        Log($"{mark} {r.Step.Title}：{r.Detail}", kind);
+        if (r.Step.ToolName is not null && r.Step.Kind is PlanStepKind.Verify)
         {
-            label.Text = r.Outcome == StepOutcome.Succeeded ? $"状态：✅ 已验证 — {r.Detail}" : $"状态：❌ 验证未通过 — {r.Detail}";
+            if (r.Outcome == StepOutcome.Succeeded)
+                SetStatus(r.Step.ToolName, $"✅ 已装好 · {r.Detail}", StatusState.Good);
+            else
+                SetStatus(r.Step.ToolName, "❌ 验证没通过", StatusState.Bad);
         }
     }
 
@@ -431,9 +459,68 @@ public partial class MainWindow : Window
         if (line is not null) Log(line);
     }
 
-    private void Log(string message)
+    private enum LogKind { Info, Success, Error, Warn }
+
+    private static readonly Brush LogInfoBrush = new SolidColorBrush(Color.FromRgb(0x44, 0x4A, 0x4F));
+    private static readonly Brush LogSuccessBrush = new SolidColorBrush(Color.FromRgb(0x2E, 0x7D, 0x32));
+    private static readonly Brush LogErrorBrush = new SolidColorBrush(Color.FromRgb(0xC7, 0x51, 0x46));
+    private static readonly Brush LogWarnBrush = new SolidColorBrush(Color.FromRgb(0xB2, 0x6A, 0x00));
+
+    private void Log(string message, LogKind kind = LogKind.Info)
     {
-        LogList.Items.Add($"{DateTime.Now:HH:mm:ss}  {message}");
-        if (LogList.Items.Count > 0) LogList.ScrollIntoView(LogList.Items[^1]);
+        var brush = kind switch
+        {
+            LogKind.Success => LogSuccessBrush,
+            LogKind.Error => LogErrorBrush,
+            LogKind.Warn => LogWarnBrush,
+            _ => LogInfoBrush,
+        };
+        var item = new ListBoxItem
+        {
+            Content = $"{DateTime.Now:HH:mm:ss}  {message}",
+            Foreground = brush,
+            Padding = new Thickness(6, 2, 6, 2),
+        };
+        LogList.Items.Add(item);
+        LogList.ScrollIntoView(item);
+    }
+
+    private enum StatusState { Neutral, Good, Bad, Manual }
+
+    /// <summary>Colored status pill on each tool card — readable at a glance.</summary>
+    private void SetStatus(string toolName, string text, StatusState state)
+    {
+        if (!_statusLabels.TryGetValue(toolName, out var label)) return;
+        label.Text = text;
+        label.Foreground = state switch
+        {
+            StatusState.Good => new SolidColorBrush(Color.FromRgb(0x2E, 0x7D, 0x32)),
+            StatusState.Bad => new SolidColorBrush(Color.FromRgb(0xC7, 0x51, 0x46)),
+            StatusState.Manual => new SolidColorBrush(Color.FromRgb(0x9A, 0x6A, 0x00)),
+            _ => new SolidColorBrush(Color.FromRgb(0x66, 0x6E, 0x73)),
+        };
+        if (_statusPills.TryGetValue(toolName, out var pill))
+        {
+            pill.Background = state switch
+            {
+                StatusState.Good => new SolidColorBrush(Color.FromRgb(0xE3, 0xF1, 0xE6)),
+                StatusState.Bad => new SolidColorBrush(Color.FromRgb(0xFD, 0xEC, 0xEA)),
+                StatusState.Manual => new SolidColorBrush(Color.FromRgb(0xFF, 0xF4, 0xDE)),
+                _ => new SolidColorBrush(Color.FromRgb(0xEE, 0xF3, 0xF5)),
+            };
+        }
+    }
+
+    private void ShowProgress()
+    {
+        ProgressPanel.Visibility = Visibility.Visible;
+    }
+
+    private void HideProgress()
+    {
+        ProgressPanel.Visibility = Visibility.Collapsed;
+        BusyBar.Value = 0;
+        ProgressText.Text = "";
+        _progressTotalSteps = 0;
     }
 }

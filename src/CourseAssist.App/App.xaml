@@ -10,13 +10,18 @@
         <Style x:Key="AccentButton" TargetType="Button">
             <Setter Property="Background" Value="{StaticResource AccentBrush}"/>
             <Setter Property="Foreground" Value="White"/>
-            <Setter Property="Padding" Value="14,6"/>
+            <Setter Property="Padding" Value="18,8"/>
             <Setter Property="Margin" Value="0,0,8,0"/>
             <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontSize" Value="13.5"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
         </Style>
         <Style x:Key="PlainButton" TargetType="Button">
-            <Setter Property="Padding" Value="14,6"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderBrush" Value="#BFDCEA"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Foreground" Value="#2F7EA3"/>
+            <Setter Property="Padding" Value="14,7"/>
             <Setter Property="Margin" Value="0,0,8,0"/>
             <Setter Property="FontSize" Value="13"/>
         </Style>

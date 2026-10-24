@@ -6,23 +6,26 @@ namespace CourseAssist.Core;
 
 public static class Verification
 {
-    /// <summary>CommandStarted tells callers the verify command could not even launch —
-    /// in that case a winget-list cross-check is more truthful than declaring "未安装".</summary>
-    public static async Task<(bool Ok, string Detail, bool CommandStarted)> RunAsync(
+    /// <summary>Runs a verify command. CommandStarted tells callers the command could not
+    /// even launch (then a winget-list cross-check is more truthful than "未安装").
+    /// FoundLine is the first output line — used to tell the user, in plain words,
+    /// WHICH version is actually present instead of leaking regexes and raw dumps.</summary>
+    public static async Task<(bool Ok, string Detail, bool CommandStarted, string FoundLine)> RunAsync(
         IProcessRunner runner, VerifyDef verify, CancellationToken ct = default)
     {
         try
         {
             var r = await runner.RunAsync(verify.Command, ct);
-            if (!r.Success) return (false, $"验证命令退出码 {r.ExitCode}：{r.Tail(300)}", true);
+            var firstLine = (r.Output.Split('\n', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
+                .FirstOrDefault() ?? "").Replace("\"", "");
+            if (!r.Success) return (false, $"验证命令退出码 {r.ExitCode}：{r.Tail(300)}", true, firstLine);
             if (verify.Expect is not null && !Regex.IsMatch(r.Output, verify.Expect))
-                return (false, $"输出与期望 /{verify.Expect}/ 不匹配：{r.Tail(300)}", true);
-            var firstLine = r.Output.Split('\n', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).FirstOrDefault() ?? "";
-            return (true, firstLine, true);
+                return (false, $"输出与期望 /{verify.Expect}/ 不匹配：{r.Tail(300)}", true, firstLine);
+            return (true, firstLine, true, firstLine);
         }
         catch (Exception ex)
         {
-            return (false, $"无法执行验证命令（程序可能未安装）：{ex.Message}", false);
+            return (false, $"无法执行验证命令（程序可能未安装）：{ex.Message}", false, "");
         }
     }
 }
@@ -54,32 +57,59 @@ public sealed class CheckEngine
             var resolved = tool.Resolve(label);
             if (resolved.Verify is not null)
             {
-                var (ok, detail, started) = await Verification.RunAsync(_runner, resolved.Verify, ct);
-                if (!ok && !started && resolved.Winget is not null)
+                // All user-facing texts below are plain-language on purpose: beginners
+                // should learn what is on their machine and what to do next — never see
+                // regex patterns, exit codes or raw process errors.
+                var (ok, detail, started, found) = await Verification.RunAsync(_runner, resolved.Verify, ct);
+                if (ok)
+                {
+                    results.Add(new ToolCheckResult(tool.Name, resolved.VersionLabel,
+                        ToolCheckStatus.Installed, found));
+                    continue;
+                }
+                if (!started && resolved.Winget is not null)
                 {
                     // The verify command itself could not launch (e.g. its folder is not
                     // on PATH yet). Cross-check with winget's own records before judging.
                     if (await _winget.IsInstalledAsync(resolved.Winget, ct))
                     {
                         results.Add(new ToolCheckResult(tool.Name, resolved.VersionLabel,
-                            ToolCheckStatus.Installed, "winget 名单确认已安装（验证命令暂时跑不起来，可能是环境变量还没刷新，重启电脑后会恢复）"));
+                            ToolCheckStatus.Installed, "已在电脑上（刚装好时验证命令偶尔要重启后才顺畅，不影响使用）"));
                         continue;
                     }
+                    results.Add(new ToolCheckResult(tool.Name, resolved.VersionLabel,
+                        ToolCheckStatus.Missing, "还没安装，点「一键配置」就会装上"));
+                    continue;
+                }
+                if (!started)
+                {
+                    results.Add(new ToolCheckResult(tool.Name, resolved.VersionLabel,
+                        ToolCheckStatus.Missing, "还没安装（或刚装完还没生效，重启电脑后再体检一次）"));
+                    continue;
+                }
+                if (detail.StartsWith("输出与期望", StringComparison.Ordinal))
+                {
+                    // Something IS installed, just not the version this course wants.
+                    var want = resolved.VersionLabel is { } lbl ? $"这门课要用 {tool.Name} {lbl}" : "这门课要用另一个版本";
+                    results.Add(new ToolCheckResult(tool.Name, resolved.VersionLabel,
+                        ToolCheckStatus.Missing,
+                        $"电脑上现在是「{found}」，{want} —— 点「一键配置」会装上需要的版本（不同版本可以共存，不用先卸载）"));
+                    continue;
                 }
                 results.Add(new ToolCheckResult(tool.Name, resolved.VersionLabel,
-                    ok ? ToolCheckStatus.Installed : ToolCheckStatus.Missing, detail));
+                    ToolCheckStatus.Missing, "还没安装成功，点「一键配置」试试"));
             }
             else if (resolved.Winget is not null)
             {
                 var installed = await _winget.IsInstalledAsync(resolved.Winget, ct);
                 results.Add(new ToolCheckResult(tool.Name, resolved.VersionLabel,
                     installed ? ToolCheckStatus.Installed : ToolCheckStatus.Missing,
-                    installed ? "winget 显示已安装" : "winget 显示未安装"));
+                    installed ? "已在电脑上" : "还没安装，点「一键配置」就会装上"));
             }
             else
             {
                 results.Add(new ToolCheckResult(tool.Name, resolved.VersionLabel,
-                    ToolCheckStatus.Unknown, "该工具为手动安装项，无法自动检测"));
+                    ToolCheckStatus.Unknown, "这个是手动安装的软件，装没装请打开它确认一下"));
             }
         }
         return results;
@@ -264,8 +294,15 @@ public sealed class InstallExecutor
 
     private async Task<StepResult> VerifyStepAsync(PlanStep step, CancellationToken ct)
     {
-        var (ok, detail, _) = await Verification.RunAsync(_runner, step.Verify!, ct);
-        return new StepResult(step, ok ? StepOutcome.Succeeded : StepOutcome.Failed, detail);
+        var (ok, detail, started, found) = await Verification.RunAsync(_runner, step.Verify!, ct);
+        if (ok) return new StepResult(step, StepOutcome.Succeeded, found);
+        if (!started)
+            return new StepResult(step, StepOutcome.Failed,
+                "验证命令暂时跑不起来（可能刚装完环境变量还没刷新，重启电脑后再体检一次）");
+        if (detail.StartsWith("输出与期望", StringComparison.Ordinal))
+            return new StepResult(step, StepOutcome.Failed,
+                $"装的版本不是课程要求的（电脑上现在是：{found}）");
+        return new StepResult(step, StepOutcome.Failed, "验证没通过，可能没有安装成功");
     }
 
     /// <summary>按安装记录卸载某门课装过的软件并还原环境变量。返回日志行。</summary>
