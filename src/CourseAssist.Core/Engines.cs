@@ -6,21 +6,23 @@ namespace CourseAssist.Core;
 
 public static class Verification
 {
-    public static async Task<(bool Ok, string Detail)> RunAsync(
+    /// <summary>CommandStarted tells callers the verify command could not even launch —
+    /// in that case a winget-list cross-check is more truthful than declaring "未安装".</summary>
+    public static async Task<(bool Ok, string Detail, bool CommandStarted)> RunAsync(
         IProcessRunner runner, VerifyDef verify, CancellationToken ct = default)
     {
         try
         {
             var r = await runner.RunAsync(verify.Command, ct);
-            if (!r.Success) return (false, $"验证命令退出码 {r.ExitCode}：{r.Tail(300)}");
+            if (!r.Success) return (false, $"验证命令退出码 {r.ExitCode}：{r.Tail(300)}", true);
             if (verify.Expect is not null && !Regex.IsMatch(r.Output, verify.Expect))
-                return (false, $"输出与期望 /{verify.Expect}/ 不匹配：{r.Tail(300)}");
+                return (false, $"输出与期望 /{verify.Expect}/ 不匹配：{r.Tail(300)}", true);
             var firstLine = r.Output.Split('\n', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).FirstOrDefault() ?? "";
-            return (true, firstLine);
+            return (true, firstLine, true);
         }
         catch (Exception ex)
         {
-            return (false, $"无法执行验证命令（程序可能未安装）：{ex.Message}");
+            return (false, $"无法执行验证命令（程序可能未安装）：{ex.Message}", false);
         }
     }
 }
@@ -52,7 +54,18 @@ public sealed class CheckEngine
             var resolved = tool.Resolve(label);
             if (resolved.Verify is not null)
             {
-                var (ok, detail) = await Verification.RunAsync(_runner, resolved.Verify, ct);
+                var (ok, detail, started) = await Verification.RunAsync(_runner, resolved.Verify, ct);
+                if (!ok && !started && resolved.Winget is not null)
+                {
+                    // The verify command itself could not launch (e.g. its folder is not
+                    // on PATH yet). Cross-check with winget's own records before judging.
+                    if (await _winget.IsInstalledAsync(resolved.Winget, ct))
+                    {
+                        results.Add(new ToolCheckResult(tool.Name, resolved.VersionLabel,
+                            ToolCheckStatus.Installed, "winget 名单确认已安装（验证命令暂时跑不起来，可能是环境变量还没刷新，重启电脑后会恢复）"));
+                        continue;
+                    }
+                }
                 results.Add(new ToolCheckResult(tool.Name, resolved.VersionLabel,
                     ok ? ToolCheckStatus.Installed : ToolCheckStatus.Missing, detail));
             }
@@ -131,7 +144,7 @@ public sealed class InstallExecutor
             _stateStore.Save(state);
             return new StepResult(step, StepOutcome.Skipped, "已安装，跳过（断点续装）");
         }
-        var r = await _runner.RunAsync("winget", WingetCommands.InstallArgs(id, step.Location), ct);
+        var r = await _runner.RunAsync(_winget.Executable, WingetCommands.InstallArgs(id, step.Location), ct);
         if (r.Success || r.Output.Contains("Successfully installed", StringComparison.OrdinalIgnoreCase))
         {
             UpsertRecord(bundle, step, state);
@@ -196,7 +209,7 @@ public sealed class InstallExecutor
 
     private async Task<StepResult> VerifyStepAsync(PlanStep step, CancellationToken ct)
     {
-        var (ok, detail) = await Verification.RunAsync(_runner, step.Verify!, ct);
+        var (ok, detail, _) = await Verification.RunAsync(_runner, step.Verify!, ct);
         return new StepResult(step, ok ? StepOutcome.Succeeded : StepOutcome.Failed, detail);
     }
 
@@ -215,7 +228,7 @@ public sealed class InstallExecutor
             }
             if (record.WingetId is not null)
             {
-                var r = await _runner.RunAsync("winget", WingetCommands.UninstallArgs(record.WingetId), ct);
+                var r = await _runner.RunAsync(_winget.Executable, WingetCommands.UninstallArgs(record.WingetId), ct);
                 log.Add(r.Success ? $"已卸载 {record.ToolName}" : $"卸载 {record.ToolName} 失败（退出码 {r.ExitCode}），可手动在系统设置中卸载");
             }
             state.Installs.Remove(record);
@@ -286,7 +299,7 @@ public sealed class Preflight
 
         var wingetOk = await _winget.IsAvailableAsync(ct);
         items.Add(new PreflightItem("winget 包管理器", wingetOk,
-            wingetOk ? "可用" : "不可用：请先从 Microsoft Store 安装/更新「应用安装程序」"));
+            wingetOk ? "可用" : "不可用（程序会自动尝试修复，不用你手动处理）"));
 
         try
         {

@@ -171,6 +171,16 @@ public partial class MainWindow : Window
         if (dialog.ShowDialog() == true) InstallRootBox.Text = dialog.FolderName;
     }
 
+    private async Task<IReadOnlyList<PreflightItem>> RunPreflightAsync(string root)
+    {
+        Log("开始预检…");
+        var preflight = await new Preflight(_winget).CheckAsync(root);
+        _lastPreflight = preflight;
+        foreach (var item in preflight)
+            Log($"预检 · {(item.Passed ? "✅" : "❌")} {item.Name}：{item.Detail}");
+        return preflight;
+    }
+
     private async void Check_Click(object sender, RoutedEventArgs e)
     {
         if (_current is null) { Log("先选一门课。"); return; }
@@ -205,15 +215,36 @@ public partial class MainWindow : Window
         SetBusy(true);
         try
         {
-            Log("开始预检…");
-            var preflight = await new Preflight(_winget).CheckAsync(root);
-            _lastPreflight = preflight;
-            foreach (var item in preflight)
-                Log($"预检 · {(item.Passed ? "✅" : "❌")} {item.Name}：{item.Detail}");
-            var critical = preflight.Where(p => !p.Passed && (p.Name.Contains("winget") || p.Name.Contains("可写"))).ToList();
+            var preflight = await RunPreflightAsync(root);
+            if (preflight.Any(p => !p.Passed))
+            {
+                // 产品原则：发现问题先自己修，不把问题甩给用户。
+                Log("发现问题，正在自动处理，不用你动手…");
+                var healer = new SelfHealService(_runner, _winget);
+                foreach (var item in preflight.Where(p => !p.Passed))
+                {
+                    if (item.Name.Contains("winget"))
+                    {
+                        var heal = await healer.EnsureWingetAsync(m => Log($"修复 · {m}"));
+                        Log($"修复 · winget：{(heal.Fixed ? "✅ 已解决" : "❌ " + heal.Detail)}");
+                    }
+                    else if (item.Name.Contains("可写") || item.Name.Contains("磁盘"))
+                    {
+                        var fallback = healer.SuggestFallbackRoot(root);
+                        if (fallback is not null && !fallback.Equals(root, StringComparison.OrdinalIgnoreCase))
+                        {
+                            root = fallback;
+                            InstallRootBox.Text = fallback;
+                            Log($"修复 · 原安装位置用不了，已自动改到 {fallback}");
+                        }
+                    }
+                }
+                preflight = await RunPreflightAsync(root);
+            }
+            var critical = preflight.Where(p => !p.Passed && (p.Name.Contains("winget") || p.Name.Contains("可写") || p.Name.Contains("系统"))).ToList();
             if (critical.Count > 0)
             {
-                Log("预检有关键项未通过，已停止。修好后重试；也可以导出诊断报告求助。");
+                Log("自动修复后仍有问题没能解决，已停止。点「导出诊断报告」发给老师或同学，他们能帮你看。");
                 DiagButton.IsEnabled = true;
                 return;
             }

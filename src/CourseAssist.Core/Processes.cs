@@ -82,13 +82,41 @@ public static class WingetCommands
 public sealed class WingetService
 {
     private readonly IProcessRunner _runner;
+    private bool _resolved;
+
     public WingetService(IProcessRunner runner) => _runner = runner;
 
-    public async Task<bool> IsAvailableAsync(CancellationToken ct = default)
+    /// <summary>How to invoke winget: plain "winget" when it is on PATH, otherwise the
+    /// full path found by <see cref="ResolveExecutableAsync"/>.</summary>
+    public string Executable { get; private set; } = "winget";
+
+    /// <summary>Probe the standard install locations for winget.exe (it can exist on the
+    /// machine while missing from PATH) and remember the full path when found.</summary>
+    public async Task<bool> ResolveExecutableAsync(CancellationToken ct = default)
+    {
+        if (_resolved) return Executable != "winget" || await ProbeAsync("winget", ct);
+        _resolved = true;
+        var local = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+        var candidates = new[]
+        {
+            Path.Combine(local, "Microsoft", "WindowsApps", "winget.exe"),
+        };
+        foreach (var candidate in candidates)
+        {
+            if (File.Exists(candidate) && await ProbeAsync(candidate, ct))
+            {
+                Executable = candidate;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private async Task<bool> ProbeAsync(string exe, CancellationToken ct)
     {
         try
         {
-            var r = await _runner.RunAsync("winget", "--version", ct);
+            var r = await _runner.RunAsync(exe, "--version", ct);
             return r.Success;
         }
         catch
@@ -97,11 +125,20 @@ public sealed class WingetService
         }
     }
 
+    public async Task<bool> IsAvailableAsync(CancellationToken ct = default)
+    {
+        if (await ProbeAsync(Executable, ct)) return true;
+        // Not reachable by name — maybe it exists but is not on PATH. Self-heal the path.
+        if (Executable == "winget" && await ResolveExecutableAsync(ct))
+            return await ProbeAsync(Executable, ct);
+        return false;
+    }
+
     public async Task<bool> IsInstalledAsync(string id, CancellationToken ct = default)
     {
         try
         {
-            var r = await _runner.RunAsync("winget", WingetCommands.ListArgs(id), ct);
+            var r = await _runner.RunAsync(Executable, WingetCommands.ListArgs(id), ct);
             return r.Success && r.Output.Contains(id, StringComparison.OrdinalIgnoreCase);
         }
         catch
