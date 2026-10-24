@@ -1,4 +1,4 @@
-# 课程包（draft）：数据结构课沿用语言课环境，C / Java / Python 三条线任选其一。
+# 课程包（draft）：数据结构课沿用语言课环境，C / Java / Python 三条线任选其一，教程均已配好。
 id: data-structures
 name: 数据结构
 category: programming
@@ -12,6 +12,16 @@ tools:
     verify:
       command: code --version
       expect: '\d+\.\d+'
+    shortcut: Visual Studio Code
+    guide:
+      tutorial_url: https://code.visualstudio.com/docs
+      tutorial_title: VS Code 官方文档（跟随最新版）
+      diagram: editor
+      steps:
+        - 打开 VS Code，「文件 → 打开文件夹」选中练习代码的文件夹
+        - 按你这门课的语言装对应插件（C/C++、Java 或 Python）
+        - 每道题建一个文件，写完点右上角三角运行，对照题目样例检查输出
+      note: VS Code 是持续更新的软件，官方文档始终对应最新版界面。
   - name: MinGW-w64 (WinLibs GCC)
     purpose: C 语言线：编译器本体
     winget: BrechtSanders.WinLibs.POSIX.UCRT
@@ -19,6 +29,16 @@ tools:
     verify:
       command: gcc --version
       expect: 'gcc'
+    shortcut: none
+    guide:
+      tutorial_url: https://winlibs.com/
+      tutorial_title: WinLibs 官网（GCC 工具链说明）
+      diagram: terminal
+      steps:
+        - 终端输入 gcc --version 确认编译器就位
+        - 在代码目录执行 gcc list.c -o list -g 编译（-g 方便调试）
+        - 执行 .\list 运行；想单步调试在 VS Code 里按 F5
+      note: GCC 命令行用法多年稳定，步骤适用于你装的这个版本。
   - name: JDK 17
     purpose: Java 线：开发工具包（更多版本见 Java 程序设计课程包）
     winget: Microsoft.OpenJDK.17
@@ -29,6 +49,16 @@ tools:
     env:
       JAVA_HOME: "{install_dir}"
       path_additions: ["{install_dir}\\bin"]
+    shortcut: none
+    guide:
+      tutorial_url: https://docs.oracle.com/en/java/javase/17/
+      tutorial_title: Oracle 官方文档（Java SE 17 版）
+      diagram: terminal
+      steps:
+        - 终端输入 java -version，应显示 17.x
+        - 新建 .java 文件，javac 编译、java 运行
+        - 每个数据结构建一个类文件，主类里写 main 逐个测试
+      note: 教程对应 JDK 17：链接是 17 的官方文档专区。想要 8/11/21 的教程，去 Java 程序设计课里选对应版本。
   - name: Python 3.12
     purpose: Python 线：解释器本体
     winget: Python.Python.3.12
@@ -36,10 +66,30 @@ tools:
     verify:
       command: python --version
       expect: 'Python 3\.12'
+    shortcut: IDLE
+    guide:
+      tutorial_url: https://docs.python.org/zh-cn/3.12/tutorial/index.html
+      tutorial_title: Python 官方中文教程（3.12 版）
+      diagram: terminal
+      steps:
+        - 终端输入 python --version，应显示 Python 3.12.x
+        - 写好的算法保存为 .py，用 python 文件名.py 运行
+        - 想逐步看变量变化，用 VS Code 打断点按 F5 调试
+      note: 教程对应 Python 3.12：链接里的版本号就是 3.12。
   - name: Dev-C++
     purpose: 机房同款 IDE：学校机房用它的可以在宿舍电脑上装一份保持手感一致
     winget: Embarcadero.DevCpp
     required: false
+    shortcut: Dev-C++
+    guide:
+      tutorial_url: https://www.bloodshed.net/
+      tutorial_title: Dev-C++ 官网
+      diagram: ide
+      steps:
+        - 打开 Dev-C++，「文件 → 新建 → 源代码」
+        - 写完代码点「编译运行」（F11），在黑窗口里按题目给的样例输入
+        - 输出和样例逐行对照，不一致就回代码里查逻辑
+      note: Dev-C++ 界面多年未变，步骤适用于当前版本。
   - name: Git
     purpose: 版本管理：把每次练习代码存档、方便对比修改
     winget: Git.Git
@@ -47,4 +97,14 @@ tools:
     verify:
       command: git --version
       expect: 'git version'
+    shortcut: Git Bash
+    guide:
+      tutorial_url: https://git-scm.com/book/zh/v2
+      tutorial_title: 《Pro Git》官方中文版（Git 官方推荐）
+      diagram: terminal
+      steps:
+        - 先设置身份：git config --global user.name / user.email 各设一次
+        - 在练习文件夹 git init，之后每完成一道题就 commit 一次
+        - 写坏了想回退：git log 看历史版本，git checkout 版本号 -- 文件名 恢复
+      note: Git 命令行多年保持一致，官方中文书对应你装的版本。
 notes: 一般只需装你这门课用的那条语言线，别三条都装。

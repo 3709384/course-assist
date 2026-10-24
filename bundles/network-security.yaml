@@ -1,4 +1,4 @@
-# 课程包（draft）：安全课工具链：虚拟机 + 抓包 + 扫描 + Web 安全 + 密码学经典工具，全在隔离环境里练。
+# 课程包（draft）：安全课工具链：虚拟机 + 抓包 + 扫描 + Web 安全 + 密码学经典工具，全在隔离环境里练，教程已配好。
 id: network-security
 name: 网络安全
 category: electives
@@ -9,14 +9,44 @@ tools:
     purpose: 搭隔离实验环境的地基：Kali 和靶机都跑在里面
     winget: Oracle.VirtualBox
     required: true
+    shortcut: Oracle VM VirtualBox
+    guide:
+      tutorial_url: https://www.virtualbox.org/manual/
+      tutorial_title: VirtualBox 官方用户手册（跟随最新版）
+      diagram: vm
+      steps:
+        - 选中虚拟机 → 设置 → 网络，把网卡改成「仅主机网络」或 NAT 网络，别用桥接练攻击工具
+        - Kali 和靶机都设成同一种网络模式，它们之间互相能 ping 通就行
+        - 每台机装好先拍快照，实验做坏了一键还原
+      note: VirtualBox 官方手册对应当前发行版，与你装的一致。
   - name: Kali Linux
     purpose: 渗透测试系统：自带几百个安全工具（在虚拟机里装，或用 WSL 版）
     manual: 到 Kali 官网下载 VirtualBox 专用镜像导入 VirtualBox；或在 Microsoft Store 装 Kali Linux（WSL 版）。默认账号 kali/kali。
     required: true
+    shortcut: none
+    guide:
+      tutorial_url: https://www.kali.org/docs/introduction/
+      tutorial_title: Kali Linux 官方文档（入门）
+      diagram: terminal
+      steps:
+        - 导入镜像后用 kali/kali 登录，先执行 sudo apt update 更新软件源
+        - 工具都在左上角的应用菜单里按分类放好，也可以终端输工具名直接启动
+        - 第一条练手命令：在终端对靶机 IP 执行 ping 和 nmap，确认两台机互通
+      note: Kali 官方文档对应当前滚动发行版，与你下载的镜像一致。
   - name: Wireshark
     purpose: 抓包分析：理解协议和攻击流量
     winget: WiresharkFoundation.Wireshark
     required: true
+    shortcut: Wireshark
+    guide:
+      tutorial_url: https://www.wireshark.org/docs/wsug_html_chunked/
+      tutorial_title: Wireshark 官方用户手册（跟随最新版）
+      diagram: ide
+      steps:
+        - 在 Kali 或靶机里操作时同步开 Wireshark 抓包，选两台机共同在的那块网卡
+        - 过滤栏输入目标 IP：ip.addr == 靶机IP，只看实验流量
+        - 右键任意包 → 追踪 → TCP 流，能完整看到一次交互的来回报文
+      note: Wireshark 官方手册对应当前发行版，与你装的一致。
   - name: Nmap
     purpose: 端口扫描与主机发现的经典工具
     winget: Insecure.Nmap
@@ -24,12 +54,42 @@ tools:
     verify:
       command: nmap --version
       expect: 'Nmap version'
+    shortcut: Zenmap
+    guide:
+      tutorial_url: https://nmap.org/book/man.html
+      tutorial_title: Nmap 官方参考手册
+      diagram: terminal
+      steps:
+        - 只在自己的实验网段练：nmap 靶机IP 看它开了哪些端口
+        - nmap -sV 靶机IP 能进一步识别每个端口跑的服务和版本
+        - 图形版 Zenmap 在开始菜单里，命令会自动拼好，适合对照学习参数
+      note: Nmap 官方手册对应当前发行版，与你装的一致。
   - name: Burp Suite Community
     purpose: Web 安全测试：抓改 HTTP 请求，Web 实验必备
     winget: PortSwigger.BurpSuite.Community
     required: false
+    shortcut: Burp Suite Community Edition
+    guide:
+      tutorial_url: https://portswigger.com/burp/documentation/desktop/getting-started
+      tutorial_title: PortSwigger 官方入门（Burp Suite，跟随最新版）
+      diagram: browser
+      steps:
+        - 打开 Burp 一路默认建临时项目，Proxy 页点 Open Browser 用它自带浏览器访问靶场
+        - 在自带浏览器里的操作都会出现在 Proxy → HTTP history 里
+        - 选中一条请求右键 Send to Repeater，就能改参数重发——Web 实验的核心玩法
+      note: Burp 持续更新，官方入门对应最新版界面。浏览器代理、证书等进阶配置看官方入门的后半部分。
   - name: John the Ripper
     purpose: 密码哈希破解经典工具：密码学与口令安全实验常用（只在实验环境练）
     manual: 到 openwall 官网下载 John the Ripper 的 Windows 版压缩包解压即用；实验靶机里通常也预装了 hashcat，可二选一。
     required: false
+    shortcut: none
+    guide:
+      tutorial_url: https://www.openwall.com/john/doc/
+      tutorial_title: John the Ripper 官方文档
+      diagram: terminal
+      steps:
+        - 把实验给的哈希按每行一条存进 hash.txt
+        - 在 John 目录执行 john hash.txt，它会用自带字典先跑一轮
+        - 跑完用 john --show hash.txt 看破出来的明文；中途按 Ctrl+C，下次会自动续跑
+      note: John 官方文档对应当前发行版；实验用法只限老师提供的哈希与靶机。
 notes: 所有攻击性工具只许在自己的虚拟机和靶场环境里用，扫描或攻击别人的网络是违法的——这点老师上课也会强调。虚拟机网卡建议用「仅主机」或「NAT 网络」模式做实验。

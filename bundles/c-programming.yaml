@@ -1,4 +1,4 @@
-# 课程包（draft）：C/C++ 工具链 + 三种编辑器选择 + 常用辅助，待实机验证。
+# 课程包（draft）：C/C++ 工具链 + 三种编辑器选择 + 常用辅助，教程均配好，待实机验证。
 id: c-programming
 name: C/C++ 程序设计
 category: programming
@@ -14,6 +14,16 @@ tools:
       expect: 'gcc'
     env:
       path_additions: ["{install_dir}\\bin"]
+    shortcut: none
+    guide:
+      tutorial_url: https://winlibs.com/
+      tutorial_title: WinLibs 官网（GCC 工具链说明）
+      diagram: terminal
+      steps:
+        - 终端输入 gcc --version，能显示版本号就说明编译器就位了
+        - 写好 hello.c 后，在文件所在目录执行 gcc hello.c -o hello 编译
+        - 执行 .\hello 运行；C++ 文件换成 g++ 即可
+      note: GCC 命令行用法多年稳定，步骤适用于你装的这个版本。
   - name: VS Code
     purpose: 轻量编辑器（推荐）：配 C/C++ 插件后写代码、调试都方便
     winget: Microsoft.VisualStudioCode
@@ -21,18 +31,58 @@ tools:
     verify:
       command: code --version
       expect: '\d+\.\d+'
+    shortcut: Visual Studio Code
+    guide:
+      tutorial_url: https://code.visualstudio.com/docs
+      tutorial_title: VS Code 官方文档（跟随最新版）
+      diagram: editor
+      steps:
+        - 打开 VS Code，「文件 → 打开文件夹」选中放代码的文件夹
+        - 左侧插件市场搜索安装「C/C++」插件（微软官方）
+        - 新建 hello.c 写代码，点右上角三角运行，或按 F5 调试（第一次会问选 GCC）
+      note: VS Code 是持续更新的软件，官方文档始终对应最新版界面。
   - name: Visual Studio 2022 Community
     purpose: 重量级 IDE 替代：课程使用 VS 或以后要做 Windows 开发时选它（体积大，下载久）
     winget: Microsoft.VisualStudio.2022.Community
     required: false
+    shortcut: Visual Studio 2022
+    guide:
+      tutorial_url: https://learn.microsoft.com/zh-cn/visualstudio/get-started/visual-studio-ide?view=vs-2022
+      tutorial_title: 微软官方 VS 2022 入门（中文，对应 2022 版）
+      diagram: ide
+      steps:
+        - 打开 Visual Studio，点「创建新项目」→ 选「控制台应用」（C++）→ 下一步、创建
+        - 项目自带一个 .cpp 文件，把 printf 那行改成自己的代码先跑通
+        - 点上方绿色三角（本地 Windows 调试器）运行，下方输出窗口看结果
+      note: 教程对应 Visual Studio 2022：链接里带 view=vs-2022，就是这个大版本的文档。
   - name: Dev-C++
     purpose: 老牌教学 IDE 替代：部分学校机房和教材仍以它为准
     winget: Embarcadero.DevCpp
     required: false
+    shortcut: Dev-C++
+    guide:
+      tutorial_url: https://www.bloodshed.net/
+      tutorial_title: Dev-C++ 官网
+      diagram: ide
+      steps:
+        - 打开 Dev-C++，菜单「文件 → 新建 → 源代码」
+        - 写好代码后点工具栏的「编译运行」按钮（或按 F11）
+        - 程序在弹出的黑色窗口里运行，看完按任意键关闭
+      note: Dev-C++ 界面多年未变，步骤适用于当前版本。
   - name: MSYS2
     purpose: 工具链替代/补充：需要 make、gdb 等 Unix 风格工具时装它
     winget: MSYS2.MSYS2
     required: false
+    shortcut: MSYS2
+    guide:
+      tutorial_url: https://www.msys2.org/docs/what-is-msys2/
+      tutorial_title: MSYS2 官方文档
+      diagram: terminal
+      steps:
+        - 从开始菜单打开「MSYS2 UCRT64」终端（写 C/C++ 用这个，别开错）
+        - 装工具用 pacman -S 包名，比如 pacman -S make
+        - 在这个终端里 gcc、g++ 和在 Linux 里用法完全一样
+      note: MSYS2 官方文档对应当前发行版，与你装的一致。
   - name: CMake
     purpose: 跨平台构建工具：高年级课程和开源项目常用
     winget: Kitware.CMake
@@ -40,6 +90,16 @@ tools:
     verify:
       command: cmake --version
       expect: 'cmake version'
+    shortcut: CMake
+    guide:
+      tutorial_url: https://cmake.org/cmake/help/latest/guide/tutorial/index.html
+      tutorial_title: CMake 官方教程（latest 版文档）
+      diagram: terminal
+      steps:
+        - 终端输入 cmake --version 确认装好
+        - 项目根目录要有 CMakeLists.txt，在该目录执行 cmake -B build 生成构建目录
+        - 再执行 cmake --build build 编译，生成的程序在 build 里
+      note: CMake 官方 latest 文档对应当前发行版，与你装的版本一致。
   - name: Git
     purpose: 版本管理：交作业、拉老师代码都要用
     winget: Git.Git
@@ -47,10 +107,30 @@ tools:
     verify:
       command: git --version
       expect: 'git version'
+    shortcut: Git Bash
+    guide:
+      tutorial_url: https://git-scm.com/book/zh/v2
+      tutorial_title: 《Pro Git》官方中文版（Git 官方推荐）
+      diagram: terminal
+      steps:
+        - 先设置身份：git config --global user.name "你的名字" 和 user.email "你的邮箱"
+        - 在代码文件夹执行 git init 初始化仓库
+        - 日常三连：git add . → git commit -m "说明" → git push
+      note: Git 命令行多年保持一致，官方中文书对应你装的版本。
   - name: Notepad++
     purpose: 随手看代码、改配置文件的轻量文本编辑器
     winget: Notepad++.Notepad++
     required: false
+    shortcut: Notepad++
+    guide:
+      tutorial_url: https://npp-user-manual.org/
+      tutorial_title: Notepad++ 官方用户手册（跟随最新版）
+      diagram: editor
+      steps:
+        - 双击任何文本文件，右键选「用 Notepad++ 打开」即可编辑
+        - 顶部菜单「语言」里选 C/C++，代码就会按语法上色
+        - 「搜索 → 在文件中查找」可以在整个文件夹里批量找关键词
+      note: Notepad++ 官方手册对应最新版，与你装的一致。
 steps:
   - type: manual
     title: VS Code 首次打开后，在插件市场搜索并安装「C/C++」插件（微软官方），才有代码提示和调试功能

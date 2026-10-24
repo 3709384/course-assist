@@ -1,4 +1,4 @@
-# 课程包（draft）：WSL2 轻量路线 + 终端/远程工具全套，待实机验证。
+# 课程包（draft）：WSL2 轻量路线 + 终端/远程工具全套，教程已配好，待实机验证。
 id: linux-systems
 name: Linux 系统
 category: systems
@@ -9,18 +9,58 @@ tools:
     purpose: 现代终端：多标签、分屏，连 WSL 和 SSH 都顺手
     winget: Microsoft.WindowsTerminal
     required: true
+    shortcut: Terminal
+    guide:
+      tutorial_url: https://learn.microsoft.com/zh-cn/windows/terminal/
+      tutorial_title: 微软官方 Windows Terminal 文档（中文）
+      diagram: terminal
+      steps:
+        - 打开 Windows Terminal，下拉箭头里选 Ubuntu，就是你的 Linux
+        - 先练五条命令：ls 看文件、cd 进目录、pwd 看当前位置、mkdir 建文件夹、cat 看文件内容
+        - Alt+Shift+D 可以把当前终端左右分屏，一边看代码一边跑命令
+      note: 微软官方文档对应当前发布的 Terminal 版本。
   - name: PuTTY
     purpose: SSH 客户端经典款：连学校服务器（已有其他 SSH 工具可不装）
     winget: PuTTY.PuTTY
     required: false
+    shortcut: PuTTY
+    guide:
+      tutorial_url: https://the.earth.li/~sgtatham/putty/latest/htmldoc/
+      tutorial_title: PuTTY 官方手册（latest 版）
+      diagram: terminal
+      steps:
+        - 打开 PuTTY，Host Name 填老师给的服务器 IP，端口 22，选 SSH
+        - 点 Open 后输入用户名密码，看到 Linux 提示符就是连上了
+        - 常连的服务器在 Saved Sessions 里存个名字，下次双击打开
+      note: PuTTY 官网 latest 手册对应当前发行版。
   - name: FinalShell
     purpose: 国产 SSH 工具替代：自带文件管理和服务器监控，学生里很流行
     manual: 到 FinalShell 官网下载安装包；免费版功能足够课程使用。
     required: false
+    shortcut: FinalShell
+    guide:
+      tutorial_url: https://www.hostbuf.com/
+      tutorial_title: FinalShell 官网（使用说明）
+      diagram: editor
+      steps:
+        - 打开 FinalShell，点左上角文件夹图标 → 新建 SSH 连接
+        - 填服务器地址、用户名密码保存，双击就连上
+        - 窗口下方直接能拖拽传文件，右侧能看服务器 CPU/内存状态
+      note: FinalShell 操作方式在当前版本线保持一致，官网有图文说明。
   - name: WinSCP
     purpose: 图形化传文件到 Linux 服务器
     winget: WinSCP.WinSCP
     required: false
+    shortcut: WinSCP
+    guide:
+      tutorial_url: https://winscp.net/eng/docs/guide_begin
+      tutorial_title: WinSCP 官方新手指南
+      diagram: editor
+      steps:
+        - 点「新建会话」填服务器 IP、用户名、密码后登录
+        - 左边本地、右边服务器，文件拖过去就是上传
+        - 实验文件传上去后，回终端里 ls 确认到位
+      note: WinSCP 官方指南对应当前发行版界面。
   - name: Git
     purpose: Windows 侧自带 OpenSSH 之外的补充：拉代码、配密钥都用得上
     winget: Git.Git
@@ -28,10 +68,30 @@ tools:
     verify:
       command: git --version
       expect: 'git version'
+    shortcut: Git Bash
+    guide:
+      tutorial_url: https://git-scm.com/book/zh/v2
+      tutorial_title: 《Pro Git》官方中文版（Git 官方推荐）
+      diagram: terminal
+      steps:
+        - 先设置身份：git config --global user.name / user.email 各设一次
+        - 老师发仓库地址时 git clone 地址 拉代码
+        - 在 WSL 里同样可以用 git，两边操作无区别
+      note: Git 命令行多年保持一致，官方中文书对应你装的版本。
   - name: VirtualBox
     purpose: 需要完整桌面版 Ubuntu 或课程指定虚拟机时选它
     winget: Oracle.VirtualBox
     required: false
+    shortcut: Oracle VM VirtualBox
+    guide:
+      tutorial_url: https://www.virtualbox.org/manual/
+      tutorial_title: VirtualBox 官方用户手册（跟随最新版）
+      diagram: vm
+      steps:
+        - 点「新建」建一台 Ubuntu 虚拟机，内存 2-4GB、硬盘 25GB 以上
+        - 启动时选 Ubuntu 的 ISO 镜像装系统
+        - 装好先拍一张快照，实验做坏了可以一键回到干净状态
+      note: VirtualBox 官方手册对应当前发行版，与你装的一致。
 steps:
   - type: feature
     name: wsl

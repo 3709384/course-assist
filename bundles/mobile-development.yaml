@@ -1,14 +1,24 @@
-# 课程包（draft）：Android Studio 主线 + 跨端工具（uni-app/Flutter）指引 + 真机投屏。
+# 课程包（draft）：Android Studio 主线 + 跨端工具（uni-app/Flutter）指引 + 真机投屏，教程已配好。
 id: mobile-development
 name: 移动应用开发
 category: engineering
-summary: Android Studio 是主线（含模拟器）；做微信小程序/跨端方向的同学看补充工具。
+summary: Android Studio 是主线（含模拟器）；做微信小程序/跨端方向的同学看备注里的补充工具。
 status: draft
 tools:
   - name: Android Studio
     purpose: 安卓开发官方 IDE：写代码、拖界面、跑模拟器都在它里面（体积大，首次启动还要下 SDK）
     winget: Google.AndroidStudio
     required: true
+    shortcut: Android Studio
+    guide:
+      tutorial_url: https://developer.android.google.cn/studio/intro
+      tutorial_title: Android Studio 官方中文文档（跟随最新版）
+      diagram: ide
+      steps:
+        - 第一次打开按向导走：选 Standard，SDK 和模拟器会自动下载（几个 GB，找网络好的时候）
+        - 点 New Project → Empty Views Activity，起好名字点 Finish，等右下角进度跑完
+        - 打开 activity_main.xml 是拖界面的地方，MainActivity 是写逻辑的地方；点上方绿三角选模拟器运行
+      note: Android Studio 持续更新，谷歌官方中文文档对应最新版界面。给的链接是官方中文站。
   - name: JDK 17
     purpose: 某些构建脚本和跨端框架（如 React Native）需要独立 JDK；Android Studio 自带一份，这个是补充
     winget: Microsoft.OpenJDK.17
@@ -19,18 +29,58 @@ tools:
     env:
       JAVA_HOME: "{install_dir}"
       path_additions: ["{install_dir}\\bin"]
+    shortcut: none
+    guide:
+      tutorial_url: https://docs.oracle.com/en/java/javase/17/
+      tutorial_title: Oracle 官方文档（Java SE 17 版）
+      diagram: terminal
+      steps:
+        - 终端输入 java -version，显示 17.x 即就绪
+        - 只有命令行构建（gradlew）或 React Native 才用这份独立 JDK
+        - Android Studio 里一般用它自带的 JDK，不用改设置
+      note: 教程对应 JDK 17：链接是 17 的官方文档专区。
   - name: HBuilderX
     purpose: uni-app 跨端开发：国内课程和微信小程序常用（需官网下载）
     manual: 到 DCloud 官网下载 HBuilderX 标准版解压即用；微信小程序方向再装「微信开发者工具」（微信官方下载页）。
     required: false
+    shortcut: HBuilderX
+    guide:
+      tutorial_url: https://hx.dcloud.net.cn/
+      tutorial_title: HBuilderX 官方文档
+      diagram: ide
+      steps:
+        - 解压后双击 HBuilderX.exe，文件 → 新建 → 项目 → uni-app，选默认模板
+        - 在 pages/index/index.vue 里改文字，顶部「运行 → 运行到浏览器」看效果
+        - 做微信小程序选「运行到小程序模拟器」，第一次要先在设置里填开发者工具路径
+      note: HBuilderX 官方文档对应当前发行版。
   - name: Flutter SDK
     purpose: 跨端框架方向：老师用 Flutter 时按指引装
     manual: 到 Flutter 官网下载 Windows 版 zip，解压到安装位置下并把 bin 目录加进 PATH，再运行 flutter doctor 按提示补齐缺项。
     required: false
+    shortcut: none
+    guide:
+      tutorial_url: https://docs.flutter.cn/get-started/install/windows
+      tutorial_title: Flutter 官方中文安装指南（跟随稳定版）
+      diagram: terminal
+      steps:
+        - 解压并配好 PATH 后，终端运行 flutter doctor，它会逐项告诉你还差什么
+        - doctor 里的 Android toolchain 打勾，需要先装好本课的 Android Studio
+        - flutter create myapp 建项目，cd 进去 flutter run 就能在模拟器跑起来
+      note: Flutter 官方中文文档跟随当前稳定版，与你下载的版本一致。
   - name: scrcpy
     purpose: 真机投屏与控制：演示作业、调真机比模拟器直观得多
     winget: Genymobile.scrcpy
     required: false
+    shortcut: none
+    guide:
+      tutorial_url: https://github.com/Genymobile/scrcpy
+      tutorial_title: scrcpy 官方仓库（含完整用法）
+      diagram: terminal
+      steps:
+        - 手机打开「开发者选项 → USB 调试」，数据线连电脑并在手机上允许调试
+        - 终端输入 scrcpy 回车，手机画面就投到电脑上，鼠标能直接操作
+        - 关掉投屏窗口或拔线就结束；加 --record 文件名.mp4 还能顺带录屏交作业
+      note: scrcpy 官方仓库文档对应当前发行版。
   - name: Git
     purpose: 版本管理
     winget: Git.Git
@@ -38,4 +88,14 @@ tools:
     verify:
       command: git --version
       expect: 'git version'
+    shortcut: Git Bash
+    guide:
+      tutorial_url: https://git-scm.com/book/zh/v2
+      tutorial_title: 《Pro Git》官方中文版（Git 官方推荐）
+      diagram: terminal
+      steps:
+        - 先设置身份：git config --global user.name / user.email 各设一次
+        - 项目文件夹 git init 后，每完成一个页面就 commit 一次
+        - UI 改崩了靠 git 回退，比在 Android Studio 里翻撤销历史靠谱
+      note: Git 命令行多年保持一致，官方中文书对应你装的版本。
 notes: Android Studio 第一次打开会向导式下载 SDK 和模拟器镜像（几个 GB），找个网络好的时候做；模拟器卡的话，插数据线用真机调试更流畅。

@@ -1,4 +1,4 @@
-# 课程包（draft）：Python 多版本 + 发行版/编辑器替代选项，待实机验证。
+# 课程包（draft）：Python 多版本（每个版本配同版本官方中文教程）+ 发行版/编辑器替代选项，待实机验证。
 id: python-programming
 name: Python 程序设计
 category: programming
@@ -8,6 +8,7 @@ tools:
   - name: Python
     purpose: Python 解释器本体。按课程要求选版本，不确定选推荐的 3.12
     required: true
+    shortcut: IDLE
     default_version: "3.12"
     versions:
       - label: "3.11"
@@ -15,28 +16,85 @@ tools:
         verify:
           command: python --version
           expect: 'Python 3\.11'
+        guide:
+          tutorial_url: https://docs.python.org/zh-cn/3.11/tutorial/index.html
+          tutorial_title: Python 官方中文教程（3.11 版）
+          diagram: terminal
+          steps:
+            - 终端输入 python --version，应显示 Python 3.11.x
+            - 输入 python 进入交互模式，打 print("你好") 按回车，立即能看到输出
+            - 输入 exit() 退出；写好的 .py 文件用 python 文件名.py 运行
+          note: 教程对应 Python 3.11：链接里的版本号就是 3.11，不会跳到别的版本。
       - label: "3.12"
         winget: Python.Python.3.12
         verify:
           command: python --version
           expect: 'Python 3\.12'
+        guide:
+          tutorial_url: https://docs.python.org/zh-cn/3.12/tutorial/index.html
+          tutorial_title: Python 官方中文教程（3.12 版）
+          diagram: terminal
+          steps:
+            - 终端输入 python --version，应显示 Python 3.12.x
+            - 输入 python 进入交互模式，打 print("你好") 按回车，立即能看到输出
+            - 输入 exit() 退出；写好的 .py 文件用 python 文件名.py 运行
+          note: 教程对应 Python 3.12：链接里的版本号就是 3.12，不会跳到别的版本。
       - label: "3.13"
         winget: Python.Python.3.13
         verify:
           command: python --version
           expect: 'Python 3\.13'
+        guide:
+          tutorial_url: https://docs.python.org/zh-cn/3.13/tutorial/index.html
+          tutorial_title: Python 官方中文教程（3.13 版）
+          diagram: terminal
+          steps:
+            - 终端输入 python --version，应显示 Python 3.13.x
+            - 输入 python 进入交互模式（3.13 的交互界面带颜色和高亮，比旧版更好用）
+            - 输入 exit() 退出；写好的 .py 文件用 python 文件名.py 运行
+          note: 教程对应 Python 3.13：链接里的版本号就是 3.13，不会跳到别的版本。
   - name: PyCharm Community
     purpose: 写 Python 代码的主力编辑器（社区版免费）
     winget: JetBrains.PyCharm.Community
     required: true
+    shortcut: PyCharm
+    guide:
+      tutorial_url: https://www.jetbrains.com/help/pycharm/getting-started.html
+      tutorial_title: JetBrains 官方入门（跟随 PyCharm 最新版）
+      diagram: ide
+      steps:
+        - 打开 PyCharm，点 New Project，新建项目时解释器选刚装的 Python
+        - 在左侧项目树右键 → New → Python File，起名 hello
+        - 写 print("你好")，点右上角绿色三角运行，下方控制台看输出
+      note: PyCharm 是持续更新的软件，官方入门始终对应最新版界面。
   - name: VS Code
     purpose: 轻量替代编辑器（与 PyCharm 二选一即可）
     winget: Microsoft.VisualStudioCode
     required: false
+    shortcut: Visual Studio Code
+    guide:
+      tutorial_url: https://code.visualstudio.com/docs
+      tutorial_title: VS Code 官方文档（跟随最新版）
+      diagram: editor
+      steps:
+        - 打开 VS Code，用「文件 → 打开文件夹」打开代码文件夹
+        - 左侧插件市场搜索安装「Python」插件（微软官方）
+        - 新建 hello.py，写好后点右上角三角运行
+      note: VS Code 是持续更新的软件，官方文档始终对应最新版界面。
   - name: Thonny
     purpose: 新手向编辑器替代：自带 Python、界面极简，零基础第一课用它最省心
     winget: Thonny.Thonny
     required: false
+    shortcut: Thonny
+    guide:
+      tutorial_url: https://thonny.org/
+      tutorial_title: Thonny 官网（自带图文介绍）
+      diagram: editor
+      steps:
+        - 打开 Thonny，上半区就是写代码的地方，写 print("你好")
+        - 按 F5 或点绿色运行按钮，下半区的 Shell 里看输出
+        - 想看变量变化：菜单「视图 → 变量」，运行后每个变量的值都列着
+      note: Thonny 界面多年保持极简布局，官网介绍与你装的版本一致。
   - name: Miniconda
     purpose: 环境管理替代方案：后续上机器学习课、需要隔离多套环境时选它（与官方 Python 可共存）
     winget: Anaconda.Miniconda3
@@ -44,6 +102,16 @@ tools:
     verify:
       command: conda --version
       expect: 'conda'
+    shortcut: Anaconda Prompt
+    guide:
+      tutorial_url: https://docs.conda.io/projects/conda/en/stable/user-guide/getting-started.html
+      tutorial_title: conda 官方入门（stable 版文档，对应当前发行版）
+      diagram: terminal
+      steps:
+        - 从开始菜单打开「Anaconda Prompt」再敲命令，conda 保证能找到
+        - conda create -n myenv python=3.12 创建一个独立环境
+        - conda activate myenv 进入环境，conda deactivate 退出
+      note: conda 官方 stable 文档对应当前发行版本，与你装的一致。
 steps:
   - type: command
     run: python -m pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple

@@ -1,4 +1,4 @@
-# 课程包（draft）：软工实训协作全家桶：版本管理 + 接口调试（含国产替代）+ 画图 + 文档。
+# 课程包（draft）：软工实训协作全家桶：版本管理 + 接口调试（含国产替代）+ 画图 + 文档，教程已配好。
 id: software-engineering
 name: 软件工程 / 项目实训
 category: engineering
@@ -12,6 +12,16 @@ tools:
     verify:
       command: git --version
       expect: 'git version'
+    shortcut: Git Bash
+    guide:
+      tutorial_url: https://git-scm.com/book/zh/v2
+      tutorial_title: 《Pro Git》官方中文版（Git 官方推荐）
+      diagram: terminal
+      steps:
+        - 先设置身份：git config --global user.name "你的名字"、user.email "你的邮箱"
+        - 拉团队仓库：git clone 仓库地址；每天开工先 git pull
+        - 提交节奏：git add . → git commit -m "做了什么" → git push，说明要写人话
+      note: Git 命令行多年保持一致，官方中文书对应你装的版本。
   - name: VS Code
     purpose: 通用编辑器
     winget: Microsoft.VisualStudioCode
@@ -19,18 +29,58 @@ tools:
     verify:
       command: code --version
       expect: '\d+\.\d+'
+    shortcut: Visual Studio Code
+    guide:
+      tutorial_url: https://code.visualstudio.com/docs
+      tutorial_title: VS Code 官方文档（跟随最新版）
+      diagram: editor
+      steps:
+        - 用「打开文件夹」打开整个项目仓库，一次看全貌
+        - 左侧第三个图标是源代码管理，能可视化看谁改了哪些行
+        - 插件按项目语言装，其他的先别贪多
+      note: VS Code 是持续更新的软件，官方文档始终对应最新版界面。
   - name: Postman
     purpose: 接口调试：联调后端接口时用
     winget: Postman.Postman
     required: true
+    shortcut: Postman
+    guide:
+      tutorial_url: https://learning.postman.com/docs/introduction/overview/
+      tutorial_title: Postman 官方学习中心（跟随最新版）
+      diagram: editor
+      steps:
+        - 新建请求，先把后端给的接口地址填上，点 Send 看返回
+        - 需要登录态的接口在 Authorization 或 Headers 里带上 token
+        - 把调通的请求保存进 Collection，就是全组的接口说明书
+      note: Postman 是持续更新的软件，官方学习中心对应最新版界面。
   - name: Apifox
     purpose: 接口调试国产替代：自带接口文档和 Mock，团队协作更方便（与 Postman 二选一或都装）
     manual: 到 Apifox 官网下载 Windows 版安装；用手机号/邮箱注册即可免费使用基础功能。
     required: false
+    shortcut: Apifox
+    guide:
+      tutorial_url: https://docs.apifox.com/
+      tutorial_title: Apifox 官方文档（跟随最新版）
+      diagram: editor
+      steps:
+        - 登录后新建项目，把后端接口按模块建好目录
+        - 在接口页填地址和参数点「运行」，返回区能看到格式化好的 JSON
+        - 开启云端 Mock 后，前端不用等后端就能先拿假数据联调页面
+      note: Apifox 持续更新，官方文档对应最新版界面。
   - name: GitHub Desktop
     purpose: Git 图形客户端：不熟命令行时用按钮也能完成提交、拉取（可选）
     winget: GitHub.GitHubDesktop
     required: false
+    shortcut: GitHub Desktop
+    guide:
+      tutorial_url: https://docs.github.com/zh/desktop
+      tutorial_title: GitHub Desktop 官方文档（中文）
+      diagram: editor
+      steps:
+        - 登录 GitHub 账号后，File → Clone repository 选团队仓库拉到本地
+        - 改完文件左侧会列出变动，写一句 Summary 点 Commit 提交
+        - 顶部 Push origin 上传，Fetch/Pull 拉队友的更新
+      note: GitHub 官方文档对应当前 Desktop 版本。
   - name: GitHub CLI
     purpose: 命令行管理仓库、PR、Issue（可选）
     winget: GitHub.cli
@@ -38,16 +88,56 @@ tools:
     verify:
       command: gh --version
       expect: 'gh version'
+    shortcut: none
+    guide:
+      tutorial_url: https://cli.github.com/manual/
+      tutorial_title: GitHub CLI 官方手册（跟随最新版）
+      diagram: terminal
+      steps:
+        - 第一次运行 gh auth login 按提示用浏览器登录授权
+        - gh repo clone 组织/仓库 拉代码；gh pr create 建合并请求
+        - gh issue list 看任务列表，和课程项目的分工表对上
+      note: GitHub CLI 官方手册对应当前发行版。
   - name: draw.io
     purpose: 画 UML、ER 图、流程图的工具（软工文档必备）
     winget: JGraph.Draw
     required: false
+    shortcut: draw.io
+    guide:
+      tutorial_url: https://www.drawio.com/doc/
+      tutorial_title: draw.io 官方文档
+      diagram: editor
+      steps:
+        - 打开后选空白图，左侧是图形库，拖到画布上就能用
+        - 画类图：左侧「UML」分类里有现成的类框，填上类名、属性、方法
+        - 画完用「文件 → 导出为 PNG」插进课程设计文档里
+      note: draw.io 官方文档对应当前发行版，基本操作多年稳定。
   - name: XMind
     purpose: 思维导图：梳理需求和功能结构时用
     manual: 到 XMind 官网下载桌面版，免费版足够课程文档使用。
     required: false
+    shortcut: XMind
+    guide:
+      tutorial_url: https://xmind.cn/
+      tutorial_title: XMind 官网（含新手引导）
+      diagram: editor
+      steps:
+        - 新建导图，中心主题写项目名，Tab 键加子主题、Enter 加同级
+        - 把功能模块按一级、二级拆开，就是需求分析的第一版结构图
+        - 导出图片后贴进需求文档，比纯文字清楚得多
+      note: XMind 基本操作在当前版本保持一致，官网有图文引导。
   - name: 7-Zip
     purpose: 解压各种格式的作业包和素材包
     winget: 7zip.7zip
     required: false
+    shortcut: 7-Zip File Manager
+    guide:
+      tutorial_url: https://www.7-zip.org/
+      tutorial_title: 7-Zip 官网
+      diagram: generic
+      steps:
+        - 任何压缩包右键 → 7-Zip → 解压到当前文件夹
+        - 交作业打包时右键文件夹 → 7-Zip → 添加到压缩包，格式选 zip 兼容性最好
+        - 中文文件名乱码时，在 7-Zip 主界面里打开压缩包再解压
+      note: 7-Zip 操作方式多年稳定，步骤适用于当前版本。
 notes: 装完 Git 先在终端里执行 git config --global user.name 和 user.email 设置身份，第一次提交前必须做。

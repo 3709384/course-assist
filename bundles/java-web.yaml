@@ -1,4 +1,4 @@
-# 课程包（draft）：Java Web 全家桶：JDK 多版本 + IDEA + Maven（含环境变量）+ 数据库 + Tomcat/Redis 指引。
+# 课程包（draft）：Java Web 全家桶：JDK 多版本（教程按版本对齐）+ IDEA + Maven + 数据库 + Tomcat 指引。
 id: java-web
 name: Java Web 开发
 category: engineering
@@ -8,6 +8,7 @@ tools:
   - name: JDK
     purpose: Java 开发工具包。Spring Boot 3 要求 17 及以上，老教材用 8 的选 8
     required: true
+    shortcut: none
     default_version: "17"
     versions:
       - label: "8"
@@ -15,16 +16,43 @@ tools:
         verify:
           command: java -version
           expect: '1\.8\.'
+        guide:
+          tutorial_url: https://docs.oracle.com/javase/8/
+          tutorial_title: Oracle 官方文档（Java SE 8 版）
+          diagram: terminal
+          steps:
+            - 终端输入 java -version，显示 1.8.x 即就绪
+            - 老式 Servlet 课程就靠这个版本，别升级，教材代码都是按 8 写的
+            - IDEA 新建项目时 SDK 选这个 8
+          note: 教程对应 JDK 8：链接是 8 的官方文档专区。
       - label: "17"
         winget: Microsoft.OpenJDK.17
         verify:
           command: java -version
           expect: '17\.'
+        guide:
+          tutorial_url: https://docs.oracle.com/en/java/javase/17/
+          tutorial_title: Oracle 官方文档（Java SE 17 版）
+          diagram: terminal
+          steps:
+            - 终端输入 java -version，显示 17.x 即就绪
+            - Spring Boot 3 项目就选这个版本，IDEA 里 SDK 也选 17
+            - 终端跑 java -jar 项目.jar 能直接验证打包结果
+          note: 教程对应 JDK 17：链接是 17 的官方文档专区。
       - label: "21"
         winget: Microsoft.OpenJDK.21
         verify:
           command: java -version
           expect: '21\.'
+        guide:
+          tutorial_url: https://docs.oracle.com/en/java/javase/21/
+          tutorial_title: Oracle 官方文档（Java SE 21 版）
+          diagram: terminal
+          steps:
+            - 终端输入 java -version，显示 21.x 即就绪
+            - IDEA 新建 Spring 项目时 SDK 选这个 21
+            - 其余用法和 17 一致，文档查 21 专区
+          note: 教程对应 JDK 21：链接是 21 的官方文档专区。
     env:
       JAVA_HOME: "{install_dir}"
       path_additions: ["{install_dir}\\bin"]
@@ -32,6 +60,16 @@ tools:
     purpose: 主力编辑器（社区版够用；终极版学校一般有教育授权）
     winget: JetBrains.IntelliJIDEA.Community
     required: true
+    shortcut: IntelliJ IDEA
+    guide:
+      tutorial_url: https://www.jetbrains.com/help/idea/getting-started.html
+      tutorial_title: JetBrains 官方入门（跟随 IDEA 最新版）
+      diagram: ide
+      steps:
+        - 新建项目时选 Spring Initializr（或先建 Maven 项目），SDK 选已装的 JDK
+        - 右侧有个象头图标是 Maven 面板，点刷新按钮拉依赖（第一次较慢）
+        - 找到带 @SpringBootApplication 的主类，点它左边的绿三角启动，控制台出现 Started 就是起来了
+      note: IDEA 是持续更新的软件，官方入门始终对应最新版界面。
   - name: Apache Maven
     purpose: 构建与依赖管理
     winget: Apache.Maven
@@ -42,28 +80,88 @@ tools:
     env:
       MAVEN_HOME: "{install_dir}"
       path_additions: ["{install_dir}\\bin"]
+    shortcut: none
+    guide:
+      tutorial_url: https://maven.apache.org/guides/getting-started/
+      tutorial_title: Maven 官方入门指南
+      diagram: terminal
+      steps:
+        - 终端输入 mvn -version 确认装好（第一次用先按下方的镜像步骤配好国内源）
+        - 项目根目录（有 pom.xml 的地方）执行 mvn spring-boot:run 启动 Spring Boot
+        - 打包用 mvn package，生成的 jar 在 target 文件夹里
+      note: Maven 3.x 各版本用法一致，官方入门适用你装的版本。
   - name: MySQL Server 8
     purpose: Web 项目的数据库
     winget: Oracle.MySQL
     required: true
+    shortcut: none
+    guide:
+      tutorial_url: https://dev.mysql.com/doc/refman/8.0/en/
+      tutorial_title: MySQL 8.0 官方手册
+      diagram: terminal
+      steps:
+        - MySQL 是后台服务，项目连不上先确认服务在跑（任务管理器服务里找 MySQL）
+        - 连接信息：localhost、3306、root + 安装时设的密码，填进项目的 application.yml
+        - 库名先在 DBeaver/Workbench 里建好，表交给框架自动生成或按实验 SQL 建
+      note: 教程对应 MySQL 8.0：手册链接就是 8.0 的专区。
   - name: DBeaver Community
     purpose: 图形化管理数据库
     winget: DBeaver.DBeaver
     required: false
+    shortcut: DBeaver
+    guide:
+      tutorial_url: https://dbeaver.com/docs/dbeaver/
+      tutorial_title: DBeaver 官方文档（跟随最新版）
+      diagram: database
+      steps:
+        - 新建 MySQL 连接，填 localhost、3306、root 和密码，测试连接通过再完成
+        - 展开连接就能看每个库的表，双击表看数据
+        - 项目里数据对不上时，先来这里直接查表核实
+      note: DBeaver 是持续更新的软件，官方文档对应最新版界面。
   - name: Apache Tomcat
     purpose: 传统 Servlet/JSP 课程需要；Spring Boot 项目自带内嵌 Tomcat，用不到它
     manual: 到 Apache Tomcat 官网下载 10.x 的 Windows zip 包，解压到安装位置下的 Tomcat 文件夹即可（免安装）。
     required: false
     env:
       CATALINA_HOME: "{install_dir}"
+    shortcut: none
+    guide:
+      tutorial_url: https://tomcat.apache.org/tomcat-10.1-doc/
+      tutorial_title: Apache Tomcat 10.1 官方文档
+      diagram: terminal
+      steps:
+        - 解压后进 bin 目录双击 startup.bat 启动，浏览器打开 localhost:8080 看到猫头页面就是起来了
+        - 关服务器运行同目录的 shutdown.bat，别直接关窗口硬杀
+        - 打好的 war 包放进 webapps 文件夹，启动时会自动部署
+      note: 课程包让你装的是 Tomcat 10.x，文档链接就是 10.1 的专区，不会串到 9 或 11。
   - name: Postman
     purpose: 调试自己写的接口
     winget: Postman.Postman
     required: false
+    shortcut: Postman
+    guide:
+      tutorial_url: https://learning.postman.com/docs/introduction/overview/
+      tutorial_title: Postman 官方学习中心（跟随最新版）
+      diagram: editor
+      steps:
+        - 项目启动后，新建请求填 http://localhost:8080/你的接口路径
+        - POST 请求在 Body → raw → JSON 里填参数，点 Send 看返回
+        - 返回 404 先查项目日志确认接口路径拼写，和代码里 @RequestMapping 对一遍
+      note: Postman 是持续更新的软件，官方学习中心对应最新版界面。
   - name: Redis
     purpose: 进阶章节（缓存/会话）常用：Windows 下走 Docker 或 WSL 运行
     manual: 用 Docker Desktop 拉取 redis 镜像运行，或在 WSL 的 Ubuntu 里执行 sudo apt install redis-server。
     required: false
+    shortcut: none
+    guide:
+      tutorial_url: https://redis.io/docs/latest/get-started/
+      tutorial_title: Redis 官方上手指南（跟随最新版）
+      diagram: terminal
+      steps:
+        - 先按指引把 Redis 跑起来（Docker 一条命令：docker run -d -p 6379:6379 redis）
+        - redis-cli 里 ping 返回 PONG 即通，项目里默认连的就是 6379
+        - set/get 各试一次，再去项目里触发缓存逻辑回来 keys * 看变化
+      note: Redis 官方入门跟随最新发行版，与你拉到的镜像版本一致。
   - name: Node.js LTS
     purpose: 前后端分离项目的前端部分要用
     winget: OpenJS.NodeJS.LTS
@@ -71,6 +169,16 @@ tools:
     verify:
       command: node --version
       expect: 'v\d+\.'
+    shortcut: none
+    guide:
+      tutorial_url: https://nodejs.org/docs/latest-v20.x/api/documentation.html
+      tutorial_title: Node.js 官方文档（v20 LTS 版）
+      diagram: terminal
+      steps:
+        - 终端输入 node -v 确认版本（LTS 通道当前是 20 线）
+        - 进前端项目目录 npm install 装依赖，再 npm run dev 启动前端
+        - 浏览器按提示打开 localhost 的前端端口，页面出来就是通了
+      note: 教程对应 Node 20 LTS 线：文档链接就是 latest-v20.x 这一支。
 steps:
   - type: manual
     title: 给 Maven 配国内镜像：打开 Maven 安装目录下 conf/settings.xml，在 mirrors 里加入阿里云镜像（搜「Maven 阿里云镜像」复制官方给的那段），拉依赖会快很多

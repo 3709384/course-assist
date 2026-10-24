@@ -10,7 +10,7 @@ public static class EmbeddedBundles
         new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
         {
             ["big-data.yaml"] = """
-# 课程包（draft）：大数据课以虚拟机+手动部署为主，本包配齐基础并给出 Hadoop/Spark 的环境变量。
+# 课程包（draft）：大数据课以虚拟机+手动部署为主，本包配齐基础并给出 Hadoop/Spark 的环境变量，教程已配好。
 id: big-data
 name: 大数据技术
 category: data-ai
@@ -27,10 +27,30 @@ tools:
     env:
       JAVA_HOME: "{install_dir}"
       path_additions: ["{install_dir}\\bin"]
+    shortcut: none
+    guide:
+      tutorial_url: https://docs.oracle.com/javase/8/
+      tutorial_title: Oracle 官方文档（Java SE 8 版）
+      diagram: terminal
+      steps:
+        - 终端输入 java -version，显示 1.8.x 就对了（这门课必须是 8）
+        - 再输入 echo %JAVA_HOME%，应指向刚装的 JDK 目录，Hadoop 靠它找 Java
+        - 之后所有 Hadoop 命令都要在 JAVA_HOME 正确的前提下运行
+      note: 教程对应 JDK 8：链接是 8 的官方文档专区。
   - name: VirtualBox
     purpose: 多数学校的 Hadoop 集群实验在虚拟机里搭（1 主 2 从）
     winget: Oracle.VirtualBox
     required: true
+    shortcut: Oracle VM VirtualBox
+    guide:
+      tutorial_url: https://www.virtualbox.org/manual/
+      tutorial_title: VirtualBox 官方用户手册（跟随最新版）
+      diagram: vm
+      steps:
+        - 先建一台装好 Ubuntu 的虚拟机并把 Hadoop 在单机模式跑通
+        - 关机后右键这台机 → 复制，克隆出另外两台（记得选重新生成 MAC）
+        - 三台机器改好主机名和固定 IP 并互相能 ping 通，集群骨架就齐了
+      note: VirtualBox 官方手册对应当前发行版，与你装的一致。
   - name: Hadoop
     purpose: 大数据核心框架：从 Apache 官网或学校镜像下载 hadoop 3.3.x 的 tar.gz，解压到本工具的安装目录
     manual: 到 Apache Hadoop 官网下载 hadoop-3.3.x.tar.gz，解压到软件为它预留的目录（安装位置下的 Hadoop 文件夹）；在 Windows 原生跑需要额外补 winutils，按老师指引操作。多数课程在 Linux 虚拟机里部署，Windows 这份可作备用。
@@ -38,25 +58,65 @@ tools:
     env:
       HADOOP_HOME: "{install_dir}"
       path_additions: ["{install_dir}\\bin"]
+    shortcut: none
+    guide:
+      tutorial_url: https://hadoop.apache.org/docs/stable/
+      tutorial_title: Apache Hadoop 官方文档（stable 版，对应 3.x 稳定版）
+      diagram: terminal
+      steps:
+        - 解压并配好后先进单机验证：hdfs dfs -mkdir /input 能执行不报错
+        - 伪分布式按官方文档改 core-site.xml、hdfs-site.xml 后 start-dfs.sh 启动
+        - 浏览器打开 localhost:9870 能看到 NameNode 页面就是起来了
+      note: 官方 stable 文档对应当前 3.x 稳定版，与课程主流用的版本一致。
   - name: Spark
     purpose: 进阶框架：课程涉及 Spark 时，在 Hadoop 之后按指引部署
     manual: 到 Apache Spark 官网下载与 Hadoop 版本匹配的 spark-3.x-bin-hadoop3.tgz，解压到安装位置下，并把 SPARK_HOME 指到该目录（可在下方备注基础上手动添加环境变量）。
     required: false
+    shortcut: none
+    guide:
+      tutorial_url: https://spark.apache.org/docs/latest/
+      tutorial_title: Apache Spark 官方文档（latest 版）
+      diagram: terminal
+      steps:
+        - 解压后进 bin 目录执行 spark-shell，能进入 scala> 提示符就是装好了
+        - 先跑自带例子：run-example SparkPi 10，下方会打印出 π 的近似值
+        - 写 Python 版用 pyspark 命令，接口和 spark-shell 类似
+      note: Spark 官方 latest 文档对应当前发行版，与你下载的版本一致。
   - name: FinalShell
     purpose: SSH 连虚拟机集群 + 传文件，国产工具上手快
     manual: 到 FinalShell 官网下载安装包，免费版足够课程使用。
     required: false
+    shortcut: FinalShell
+    guide:
+      tutorial_url: https://www.hostbuf.com/
+      tutorial_title: FinalShell 官网（使用说明）
+      diagram: editor
+      steps:
+        - 新建三个 SSH 连接，分别对应集群的三台虚拟机
+        - 双击连接名登录，下方文件区直接拖拽分发安装包
+        - 三个连接开成分页，改配置时来回切换不用来回登录
+      note: FinalShell 操作方式在当前版本线保持一致，官网有图文说明。
   - name: WinSCP
     purpose: 往虚拟机/服务器传安装包和数据文件
     winget: WinSCP.WinSCP
     required: false
+    shortcut: WinSCP
+    guide:
+      tutorial_url: https://winscp.net/eng/docs/guide_begin
+      tutorial_title: WinSCP 官方新手指南
+      diagram: editor
+      steps:
+        - 新建会话填虚拟机 IP、用户名密码后登录
+        - 把 hadoop 的 tar.gz 从左边拖到右边就是上传
+        - 大文件传一半别关窗口，底部有进度条
+      note: WinSCP 官方指南对应当前发行版界面。
 steps:
   - type: manual
     title: 集群实验建议：一台虚拟机装好并调通后，关机克隆出另外两台再改主机名和 IP，比从头装三遍快得多
 notes: 先确认老师用的是 Hadoop 还是 Spark、版本号是多少，再动手装；组队实验务必全组用同一套版本。
 """,
             ["c-programming.yaml"] = """
-# 课程包（draft）：C/C++ 工具链 + 三种编辑器选择 + 常用辅助，待实机验证。
+# 课程包（draft）：C/C++ 工具链 + 三种编辑器选择 + 常用辅助，教程均配好，待实机验证。
 id: c-programming
 name: C/C++ 程序设计
 category: programming
@@ -72,6 +132,16 @@ tools:
       expect: 'gcc'
     env:
       path_additions: ["{install_dir}\\bin"]
+    shortcut: none
+    guide:
+      tutorial_url: https://winlibs.com/
+      tutorial_title: WinLibs 官网（GCC 工具链说明）
+      diagram: terminal
+      steps:
+        - 终端输入 gcc --version，能显示版本号就说明编译器就位了
+        - 写好 hello.c 后，在文件所在目录执行 gcc hello.c -o hello 编译
+        - 执行 .\hello 运行；C++ 文件换成 g++ 即可
+      note: GCC 命令行用法多年稳定，步骤适用于你装的这个版本。
   - name: VS Code
     purpose: 轻量编辑器（推荐）：配 C/C++ 插件后写代码、调试都方便
     winget: Microsoft.VisualStudioCode
@@ -79,18 +149,58 @@ tools:
     verify:
       command: code --version
       expect: '\d+\.\d+'
+    shortcut: Visual Studio Code
+    guide:
+      tutorial_url: https://code.visualstudio.com/docs
+      tutorial_title: VS Code 官方文档（跟随最新版）
+      diagram: editor
+      steps:
+        - 打开 VS Code，「文件 → 打开文件夹」选中放代码的文件夹
+        - 左侧插件市场搜索安装「C/C++」插件（微软官方）
+        - 新建 hello.c 写代码，点右上角三角运行，或按 F5 调试（第一次会问选 GCC）
+      note: VS Code 是持续更新的软件，官方文档始终对应最新版界面。
   - name: Visual Studio 2022 Community
     purpose: 重量级 IDE 替代：课程使用 VS 或以后要做 Windows 开发时选它（体积大，下载久）
     winget: Microsoft.VisualStudio.2022.Community
     required: false
+    shortcut: Visual Studio 2022
+    guide:
+      tutorial_url: https://learn.microsoft.com/zh-cn/visualstudio/get-started/visual-studio-ide?view=vs-2022
+      tutorial_title: 微软官方 VS 2022 入门（中文，对应 2022 版）
+      diagram: ide
+      steps:
+        - 打开 Visual Studio，点「创建新项目」→ 选「控制台应用」（C++）→ 下一步、创建
+        - 项目自带一个 .cpp 文件，把 printf 那行改成自己的代码先跑通
+        - 点上方绿色三角（本地 Windows 调试器）运行，下方输出窗口看结果
+      note: 教程对应 Visual Studio 2022：链接里带 view=vs-2022，就是这个大版本的文档。
   - name: Dev-C++
     purpose: 老牌教学 IDE 替代：部分学校机房和教材仍以它为准
     winget: Embarcadero.DevCpp
     required: false
+    shortcut: Dev-C++
+    guide:
+      tutorial_url: https://www.bloodshed.net/
+      tutorial_title: Dev-C++ 官网
+      diagram: ide
+      steps:
+        - 打开 Dev-C++，菜单「文件 → 新建 → 源代码」
+        - 写好代码后点工具栏的「编译运行」按钮（或按 F11）
+        - 程序在弹出的黑色窗口里运行，看完按任意键关闭
+      note: Dev-C++ 界面多年未变，步骤适用于当前版本。
   - name: MSYS2
     purpose: 工具链替代/补充：需要 make、gdb 等 Unix 风格工具时装它
     winget: MSYS2.MSYS2
     required: false
+    shortcut: MSYS2
+    guide:
+      tutorial_url: https://www.msys2.org/docs/what-is-msys2/
+      tutorial_title: MSYS2 官方文档
+      diagram: terminal
+      steps:
+        - 从开始菜单打开「MSYS2 UCRT64」终端（写 C/C++ 用这个，别开错）
+        - 装工具用 pacman -S 包名，比如 pacman -S make
+        - 在这个终端里 gcc、g++ 和在 Linux 里用法完全一样
+      note: MSYS2 官方文档对应当前发行版，与你装的一致。
   - name: CMake
     purpose: 跨平台构建工具：高年级课程和开源项目常用
     winget: Kitware.CMake
@@ -98,6 +208,16 @@ tools:
     verify:
       command: cmake --version
       expect: 'cmake version'
+    shortcut: CMake
+    guide:
+      tutorial_url: https://cmake.org/cmake/help/latest/guide/tutorial/index.html
+      tutorial_title: CMake 官方教程（latest 版文档）
+      diagram: terminal
+      steps:
+        - 终端输入 cmake --version 确认装好
+        - 项目根目录要有 CMakeLists.txt，在该目录执行 cmake -B build 生成构建目录
+        - 再执行 cmake --build build 编译，生成的程序在 build 里
+      note: CMake 官方 latest 文档对应当前发行版，与你装的版本一致。
   - name: Git
     purpose: 版本管理：交作业、拉老师代码都要用
     winget: Git.Git
@@ -105,10 +225,30 @@ tools:
     verify:
       command: git --version
       expect: 'git version'
+    shortcut: Git Bash
+    guide:
+      tutorial_url: https://git-scm.com/book/zh/v2
+      tutorial_title: 《Pro Git》官方中文版（Git 官方推荐）
+      diagram: terminal
+      steps:
+        - 先设置身份：git config --global user.name "你的名字" 和 user.email "你的邮箱"
+        - 在代码文件夹执行 git init 初始化仓库
+        - 日常三连：git add . → git commit -m "说明" → git push
+      note: Git 命令行多年保持一致，官方中文书对应你装的版本。
   - name: Notepad++
     purpose: 随手看代码、改配置文件的轻量文本编辑器
     winget: Notepad++.Notepad++
     required: false
+    shortcut: Notepad++
+    guide:
+      tutorial_url: https://npp-user-manual.org/
+      tutorial_title: Notepad++ 官方用户手册（跟随最新版）
+      diagram: editor
+      steps:
+        - 双击任何文本文件，右键选「用 Notepad++ 打开」即可编辑
+        - 顶部菜单「语言」里选 C/C++，代码就会按语法上色
+        - 「搜索 → 在文件中查找」可以在整个文件夹里批量找关键词
+      note: Notepad++ 官方手册对应最新版，与你装的一致。
 steps:
   - type: manual
     title: VS Code 首次打开后，在插件市场搜索并安装「C/C++」插件（微软官方），才有代码提示和调试功能
@@ -157,7 +297,7 @@ categories:
       - { id: math-modeling,      name: 数学建模,       status: draft }
 """,
             ["cloud-containers.yaml"] = """
-# 课程包（draft）：Docker Desktop 主线（带验证）+ WSL2 + 镜像加速指引 + K8s 入门工具。
+# 课程包（draft）：Docker Desktop 主线（带验证）+ WSL2 + 镜像加速指引 + K8s 入门工具，教程已配好。
 id: cloud-containers
 name: 云计算与容器
 category: engineering
@@ -171,10 +311,30 @@ tools:
     verify:
       command: docker --version
       expect: 'Docker version'
+    shortcut: Docker Desktop
+    guide:
+      tutorial_url: https://docs.docker.com/get-started/
+      tutorial_title: Docker 官方上手教程（跟随最新版）
+      diagram: ide
+      steps:
+        - 打开 Docker Desktop，等左下角变绿（引擎启动完成）再敲命令
+        - 终端执行 docker run hello-world，看到欢迎文字说明引擎正常
+        - 主界面 Containers 页能看正在跑的容器，Images 页管理镜像；练习常用 docker ps、docker images 两条命令
+      note: Docker Desktop 持续更新，官方上手教程对应最新版界面。
   - name: Windows Terminal
     purpose: 敲 docker / kubectl 命令的终端
     winget: Microsoft.WindowsTerminal
     required: false
+    shortcut: Terminal
+    guide:
+      tutorial_url: https://learn.microsoft.com/zh-cn/windows/terminal/
+      tutorial_title: 微软官方 Windows Terminal 文档（中文）
+      diagram: terminal
+      steps:
+        - 打开后默认是 PowerShell，docker 命令直接在这里敲
+        - Ctrl+Shift+T 开新标签，一个看日志一个敲命令
+        - 命令太长记不住时，↑方向键翻历史命令
+      note: 微软官方文档对应当前发布的 Terminal 版本。
   - name: VS Code
     purpose: 写 Dockerfile 和 YAML 配置的编辑器
     winget: Microsoft.VisualStudioCode
@@ -182,10 +342,30 @@ tools:
     verify:
       command: code --version
       expect: '\d+\.\d+'
+    shortcut: Visual Studio Code
+    guide:
+      tutorial_url: https://code.visualstudio.com/docs
+      tutorial_title: VS Code 官方文档（跟随最新版）
+      diagram: editor
+      steps:
+        - 打开放 Dockerfile 的文件夹，装官方「Docker」插件，写 Dockerfile 有提示
+        - YAML 文件注意缩进只能用空格，插件会帮你标红错误缩进
+        - 下方终端直接执行 docker build，不用切换窗口
+      note: VS Code 是持续更新的软件，官方文档始终对应最新版界面。
   - name: kubectl
     purpose: Kubernetes 命令行：学到 K8s 章节时需要（Docker Desktop 也可自带一份）
     manual: 按 Kubernetes 官网「在 Windows 上安装 kubectl」的指引下载 kubectl.exe 放进 PATH 目录；或在 Docker Desktop 设置里启用 Kubernetes 后使用其自带版本。
     required: false
+    shortcut: none
+    guide:
+      tutorial_url: https://kubernetes.io/zh-cn/docs/tasks/tools/
+      tutorial_title: Kubernetes 官方中文文档（工具安装与使用）
+      diagram: terminal
+      steps:
+        - 先在 Docker Desktop 设置 → Kubernetes 里勾选 Enable Kubernetes 并应用，等它变绿
+        - 终端执行 kubectl get nodes，应显示一个 Ready 状态的节点
+        - 练手三连：kubectl create deployment hello --image=nginx → kubectl get pods → kubectl delete deployment hello
+      note: Kubernetes 官方中文文档按当前版本维护，与你装的 kubectl 一致。
 steps:
   - type: feature
     name: wsl
@@ -194,7 +374,7 @@ steps:
 notes: 装 Docker Desktop 前确认 BIOS 虚拟化已开启；家庭版 Windows 用 WSL2 后端即可。docker 命令要在 Docker Desktop 启动完成后才能用（等右下角鲸鱼图标稳定）。镜像加速地址会随时间变化，失效时搜「Docker 国内镜像」换最新可用的。
 """,
             ["compiler-principles.yaml"] = """
-# 课程包（draft）：以 MSYS2 工具链提供 flex/bison，ANTLR 路线也备了指引，待实机验证。
+# 课程包（draft）：以 MSYS2 工具链提供 flex/bison，ANTLR 路线也备了指引，教程已配好，待实机验证。
 id: compiler-principles
 name: 编译原理
 category: systems
@@ -205,6 +385,16 @@ tools:
     purpose: 提供 flex、bison、gcc 的 Unix 风格工具链（装完按下面步骤补齐组件）
     winget: MSYS2.MSYS2
     required: true
+    shortcut: MSYS2
+    guide:
+      tutorial_url: https://www.msys2.org/docs/what-is-msys2/
+      tutorial_title: MSYS2 官方文档
+      diagram: terminal
+      steps:
+        - 从开始菜单打开「MSYS2 UCRT64」终端，本课的命令都在这里敲
+        - 先验证工具链：flex --version 和 bison --version 都能输出版本号
+        - 写好 .l 文件执行 flex lexer.l 生成 lex.yy.c，再 gcc lex.yy.c -o lexer 编译运行
+      note: MSYS2 官方文档对应当前发行版，与你装的一致。
   - name: VS Code
     purpose: 写编译器代码的编辑器
     winget: Microsoft.VisualStudioCode
@@ -212,6 +402,16 @@ tools:
     verify:
       command: code --version
       expect: '\d+\.\d+'
+    shortcut: Visual Studio Code
+    guide:
+      tutorial_url: https://code.visualstudio.com/docs
+      tutorial_title: VS Code 官方文档（跟随最新版）
+      diagram: editor
+      steps:
+        - 用「文件 → 打开文件夹」打开你的编译器项目文件夹
+        - .l / .y 文件装个语法高亮插件看起来更清楚（插件市场搜 flex bison）
+        - 下方终端直接开 MSYS2 环境敲 flex/bison 命令，不用另开窗口也行
+      note: VS Code 是持续更新的软件，官方文档始终对应最新版界面。
   - name: JDK 17
     purpose: 课程若用 Java 版工具（如 JFlex/CUP 或 ANTLR）时需要
     winget: Microsoft.OpenJDK.17
@@ -219,17 +419,37 @@ tools:
     verify:
       command: java -version
       expect: '17\.'
+    shortcut: none
+    guide:
+      tutorial_url: https://docs.oracle.com/en/java/javase/17/
+      tutorial_title: Oracle 官方文档（Java SE 17 版）
+      diagram: terminal
+      steps:
+        - 终端输入 java -version，显示 17.x 即就绪
+        - 运行工具 jar 的格式：java -jar 工具.jar 参数
+        - ANTLR 生成代码后用 javac *.java 整体编译
+      note: 教程对应 JDK 17：链接是 17 的官方文档专区。
   - name: ANTLR 4
     purpose: 语法分析生成器替代路线：用语法文件直接生成解析器（Java 路线）
     manual: 到 ANTLR 官网下载 antlr-4.x-complete.jar，放到顺手的目录，并按官网 Quick Start 给它配一个别名命令。
     required: false
+    shortcut: none
+    guide:
+      tutorial_url: https://github.com/antlr/antlr4/blob/master/doc/getting-started.md
+      tutorial_title: ANTLR 官方快速开始（GitHub 仓库文档）
+      diagram: terminal
+      steps:
+        - 按快速开始把 antlr4 命令配好，先写一个最小的 .g4 语法文件
+        - 执行 antlr4 Hello.g4 生成词法/语法分析器代码
+        - 编译后用 grun Hello r -gui 运行，能弹出一棵可视化的语法树
+      note: 这是 ANTLR 官方仓库的当前文档，对应你下载的 4.x 版本。
 steps:
   - type: command
     run: C:\msys64\usr\bin\bash.exe -lc "pacman -S --noconfirm mingw-w64-ucrt-x86_64-gcc flex bison"
 notes: 如果 MSYS2 装到了别的盘，把步骤里的路径换成实际的 msys64 目录。装完在 MSYS2 终端里输入 flex --version 验证工具链。
 """,
             ["computer-graphics.yaml"] = """
-# 课程包（draft）：图形学 = Visual Studio + OpenGL 生态，库用 vcpkg 一键装，另加 Blender 体验。
+# 课程包（draft）：图形学 = Visual Studio + OpenGL 生态，库用 vcpkg 一键装，另加 Blender 体验，教程已配好。
 id: computer-graphics
 name: 计算机图形学
 category: electives
@@ -240,6 +460,16 @@ tools:
     purpose: 图形学实验的主力 IDE（安装时记得勾选「使用 C++ 的桌面开发」工作负载）
     winget: Microsoft.VisualStudio.2022.Community
     required: true
+    shortcut: Visual Studio 2022
+    guide:
+      tutorial_url: https://learn.microsoft.com/zh-cn/visualstudio/get-started/visual-studio-ide?view=vs-2022
+      tutorial_title: 微软官方 VS 2022 入门（中文，对应 2022 版）
+      diagram: ide
+      steps:
+        - 创建新项目选「控制台应用」（C++），先跑通自带示例
+        - 图形学项目要改成窗口程序时，在项目属性 → 链接器 → 系统 → 子系统里选「窗口」
+        - Ctrl+F5 是运行不调试，画窗口的实验用这个，黑框不会一闪而过
+      note: 教程对应 Visual Studio 2022：链接带 view=vs-2022，就是这个大版本的文档。
   - name: CMake
     purpose: 组织图形学工程的构建工具
     winget: Kitware.CMake
@@ -247,6 +477,16 @@ tools:
     verify:
       command: cmake --version
       expect: 'cmake version'
+    shortcut: CMake
+    guide:
+      tutorial_url: https://cmake.org/cmake/help/latest/guide/tutorial/index.html
+      tutorial_title: CMake 官方教程（latest 版文档）
+      diagram: terminal
+      steps:
+        - 用了 vcpkg 的项目，配置时加 -DCMAKE_TOOLCHAIN_FILE=vcpkg路径/scripts/buildsystems/vcpkg.cmake
+        - cmake -B build 生成，cmake --build build 编译，一套命令所有实验通用
+        - 找不到 GLFW 时先检查上面那串 toolchain 参数有没有漏
+      note: CMake 官方 latest 文档对应当前发行版，与你装的版本一致。
   - name: Git
     purpose: 拉取 vcpkg 和课程框架代码
     winget: Git.Git
@@ -254,23 +494,53 @@ tools:
     verify:
       command: git --version
       expect: 'git version'
+    shortcut: Git Bash
+    guide:
+      tutorial_url: https://git-scm.com/book/zh/v2
+      tutorial_title: 《Pro Git》官方中文版（Git 官方推荐）
+      diagram: terminal
+      steps:
+        - 先设置身份：git config --global user.name / user.email 各设一次
+        - 拉 vcpkg 和课程框架都用 git clone 仓库地址
+        - 框架代码拉下来先 commit 一份原版，改崩了能对照
+      note: Git 命令行多年保持一致，官方中文书对应你装的版本。
   - name: vcpkg
     purpose: 微软的 C++ 包管理器：GLFW、GLM 等图形库一条命令安装并自动配好
     manual: 在安装位置下执行 git clone https://github.com/microsoft/vcpkg 并运行 .\\vcpkg\\bootstrap-vcpkg.bat，然后 .\\vcpkg\\vcpkg install glfw3 glm 即可。
     required: false
     env:
       VCPKG_ROOT: "{install_dir}"
+    shortcut: none
+    guide:
+      tutorial_url: https://learn.microsoft.com/zh-cn/vcpkg/get_started/overview
+      tutorial_title: 微软官方 vcpkg 上手文档（中文）
+      diagram: terminal
+      steps:
+        - 按左侧指引 clone 并 bootstrap 之后，先跑 vcpkg install glfw3 glm glad 把常用库装上
+        - 装完执行 vcpkg integrate install，Visual Studio 就能直接 #include <GLFW/glfw3.h>
+        - 查库用 vcpkg search 库名，卸载用 vcpkg remove 库名
+      note: 微软官方 vcpkg 文档对应当前发行版，与你拉的版本一致。
   - name: Blender
     purpose: 三维建模体验：理解顶点、网格、材质这些概念最直观的方式（课外加分项）
     winget: BlenderFoundation.Blender
     required: false
+    shortcut: Blender
+    guide:
+      tutorial_url: https://docs.blender.org/manual/en/latest/getting_started/index.html
+      tutorial_title: Blender 官方手册（latest 版，入门章）
+      diagram: editor
+      steps:
+        - 打开自带一个立方体场景：鼠标中键拖动旋转视角、滚轮缩放——这就是图形学里的视图变换
+        - 选中立方体按 Tab 进编辑模式，能拖它的顶点，看网格怎么变
+        - 右侧属性里给它加个材质改颜色，上方切到渲染预览看光照效果
+      note: Blender 官方 latest 手册对应当前发行版，与你装的一致。
 steps:
   - type: manual
     title: Visual Studio 安装器里务必勾选「使用 C++ 的桌面开发」，没勾的话打开安装器点「修改」补上
 notes: 课程若使用固定版本的 GLUT/freeglut 老框架，以老师发的库文件为准，vcpkg 路线适合新框架（GLFW）方向。
 """,
             ["computer-networks.yaml"] = """
-# 课程包（draft）：抓包工具可自动装，网络模拟器多需账号/授权，按指引获取。
+# 课程包（draft）：抓包工具可自动装，网络模拟器多需账号/授权，按指引获取，教程已配好。
 id: computer-networks
 name: 计算机网络
 category: systems
@@ -281,34 +551,104 @@ tools:
     purpose: 抓包分析神器：看懂 TCP 三次握手、DNS、HTTP 都靠它
     winget: WiresharkFoundation.Wireshark
     required: true
+    shortcut: Wireshark
+    guide:
+      tutorial_url: https://www.wireshark.org/docs/wsug_html_chunked/
+      tutorial_title: Wireshark 官方用户手册（跟随最新版）
+      diagram: ide
+      steps:
+        - 打开 Wireshark，首页会列出网卡，双击你正在用的那块（WLAN 或以太网）开始抓包
+        - 在上方过滤栏输入 http 或 dns 再回车，只看这类包，列表立刻清爽
+        - 点任意一行，下方能展开看 Ethernet/IP/TCP/应用层的逐层细节，这就是实验要截图分析的东西
+      note: Wireshark 官方手册对应当前发行版，与你装的一致。
   - name: Cisco Packet Tracer
     purpose: 网络拓扑模拟：配路由器、交换机做实验（需思科账号免费注册）
     manual: 到思科 NetAcad 官网注册账号后免费下载 Packet Tracer，或使用老师发的安装包。
     required: false
+    shortcut: Cisco Packet Tracer
+    guide:
+      tutorial_url: https://www.netacad.com/
+      tutorial_title: 思科 NetAcad（Packet Tracer 官方获取与课程）
+      diagram: editor
+      steps:
+        - 打开后先登录思科账号，点左下角设备区把路由器、交换机、PC 拖到画布上
+        - 点一台设备 → CLI 标签页，就是敲命令配置的地方
+        - 连线时选闪电图标的自动连接，或手选铜线；红色三角变绿说明链路通了
+      note: Packet Tracer 的操作方式在 8.x 各版本一致，实验步骤通用。
   - name: eNSP
     purpose: 华为网络设备模拟器：使用华为教材的学校常用（依赖 WinPcap 与 VirtualBox）
     manual: 从华为企业支持网站或老师处获取 eNSP 安装包，安装前先装好 VirtualBox 与 Wireshark。
     required: false
+    shortcut: eNSP
+    guide:
+      tutorial_url: https://support.huawei.com/enterprise/zh/
+      tutorial_title: 华为企业支持（eNSP 官方资料）
+      diagram: editor
+      steps:
+        - 打开 eNSP，新建拓扑，从左侧把路由器、交换机、PC 拖到画布
+        - 右键设备选「启动」，再右键选「命令行」打开它的配置窗口
+        - 画布上方的连线工具选 Copper 线连接各设备端口
+      note: eNSP 界面长期稳定，步骤适用于学校常用的版本。
   - name: GNS3
     purpose: 更真实的网络拓扑模拟（高年级/自学进阶方向）
     manual: 到 GNS3 官网下载客户端；设备镜像需自行准备（课程一般不强制）。
     required: false
+    shortcut: GNS3
+    guide:
+      tutorial_url: https://docs.gns3.com/
+      tutorial_title: GNS3 官方文档（跟随最新版）
+      diagram: editor
+      steps:
+        - 第一次打开会走本地服务器向导，一路默认即可
+        - 新建项目后，从左侧把路由器拖到画布，右键可启动和打开控制台
+        - 没有设备镜像时先用内置的 VPCS 模拟 PC 练连通
+      note: GNS3 官方文档对应当前发行版。
   - name: PuTTY
     purpose: SSH/Telnet 客户端：连实验服务器和网络设备
     winget: PuTTY.PuTTY
     required: false
+    shortcut: PuTTY
+    guide:
+      tutorial_url: https://the.earth.li/~sgtatham/putty/latest/htmldoc/
+      tutorial_title: PuTTY 官方手册（latest 版）
+      diagram: terminal
+      steps:
+        - 打开 PuTTY，在 Host Name 里填服务器 IP，端口默认 22，连接类型选 SSH
+        - 点 Open，第一次会问是否信任主机密钥，确认后输入用户名密码登录
+        - 常用连接可以填好后在 Saved Sessions 里起名字保存，下次双击就连
+      note: PuTTY 官网 latest 手册对应当前发行版。
   - name: WinSCP
     purpose: 图形化文件传输：往实验服务器传文件
     winget: WinSCP.WinSCP
     required: false
+    shortcut: WinSCP
+    guide:
+      tutorial_url: https://winscp.net/eng/docs/guide_begin
+      tutorial_title: WinSCP 官方新手指南
+      diagram: editor
+      steps:
+        - 打开后点「新建会话」，填服务器 IP、用户名密码，点登录
+        - 界面左边是本地文件夹、右边是服务器，文件直接拖过去就传
+        - 双击右侧的文本文件能直接编辑，保存时自动传回服务器
+      note: WinSCP 官方指南对应当前发行版界面。
   - name: Postman
     purpose: 网络编程实验里调 HTTP 接口用
     winget: Postman.Postman
     required: false
+    shortcut: Postman
+    guide:
+      tutorial_url: https://learning.postman.com/docs/introduction/overview/
+      tutorial_title: Postman 官方学习中心（跟随最新版）
+      diagram: editor
+      steps:
+        - 打开 Postman（可跳过登录用轻量模式），点「+」新建一个请求
+        - 选 GET，在地址栏填一个网址，点 Send，下方就能看到返回的状态码和内容
+        - 把常用的请求 Ctrl+S 保存到一个 Collection 里，下次直接打开用
+      note: Postman 是持续更新的软件，官方学习中心对应最新版界面。
 notes: Wireshark 安装时记得勾选 Npcap，否则抓不到包。
 """,
             ["computer-organization.yaml"] = """
-# 课程包（draft）：组成原理实验工具以模拟器为主，多为绿色软件，按指引手动获取。
+# 课程包（draft）：组成原理实验工具以模拟器为主，多为绿色软件，按指引手动获取，教程已配好。
 id: computer-organization
 name: 计算机组成原理
 category: systems
@@ -319,18 +659,58 @@ tools:
     purpose: 数字电路模拟：搭加法器、寄存器、单周期 CPU 都在它上面做
     manual: 到 GitHub 的 logisim-evolution 项目 Releases 页下载 logisim-evolution 的 jar 或 exe（需要先装好 Java），或使用老师发的版本。
     required: true
+    shortcut: none
+    guide:
+      tutorial_url: https://github.com/logisim-evolution/logisim-evolution
+      tutorial_title: Logisim-evolution 官方仓库（含图文说明）
+      diagram: editor
+      steps:
+        - 下载后双击打开，左侧是元件库（输入输出、逻辑门、存储器）
+        - 先练最简单的：拖一个输入引脚、一个与门、一个输出引脚，连线后点引脚切换 0/1，看输出变化
+        - 菜单「模拟 → 时钟」可以驱动时序电路，寄存器实验会用到
+      note: 这是该模拟器的官方发布仓库，说明对应你下载的当前版本。
   - name: RARS (RISC-V 模拟器)
     purpose: RISC-V 汇编模拟器：体系结构实验常用（需要 Java）
     manual: 到 GitHub 的 TheThirdOne/rars 项目 Releases 页下载 rars 的 jar 包，用 java -jar 运行，或使用老师发的版本。
     required: false
+    shortcut: none
+    guide:
+      tutorial_url: https://github.com/TheThirdOne/rars
+      tutorial_title: RARS 官方仓库（含使用说明）
+      diagram: ide
+      steps:
+        - 用 java -jar rars.jar 打开（或双击 jar），在编辑区写 RISC-V 汇编
+        - 点工具栏的扳手图标汇编，再点播放图标运行
+        - 右侧寄存器表实时显示每个寄存器的值，下方控制台看输出
+      note: 这是 RARS 的官方发布仓库，说明对应你下载的当前版本。
   - name: MARS (MIPS 模拟器)
     purpose: MIPS 汇编模拟器：用 MIPS 教材的学校常用（需要 Java）
     manual: 到密苏里州立大学的 MARS 官网页面下载 Mars.jar，用 java -jar Mars.jar 运行，或使用老师发的版本。
     required: false
+    shortcut: none
+    guide:
+      tutorial_url: https://courses.missouristate.edu/kenvollmar/mars/
+      tutorial_title: MARS 官方页面（密苏里州立大学）
+      diagram: ide
+      steps:
+        - 双击 Mars.jar 打开，在 Edit 区写 MIPS 汇编
+        - 点扳手图标 Assemble，再点播放图标运行
+        - Execute 区能看到每条指令的执行，右侧是寄存器实时值
+      note: MARS 多年保持同一界面，官方页面的说明适用于当前版本。
   - name: Proteus
     purpose: 电路仿真（偏硬件方向的学校使用，商业软件，学校一般有授权或机房版）
     manual: 优先用学校机房版或老师提供的安装包；个人学习可用官网试用版。
     required: false
+    shortcut: Proteus
+    guide:
+      tutorial_url: https://www.labcenter.com/
+      tutorial_title: Proteus 官网（Labcenter）
+      diagram: editor
+      steps:
+        - 打开 ISIS，新建工程后按 P 键打开元件库搜索元件
+        - 把元件放到画布上连线，点左下角播放按钮开始仿真
+        - 单片机实验：双击芯片模型，选择要加载的 .hex 程序文件再运行
+      note: Proteus 基本操作在 8.x 各版本一致，官网资料对应当前版本线。
   - name: JDK 17
     purpose: 上面几个模拟器的运行基础（没装 Java 的先装它）
     winget: Microsoft.OpenJDK.17
@@ -338,14 +718,34 @@ tools:
     verify:
       command: java -version
       expect: '17\.'
+    shortcut: none
+    guide:
+      tutorial_url: https://docs.oracle.com/en/java/javase/17/
+      tutorial_title: Oracle 官方文档（Java SE 17 版）
+      diagram: terminal
+      steps:
+        - 终端输入 java -version，显示 17.x 就说明模拟器的地基好了
+        - 运行 jar 包的命令格式：java -jar 文件名.jar
+        - 双击 jar 没反应时，就用上一条命令在终端里打开，能看到报错原因
+      note: 教程对应 JDK 17：链接是 17 的官方文档专区。
   - name: VS Code
     purpose: 写汇编和实验报告时的编辑器
     winget: Microsoft.VisualStudioCode
     required: false
+    shortcut: Visual Studio Code
+    guide:
+      tutorial_url: https://code.visualstudio.com/docs
+      tutorial_title: VS Code 官方文档（跟随最新版）
+      diagram: editor
+      steps:
+        - 打开 VS Code，把实验文件夹拖进来或用「打开文件夹」
+        - 汇编文件存为 .s 或 .asm，插件市场可装汇编语法高亮
+        - 报告里的代码片段从这里复制，能保留格式
+      note: VS Code 是持续更新的软件，官方文档始终对应最新版界面。
 notes: 这门课各学校用的模拟器差别很大（MARS、RARS、Logisim、Proteus 都有），以老师指定为准，本包覆盖最常见的几种。
 """,
             ["data-structures.yaml"] = """
-# 课程包（draft）：数据结构课沿用语言课环境，C / Java / Python 三条线任选其一。
+# 课程包（draft）：数据结构课沿用语言课环境，C / Java / Python 三条线任选其一，教程均已配好。
 id: data-structures
 name: 数据结构
 category: programming
@@ -359,6 +759,16 @@ tools:
     verify:
       command: code --version
       expect: '\d+\.\d+'
+    shortcut: Visual Studio Code
+    guide:
+      tutorial_url: https://code.visualstudio.com/docs
+      tutorial_title: VS Code 官方文档（跟随最新版）
+      diagram: editor
+      steps:
+        - 打开 VS Code，「文件 → 打开文件夹」选中练习代码的文件夹
+        - 按你这门课的语言装对应插件（C/C++、Java 或 Python）
+        - 每道题建一个文件，写完点右上角三角运行，对照题目样例检查输出
+      note: VS Code 是持续更新的软件，官方文档始终对应最新版界面。
   - name: MinGW-w64 (WinLibs GCC)
     purpose: C 语言线：编译器本体
     winget: BrechtSanders.WinLibs.POSIX.UCRT
@@ -366,6 +776,16 @@ tools:
     verify:
       command: gcc --version
       expect: 'gcc'
+    shortcut: none
+    guide:
+      tutorial_url: https://winlibs.com/
+      tutorial_title: WinLibs 官网（GCC 工具链说明）
+      diagram: terminal
+      steps:
+        - 终端输入 gcc --version 确认编译器就位
+        - 在代码目录执行 gcc list.c -o list -g 编译（-g 方便调试）
+        - 执行 .\list 运行；想单步调试在 VS Code 里按 F5
+      note: GCC 命令行用法多年稳定，步骤适用于你装的这个版本。
   - name: JDK 17
     purpose: Java 线：开发工具包（更多版本见 Java 程序设计课程包）
     winget: Microsoft.OpenJDK.17
@@ -376,6 +796,16 @@ tools:
     env:
       JAVA_HOME: "{install_dir}"
       path_additions: ["{install_dir}\\bin"]
+    shortcut: none
+    guide:
+      tutorial_url: https://docs.oracle.com/en/java/javase/17/
+      tutorial_title: Oracle 官方文档（Java SE 17 版）
+      diagram: terminal
+      steps:
+        - 终端输入 java -version，应显示 17.x
+        - 新建 .java 文件，javac 编译、java 运行
+        - 每个数据结构建一个类文件，主类里写 main 逐个测试
+      note: 教程对应 JDK 17：链接是 17 的官方文档专区。想要 8/11/21 的教程，去 Java 程序设计课里选对应版本。
   - name: Python 3.12
     purpose: Python 线：解释器本体
     winget: Python.Python.3.12
@@ -383,10 +813,30 @@ tools:
     verify:
       command: python --version
       expect: 'Python 3\.12'
+    shortcut: IDLE
+    guide:
+      tutorial_url: https://docs.python.org/zh-cn/3.12/tutorial/index.html
+      tutorial_title: Python 官方中文教程（3.12 版）
+      diagram: terminal
+      steps:
+        - 终端输入 python --version，应显示 Python 3.12.x
+        - 写好的算法保存为 .py，用 python 文件名.py 运行
+        - 想逐步看变量变化，用 VS Code 打断点按 F5 调试
+      note: 教程对应 Python 3.12：链接里的版本号就是 3.12。
   - name: Dev-C++
     purpose: 机房同款 IDE：学校机房用它的可以在宿舍电脑上装一份保持手感一致
     winget: Embarcadero.DevCpp
     required: false
+    shortcut: Dev-C++
+    guide:
+      tutorial_url: https://www.bloodshed.net/
+      tutorial_title: Dev-C++ 官网
+      diagram: ide
+      steps:
+        - 打开 Dev-C++，「文件 → 新建 → 源代码」
+        - 写完代码点「编译运行」（F11），在黑窗口里按题目给的样例输入
+        - 输出和样例逐行对照，不一致就回代码里查逻辑
+      note: Dev-C++ 界面多年未变，步骤适用于当前版本。
   - name: Git
     purpose: 版本管理：把每次练习代码存档、方便对比修改
     winget: Git.Git
@@ -394,10 +844,20 @@ tools:
     verify:
       command: git --version
       expect: 'git version'
+    shortcut: Git Bash
+    guide:
+      tutorial_url: https://git-scm.com/book/zh/v2
+      tutorial_title: 《Pro Git》官方中文版（Git 官方推荐）
+      diagram: terminal
+      steps:
+        - 先设置身份：git config --global user.name / user.email 各设一次
+        - 在练习文件夹 git init，之后每完成一道题就 commit 一次
+        - 写坏了想回退：git log 看历史版本，git checkout 版本号 -- 文件名 恢复
+      note: Git 命令行多年保持一致，官方中文书对应你装的版本。
 notes: 一般只需装你这门课用的那条语言线，别三条都装。
 """,
             ["database-systems.yaml"] = """
-# 课程包（draft）：MySQL 主线 + PostgreSQL/SQLite 替代与附加工具，待实机验证。
+# 课程包（draft）：MySQL 主线 + PostgreSQL/SQLite 替代与附加工具，教程均对应所装版本，待实机验证。
 id: database-systems
 name: 数据库系统
 category: data-ai
@@ -409,38 +869,118 @@ tools:
     winget: Oracle.MySQL
     version: ">=8.0"
     required: true
+    shortcut: none
+    guide:
+      tutorial_url: https://dev.mysql.com/doc/refman/8.0/en/
+      tutorial_title: MySQL 8.0 官方手册
+      diagram: terminal
+      steps:
+        - MySQL 是后台服务，没有主界面：装完它就自动在后台运行了
+        - 用下面的 DBeaver 或 Workbench 连它：地址 localhost、端口 3306、用户 root、密码是安装时你设的那个
+        - 终端输入 mysql -u root -p 也可以登录，输完密码进 mysql> 提示符就是成功
+      note: 教程对应 MySQL 8.0：手册链接就是 8.0 的专区。
   - name: DBeaver Community
     purpose: 图形化连数据库、写 SQL、看表结构（免费，替代收费的 Navicat）
     winget: DBeaver.DBeaver
     required: true
+    shortcut: DBeaver
+    guide:
+      tutorial_url: https://dbeaver.com/docs/dbeaver/
+      tutorial_title: DBeaver 官方文档（跟随最新版）
+      diagram: database
+      steps:
+        - 打开 DBeaver，左上角插头图标 → 新建连接 → 选 MySQL → 下一步
+        - 填 localhost、3306、root 和安装 MySQL 时设的密码，点「测试连接」，通了点完成（第一次会让下载驱动，同意即可）
+        - 点连接名左侧三角展开，就能看到表；右键连接 → SQL 编辑器，写 SELECT 就能查
+      note: DBeaver 是持续更新的软件，官方文档对应最新版界面。
   - name: MySQL Workbench
     purpose: MySQL 官方图形工具：建模和 ER 图更顺手（与 DBeaver 二选一或都装）
     winget: Oracle.MySQLWorkbench
     required: false
+    shortcut: MySQL Workbench
+    guide:
+      tutorial_url: https://dev.mysql.com/doc/workbench/en/
+      tutorial_title: MySQL Workbench 官方文档（对应 8.0 系列）
+      diagram: database
+      steps:
+        - 打开 Workbench，首页会自动列出本机连接，点它并输入 root 密码
+        - 左侧 SCHEMAS 区右键 → Create Schema 建自己的数据库
+        - 上方查询标签页写 SQL，点闪电图标执行，下方看结果表格
+      note: Workbench 与 MySQL 8.0 配套，文档对应 8.0 系列。
   - name: PostgreSQL 16
     purpose: 替代数据库：课程使用 PostgreSQL 时选它
     winget: PostgreSQL.PostgreSQL.16
     required: false
+    shortcut: pgAdmin
+    guide:
+      tutorial_url: https://www.postgresql.org/docs/16/tutorial.html
+      tutorial_title: PostgreSQL 16 官方教程
+      diagram: database
+      steps:
+        - 装完从开始菜单打开 pgAdmin 4，首次要设一个主密码（记牢）
+        - 左侧 Servers 会自动出现 PostgreSQL 16，点开输入安装时给 postgres 用户设的密码
+        - 右键 Databases → Create 新建数据库；选中库后点顶部「查询工具」写 SQL
+      note: 教程对应 PostgreSQL 16：链接就是 16 版的官方教程。
   - name: SQLite
     purpose: 轻量数据库：免安装服务，练 SQL 语法和嵌入式场景常用
     winget: SQLite.SQLite
     required: false
+    shortcut: none
+    guide:
+      tutorial_url: https://sqlite.org/docs.html
+      tutorial_title: SQLite 官方文档
+      diagram: terminal
+      steps:
+        - 终端输入 sqlite3 test.db 就创建并打开一个数据库文件（不存在会自动建）
+        - 输入 .tables 看有哪些表，写 SQL 以分号结尾回车执行
+        - 输入 .quit 退出；数据库就是那个 .db 文件，拷走就能带走
+      note: SQLite 命令行各版本用法一致，官方文档适用你装的版本。
   - name: Redis
     purpose: 高年级/实训拓展：缓存与键值数据库。Windows 下建议通过 Docker 或 WSL 运行，按指引操作
     manual: 从 Docker Desktop 拉取 redis 镜像运行，或在 WSL 的 Ubuntu 里执行 sudo apt install redis-server。
     required: false
+    shortcut: none
+    guide:
+      tutorial_url: https://redis.io/docs/latest/get-started/
+      tutorial_title: Redis 官方上手指南（跟随最新版）
+      diagram: terminal
+      steps:
+        - 按左侧手动指引先把 Redis 跑起来（Docker 或 WSL 里）
+        - 另开终端输入 redis-cli，连上后打 ping，返回 PONG 就是通了
+        - 试三条命令：set name "xiaoming"、get name、keys *
+      note: Redis 官方入门文档跟随最新发行版，与你拉到的镜像版本一致。
   - name: MongoDB Compass
     purpose: NoSQL 方向：MongoDB 的图形客户端（课程涉及文档数据库时选）
     winget: MongoDB.Compass
     required: false
+    shortcut: MongoDB Compass
+    guide:
+      tutorial_url: https://www.mongodb.com/docs/compass/current/
+      tutorial_title: MongoDB Compass 官方文档（current 版）
+      diagram: database
+      steps:
+        - 打开 Compass，连接字符串保持默认 mongodb://localhost:27017，点 Connect
+        - 左侧点「+」新建数据库和集合（collection，相当于关系型的表）
+        - 选中集合后点 ADD DATA → Insert Document 插入一条 JSON 数据试试
+      note: Compass 官方 current 文档对应当前发行版，与你装的一致。
   - name: SQL Server Express
     purpose: 替代数据库：使用微软教材/国产化替代教材的学校可能指定它（免费版够用）
     manual: 到微软官网下载 SQL Server Express 安装包，并另装 SSMS 管理工具（同页面有下载入口）。
     required: false
+    shortcut: Microsoft SQL Server Management Studio
+    guide:
+      tutorial_url: https://learn.microsoft.com/zh-cn/sql/ssms/sql-server-management-studio-ssms
+      tutorial_title: 微软官方 SSMS 文档（中文，跟随最新版）
+      diagram: database
+      steps:
+        - 先按指引装好 SQL Server Express，再装 SSMS 并打开它
+        - 连接框里服务器名称填 localhost\SQLEXPRESS，身份验证选 Windows 身份验证，点连接
+        - 左侧展开「数据库」，右键 → 新建查询，写 SQL 点「执行」
+      note: SSMS 是持续更新的官方工具，微软文档对应最新版。
 notes: MySQL 安装过程中设置的 root 密码请务必记牢，实验课每次都要用。
 """,
             ["embedded-systems.yaml"] = """
-# 课程包（draft）：嵌入式工具多为厂商软件，需账号/授权，按指引获取；仿真与开源替代也备了。
+# 课程包（draft）：嵌入式工具多为厂商软件，需账号/授权，按指引获取；仿真与开源替代也备了，教程已配好。
 id: embedded-systems
 name: 嵌入式系统
 category: electives
@@ -451,14 +991,44 @@ tools:
     purpose: 图形化配置 STM32 芯片引脚和时钟，自动生成工程代码
     manual: 到 ST 官网注册账号后免费下载 STM32CubeMX 并安装（需登录账号激活）。
     required: true
+    shortcut: STM32CubeMX
+    guide:
+      tutorial_url: https://wiki.st.com/stm32mcu/wiki/STM32CubeMX_introduction
+      tutorial_title: ST 官方 STM32CubeMX 入门（wiki，跟随最新版）
+      diagram: editor
+      steps:
+        - 打开后选 New Project，按你的开发板芯片型号搜并选中它
+        - 在芯片图上点引脚配置功能（比如把某个脚设为 GPIO_Output 点灯用）
+        - Project 页填工程名、工具链选 MDK-ARM，点 GENERATE CODE 生成 Keil 工程
+      note: STM32CubeMX 持续更新，ST 官方 wiki 对应当前版本。
   - name: Keil MDK
     purpose: ARM 官方编译环境：多数 STM32 教材的指定 IDE（社区版有代码大小限制，课程够用）
     manual: 到 Keil 官网下载 MDK-Arm 社区版安装，装完在 Pack Installer 里勾选你开发板对应的芯片支持包。
     required: true
+    shortcut: Keil uVision
+    guide:
+      tutorial_url: https://www.keil.com/support/man/docs/uv4/
+      tutorial_title: Keil µVision 官方手册
+      diagram: ide
+      steps:
+        - 打开 CubeMX 生成的工程（或老师给的工程），左侧是文件树
+        - 点魔术棒图标（Options）确认调试器选了 ST-Link，先别急着改其他项
+        - F7 编译、F8 下载（或工具栏的 LOAD 按钮），开发板跑起来后回来改代码
+      note: µVision 官方手册对应当前 MDK 版本线。
   - name: Arduino IDE
     purpose: Arduino 方向的开发环境：装好就能写、就能烧录
     winget: ArduinoSA.IDE.stable
     required: false
+    shortcut: Arduino IDE
+    guide:
+      tutorial_url: https://docs.arduino.cc/learn/starting-guide/the-arduino-software-ide-v2
+      tutorial_title: Arduino 官方 IDE 2.x 使用指南
+      diagram: ide
+      steps:
+        - 打开后先在 Tools → Board 选你的板子型号，再在 Port 选它占用的串口
+        - 打开示例：文件 → 示例 → Basics → Blink，先烧这个验证链路
+        - 点左上角箭头（上传），下方提示 Done uploading 就是烧好了，板上灯开始闪
+      note: 链接对应 Arduino IDE 2.x——装的就是 2.x 这条线，不会串到老 1.x 的界面。
   - name: VS Code
     purpose: 配合 PlatformIO 插件是更现代的嵌入式开发方式（可选体验）
     winget: Microsoft.VisualStudioCode
@@ -466,21 +1036,50 @@ tools:
     verify:
       command: code --version
       expect: '\d+\.\d+'
+    shortcut: Visual Studio Code
+    guide:
+      tutorial_url: https://code.visualstudio.com/docs
+      tutorial_title: VS Code 官方文档（跟随最新版）
+      diagram: editor
+      steps:
+        - 先装 PlatformIO 插件（左侧插件市场搜 PlatformIO IDE），装完重启 VS Code
+        - PlatformIO 首页 → New Project，选板子型号，它自动配好工具链
+        - 底部状态栏的对勾是编译、箭头是烧录、插头图标是串口监视器
+      note: VS Code 是持续更新的软件，官方文档始终对应最新版界面。
   - name: Proteus
     purpose: 电路与单片机仿真：没硬件时先在仿真里跑通逻辑
     manual: 优先用学校机房版或老师提供的安装包；个人可用官网试用版体验。
     required: false
+    shortcut: Proteus
+    guide:
+      tutorial_url: https://www.labcenter.com/
+      tutorial_title: Proteus 官网（Labcenter）
+      diagram: editor
+      steps:
+        - 打开 ISIS 按 P 搜元件（AT89C51、LED、RES 等关键字）放到画布连线
+        - 双击单片机，在 Program File 里选编译好的 .hex
+        - 点左下播放按钮开始仿真，LED 该亮就说明逻辑对了
+      note: Proteus 基本操作在 8.x 各版本一致，官网资料对应当前版本线。
   - name: 串口调试助手
     purpose: 看单片机串口输出、调通信协议
     manual: 使用老师发的串口助手，或在网上搜「SSCOM 串口调试助手」下载绿色版；CH340/CP2102 驱动按开发板芯片型号安装。
     required: false
+    shortcut: none
+    guide:
+      tutorial_title: 串口调试助手通用操作（这类小工具界面都大同小异）
+      diagram: terminal
+      steps:
+        - 先选对串口号（设备管理器里看 CH340 对应的 COM 号）
+        - 波特率和程序里 Serial.begin 设的一致（常见 9600 或 115200），点打开串口
+        - 单片机 printf 的内容会滚在这里，收不到先查波特率和接线 TX/RX 是否交叉
+      note: 串口助手没有统一的官方教程，各版本操作就这三步，学会一次到处通用。
 steps:
   - type: manual
     title: 用 VS Code 路线的同学：装好后在插件市场安装「PlatformIO IDE」，新建工程时它会自动下载工具链
 notes: 插上开发板没反应，八成是缺 USB 转串口驱动（CH340 最常见），先查驱动再怀疑代码。ST-Link 驱动装 STM32CubeMX 时会顺带装上。
 """,
             ["java-programming.yaml"] = """
-# 课程包（draft）：JDK 四个版本可选，winget 包 ID 待维护者实机验证后升级为 verified。
+# 课程包（draft）：JDK 四个版本可选（每个版本配同版本教程），winget 包 ID 待维护者实机验证后升级为 verified。
 id: java-programming
 name: Java 程序设计
 category: programming
@@ -497,32 +1096,90 @@ tools:
         verify:
           command: java -version
           expect: '1\.8\.'
+        guide:
+          tutorial_url: https://docs.oracle.com/javase/8/
+          tutorial_title: Oracle 官方文档（Java SE 8 版）
+          diagram: terminal
+          steps:
+            - 打开终端（Win+R 输入 cmd），输入 java -version，应显示 1.8.x，说明装好了
+            - 新建文件 Hello.java，第一行写 public class Hello {，类名必须和文件名一模一样
+            - 在文件所在目录执行 javac Hello.java 编译，再执行 java Hello 运行
+          note: 教程对应 JDK 8：这个版本的官方文档就是 8 的专区，不会串到新版本。
       - label: "11"
         winget: EclipseAdoptium.Temurin.11.JDK
         verify:
           command: java -version
           expect: '11\.'
+        guide:
+          tutorial_url: https://docs.oracle.com/en/java/javase/11/
+          tutorial_title: Oracle 官方文档（Java SE 11 版）
+          diagram: terminal
+          steps:
+            - 打开终端输入 java -version，应显示 11.x，说明装好了
+            - 新建 Hello.java 写一个 main 方法，javac 编译、java 运行
+            - 11 支持单文件直接运行：java Hello.java 也能跑（不用先 javac）
+          note: 教程对应 JDK 11：链接是 11 的官方文档专区。
       - label: "17"
         winget: Microsoft.OpenJDK.17
         verify:
           command: java -version
           expect: '17\.'
+        guide:
+          tutorial_url: https://docs.oracle.com/en/java/javase/17/
+          tutorial_title: Oracle 官方文档（Java SE 17 版）
+          diagram: terminal
+          steps:
+            - 打开终端输入 java -version，应显示 17.x，说明装好了
+            - 新建 Hello.java 写一个 main 方法，javac 编译、java 运行
+            - 在 IDEA 里新建项目时，项目 SDK 就选这个 17
+          note: 教程对应 JDK 17：链接是 17 的官方文档专区。
       - label: "21"
         winget: Microsoft.OpenJDK.21
         verify:
           command: java -version
           expect: '21\.'
+        guide:
+          tutorial_url: https://docs.oracle.com/en/java/javase/21/
+          tutorial_title: Oracle 官方文档（Java SE 21 版）
+          diagram: terminal
+          steps:
+            - 打开终端输入 java -version，应显示 21.x，说明装好了
+            - 新建 Hello.java 写一个 main 方法，javac 编译、java 运行
+            - 在 IDEA 里新建项目时，项目 SDK 就选这个 21
+          note: 教程对应 JDK 21：链接是 21 的官方文档专区。
     env:
       JAVA_HOME: "{install_dir}"
       path_additions: ["{install_dir}\\bin"]
+    shortcut: none
   - name: IntelliJ IDEA Community
     purpose: 写 Java 代码的主力编辑器（社区版免费）
     winget: JetBrains.IntelliJIDEA.Community
     required: true
+    shortcut: IntelliJ IDEA
+    guide:
+      tutorial_url: https://www.jetbrains.com/help/idea/getting-started.html
+      tutorial_title: JetBrains 官方入门（跟随 IDEA 最新版）
+      diagram: ide
+      steps:
+        - 打开 IDEA，点 New Project，起个名字，SDK 选刚装的 JDK，点 Create
+        - 在左侧项目树右键 src → New → Java Class，起名 Hello
+        - 输入 main 后按回车可自动补全 main 方法；写一句 System.out.println("你好");
+        - 点编辑区上方或行号旁的绿色三角运行，下方控制台看到输出就成功了
+      note: IDEA 是持续更新的软件，本教程链接到官方最新版入门，界面与你装的版本一致。
   - name: VS Code
     purpose: 轻量替代编辑器：习惯轻量编辑器或电脑配置较低时选它（与 IDEA 二选一即可）
     winget: Microsoft.VisualStudioCode
     required: false
+    shortcut: Visual Studio Code
+    guide:
+      tutorial_url: https://code.visualstudio.com/docs
+      tutorial_title: VS Code 官方文档（跟随最新版）
+      diagram: editor
+      steps:
+        - 打开 VS Code，点「文件 → 打开文件夹」选中你的代码文件夹
+        - 左侧插件市场搜索并安装「Extension Pack for Java」
+        - 新建 Hello.java，写好 main 方法后点右上角三角运行
+      note: VS Code 是持续更新的软件，官方文档始终对应最新版界面。
   - name: Apache Maven
     purpose: Java 项目构建与依赖管理（高年级课程与实训常用）
     winget: Apache.Maven
@@ -530,6 +1187,16 @@ tools:
     verify:
       command: mvn -version
       expect: 'Apache Maven'
+    shortcut: none
+    guide:
+      tutorial_url: https://maven.apache.org/guides/getting-started/
+      tutorial_title: Maven 官方入门指南
+      diagram: terminal
+      steps:
+        - 终端输入 mvn -version，能显示版本号说明装好了
+        - 一个 Maven 项目的标志是根目录有 pom.xml，在该目录执行 mvn compile 编译
+        - 执行 mvn test 跑测试，mvn package 打包成 jar
+      note: Maven 各 3.x 版本用法一致，官方入门指南适用于你装的版本。
   - name: Git
     purpose: 版本管理：交作业、拉老师代码、做团队项目都要用
     winget: Git.Git
@@ -537,10 +1204,20 @@ tools:
     verify:
       command: git --version
       expect: 'git version'
+    shortcut: Git Bash
+    guide:
+      tutorial_url: https://git-scm.com/book/zh/v2
+      tutorial_title: 《Pro Git》官方中文版（Git 官方推荐）
+      diagram: terminal
+      steps:
+        - 先做一次性的身份设置：git config --global user.name "你的名字"，再 git config --global user.email "你的邮箱"
+        - 在代码文件夹里执行 git init 初始化仓库
+        - 日常三连：git add . → git commit -m "说明" → 需要时 git push 上传
+      note: Git 命令行多年保持一致，官方中文书对应你装的版本。
 notes: 部分学校课程指定 JDK 8 或 11，安装时在版本列表里选对应版本即可；多个 JDK 版本可以共存，默认版本由 JAVA_HOME 指向决定。
 """,
             ["java-web.yaml"] = """
-# 课程包（draft）：Java Web 全家桶：JDK 多版本 + IDEA + Maven（含环境变量）+ 数据库 + Tomcat/Redis 指引。
+# 课程包（draft）：Java Web 全家桶：JDK 多版本（教程按版本对齐）+ IDEA + Maven + 数据库 + Tomcat 指引。
 id: java-web
 name: Java Web 开发
 category: engineering
@@ -550,6 +1227,7 @@ tools:
   - name: JDK
     purpose: Java 开发工具包。Spring Boot 3 要求 17 及以上，老教材用 8 的选 8
     required: true
+    shortcut: none
     default_version: "17"
     versions:
       - label: "8"
@@ -557,16 +1235,43 @@ tools:
         verify:
           command: java -version
           expect: '1\.8\.'
+        guide:
+          tutorial_url: https://docs.oracle.com/javase/8/
+          tutorial_title: Oracle 官方文档（Java SE 8 版）
+          diagram: terminal
+          steps:
+            - 终端输入 java -version，显示 1.8.x 即就绪
+            - 老式 Servlet 课程就靠这个版本，别升级，教材代码都是按 8 写的
+            - IDEA 新建项目时 SDK 选这个 8
+          note: 教程对应 JDK 8：链接是 8 的官方文档专区。
       - label: "17"
         winget: Microsoft.OpenJDK.17
         verify:
           command: java -version
           expect: '17\.'
+        guide:
+          tutorial_url: https://docs.oracle.com/en/java/javase/17/
+          tutorial_title: Oracle 官方文档（Java SE 17 版）
+          diagram: terminal
+          steps:
+            - 终端输入 java -version，显示 17.x 即就绪
+            - Spring Boot 3 项目就选这个版本，IDEA 里 SDK 也选 17
+            - 终端跑 java -jar 项目.jar 能直接验证打包结果
+          note: 教程对应 JDK 17：链接是 17 的官方文档专区。
       - label: "21"
         winget: Microsoft.OpenJDK.21
         verify:
           command: java -version
           expect: '21\.'
+        guide:
+          tutorial_url: https://docs.oracle.com/en/java/javase/21/
+          tutorial_title: Oracle 官方文档（Java SE 21 版）
+          diagram: terminal
+          steps:
+            - 终端输入 java -version，显示 21.x 即就绪
+            - IDEA 新建 Spring 项目时 SDK 选这个 21
+            - 其余用法和 17 一致，文档查 21 专区
+          note: 教程对应 JDK 21：链接是 21 的官方文档专区。
     env:
       JAVA_HOME: "{install_dir}"
       path_additions: ["{install_dir}\\bin"]
@@ -574,6 +1279,16 @@ tools:
     purpose: 主力编辑器（社区版够用；终极版学校一般有教育授权）
     winget: JetBrains.IntelliJIDEA.Community
     required: true
+    shortcut: IntelliJ IDEA
+    guide:
+      tutorial_url: https://www.jetbrains.com/help/idea/getting-started.html
+      tutorial_title: JetBrains 官方入门（跟随 IDEA 最新版）
+      diagram: ide
+      steps:
+        - 新建项目时选 Spring Initializr（或先建 Maven 项目），SDK 选已装的 JDK
+        - 右侧有个象头图标是 Maven 面板，点刷新按钮拉依赖（第一次较慢）
+        - 找到带 @SpringBootApplication 的主类，点它左边的绿三角启动，控制台出现 Started 就是起来了
+      note: IDEA 是持续更新的软件，官方入门始终对应最新版界面。
   - name: Apache Maven
     purpose: 构建与依赖管理
     winget: Apache.Maven
@@ -584,28 +1299,88 @@ tools:
     env:
       MAVEN_HOME: "{install_dir}"
       path_additions: ["{install_dir}\\bin"]
+    shortcut: none
+    guide:
+      tutorial_url: https://maven.apache.org/guides/getting-started/
+      tutorial_title: Maven 官方入门指南
+      diagram: terminal
+      steps:
+        - 终端输入 mvn -version 确认装好（第一次用先按下方的镜像步骤配好国内源）
+        - 项目根目录（有 pom.xml 的地方）执行 mvn spring-boot:run 启动 Spring Boot
+        - 打包用 mvn package，生成的 jar 在 target 文件夹里
+      note: Maven 3.x 各版本用法一致，官方入门适用你装的版本。
   - name: MySQL Server 8
     purpose: Web 项目的数据库
     winget: Oracle.MySQL
     required: true
+    shortcut: none
+    guide:
+      tutorial_url: https://dev.mysql.com/doc/refman/8.0/en/
+      tutorial_title: MySQL 8.0 官方手册
+      diagram: terminal
+      steps:
+        - MySQL 是后台服务，项目连不上先确认服务在跑（任务管理器服务里找 MySQL）
+        - 连接信息：localhost、3306、root + 安装时设的密码，填进项目的 application.yml
+        - 库名先在 DBeaver/Workbench 里建好，表交给框架自动生成或按实验 SQL 建
+      note: 教程对应 MySQL 8.0：手册链接就是 8.0 的专区。
   - name: DBeaver Community
     purpose: 图形化管理数据库
     winget: DBeaver.DBeaver
     required: false
+    shortcut: DBeaver
+    guide:
+      tutorial_url: https://dbeaver.com/docs/dbeaver/
+      tutorial_title: DBeaver 官方文档（跟随最新版）
+      diagram: database
+      steps:
+        - 新建 MySQL 连接，填 localhost、3306、root 和密码，测试连接通过再完成
+        - 展开连接就能看每个库的表，双击表看数据
+        - 项目里数据对不上时，先来这里直接查表核实
+      note: DBeaver 是持续更新的软件，官方文档对应最新版界面。
   - name: Apache Tomcat
     purpose: 传统 Servlet/JSP 课程需要；Spring Boot 项目自带内嵌 Tomcat，用不到它
     manual: 到 Apache Tomcat 官网下载 10.x 的 Windows zip 包，解压到安装位置下的 Tomcat 文件夹即可（免安装）。
     required: false
     env:
       CATALINA_HOME: "{install_dir}"
+    shortcut: none
+    guide:
+      tutorial_url: https://tomcat.apache.org/tomcat-10.1-doc/
+      tutorial_title: Apache Tomcat 10.1 官方文档
+      diagram: terminal
+      steps:
+        - 解压后进 bin 目录双击 startup.bat 启动，浏览器打开 localhost:8080 看到猫头页面就是起来了
+        - 关服务器运行同目录的 shutdown.bat，别直接关窗口硬杀
+        - 打好的 war 包放进 webapps 文件夹，启动时会自动部署
+      note: 课程包让你装的是 Tomcat 10.x，文档链接就是 10.1 的专区，不会串到 9 或 11。
   - name: Postman
     purpose: 调试自己写的接口
     winget: Postman.Postman
     required: false
+    shortcut: Postman
+    guide:
+      tutorial_url: https://learning.postman.com/docs/introduction/overview/
+      tutorial_title: Postman 官方学习中心（跟随最新版）
+      diagram: editor
+      steps:
+        - 项目启动后，新建请求填 http://localhost:8080/你的接口路径
+        - POST 请求在 Body → raw → JSON 里填参数，点 Send 看返回
+        - 返回 404 先查项目日志确认接口路径拼写，和代码里 @RequestMapping 对一遍
+      note: Postman 是持续更新的软件，官方学习中心对应最新版界面。
   - name: Redis
     purpose: 进阶章节（缓存/会话）常用：Windows 下走 Docker 或 WSL 运行
     manual: 用 Docker Desktop 拉取 redis 镜像运行，或在 WSL 的 Ubuntu 里执行 sudo apt install redis-server。
     required: false
+    shortcut: none
+    guide:
+      tutorial_url: https://redis.io/docs/latest/get-started/
+      tutorial_title: Redis 官方上手指南（跟随最新版）
+      diagram: terminal
+      steps:
+        - 先按指引把 Redis 跑起来（Docker 一条命令：docker run -d -p 6379:6379 redis）
+        - redis-cli 里 ping 返回 PONG 即通，项目里默认连的就是 6379
+        - set/get 各试一次，再去项目里触发缓存逻辑回来 keys * 看变化
+      note: Redis 官方入门跟随最新发行版，与你拉到的镜像版本一致。
   - name: Node.js LTS
     purpose: 前后端分离项目的前端部分要用
     winget: OpenJS.NodeJS.LTS
@@ -613,13 +1388,23 @@ tools:
     verify:
       command: node --version
       expect: 'v\d+\.'
+    shortcut: none
+    guide:
+      tutorial_url: https://nodejs.org/docs/latest-v20.x/api/documentation.html
+      tutorial_title: Node.js 官方文档（v20 LTS 版）
+      diagram: terminal
+      steps:
+        - 终端输入 node -v 确认版本（LTS 通道当前是 20 线）
+        - 进前端项目目录 npm install 装依赖，再 npm run dev 启动前端
+        - 浏览器按提示打开 localhost 的前端端口，页面出来就是通了
+      note: 教程对应 Node 20 LTS 线：文档链接就是 latest-v20.x 这一支。
 steps:
   - type: manual
     title: 给 Maven 配国内镜像：打开 Maven 安装目录下 conf/settings.xml，在 mirrors 里加入阿里云镜像（搜「Maven 阿里云镜像」复制官方给的那段），拉依赖会快很多
 notes: Spring Boot 项目跑不起来先看三件事：JDK 版本、数据库密码、端口被占用——九成问题在这三处。
 """,
             ["linux-systems.yaml"] = """
-# 课程包（draft）：WSL2 轻量路线 + 终端/远程工具全套，待实机验证。
+# 课程包（draft）：WSL2 轻量路线 + 终端/远程工具全套，教程已配好，待实机验证。
 id: linux-systems
 name: Linux 系统
 category: systems
@@ -630,18 +1415,58 @@ tools:
     purpose: 现代终端：多标签、分屏，连 WSL 和 SSH 都顺手
     winget: Microsoft.WindowsTerminal
     required: true
+    shortcut: Terminal
+    guide:
+      tutorial_url: https://learn.microsoft.com/zh-cn/windows/terminal/
+      tutorial_title: 微软官方 Windows Terminal 文档（中文）
+      diagram: terminal
+      steps:
+        - 打开 Windows Terminal，下拉箭头里选 Ubuntu，就是你的 Linux
+        - 先练五条命令：ls 看文件、cd 进目录、pwd 看当前位置、mkdir 建文件夹、cat 看文件内容
+        - Alt+Shift+D 可以把当前终端左右分屏，一边看代码一边跑命令
+      note: 微软官方文档对应当前发布的 Terminal 版本。
   - name: PuTTY
     purpose: SSH 客户端经典款：连学校服务器（已有其他 SSH 工具可不装）
     winget: PuTTY.PuTTY
     required: false
+    shortcut: PuTTY
+    guide:
+      tutorial_url: https://the.earth.li/~sgtatham/putty/latest/htmldoc/
+      tutorial_title: PuTTY 官方手册（latest 版）
+      diagram: terminal
+      steps:
+        - 打开 PuTTY，Host Name 填老师给的服务器 IP，端口 22，选 SSH
+        - 点 Open 后输入用户名密码，看到 Linux 提示符就是连上了
+        - 常连的服务器在 Saved Sessions 里存个名字，下次双击打开
+      note: PuTTY 官网 latest 手册对应当前发行版。
   - name: FinalShell
     purpose: 国产 SSH 工具替代：自带文件管理和服务器监控，学生里很流行
     manual: 到 FinalShell 官网下载安装包；免费版功能足够课程使用。
     required: false
+    shortcut: FinalShell
+    guide:
+      tutorial_url: https://www.hostbuf.com/
+      tutorial_title: FinalShell 官网（使用说明）
+      diagram: editor
+      steps:
+        - 打开 FinalShell，点左上角文件夹图标 → 新建 SSH 连接
+        - 填服务器地址、用户名密码保存，双击就连上
+        - 窗口下方直接能拖拽传文件，右侧能看服务器 CPU/内存状态
+      note: FinalShell 操作方式在当前版本线保持一致，官网有图文说明。
   - name: WinSCP
     purpose: 图形化传文件到 Linux 服务器
     winget: WinSCP.WinSCP
     required: false
+    shortcut: WinSCP
+    guide:
+      tutorial_url: https://winscp.net/eng/docs/guide_begin
+      tutorial_title: WinSCP 官方新手指南
+      diagram: editor
+      steps:
+        - 点「新建会话」填服务器 IP、用户名、密码后登录
+        - 左边本地、右边服务器，文件拖过去就是上传
+        - 实验文件传上去后，回终端里 ls 确认到位
+      note: WinSCP 官方指南对应当前发行版界面。
   - name: Git
     purpose: Windows 侧自带 OpenSSH 之外的补充：拉代码、配密钥都用得上
     winget: Git.Git
@@ -649,10 +1474,30 @@ tools:
     verify:
       command: git --version
       expect: 'git version'
+    shortcut: Git Bash
+    guide:
+      tutorial_url: https://git-scm.com/book/zh/v2
+      tutorial_title: 《Pro Git》官方中文版（Git 官方推荐）
+      diagram: terminal
+      steps:
+        - 先设置身份：git config --global user.name / user.email 各设一次
+        - 老师发仓库地址时 git clone 地址 拉代码
+        - 在 WSL 里同样可以用 git，两边操作无区别
+      note: Git 命令行多年保持一致，官方中文书对应你装的版本。
   - name: VirtualBox
     purpose: 需要完整桌面版 Ubuntu 或课程指定虚拟机时选它
     winget: Oracle.VirtualBox
     required: false
+    shortcut: Oracle VM VirtualBox
+    guide:
+      tutorial_url: https://www.virtualbox.org/manual/
+      tutorial_title: VirtualBox 官方用户手册（跟随最新版）
+      diagram: vm
+      steps:
+        - 点「新建」建一台 Ubuntu 虚拟机，内存 2-4GB、硬盘 25GB 以上
+        - 启动时选 Ubuntu 的 ISO 镜像装系统
+        - 装好先拍一张快照，实验做坏了可以一键回到干净状态
+      note: VirtualBox 官方手册对应当前发行版，与你装的一致。
 steps:
   - type: feature
     name: wsl
@@ -661,7 +1506,7 @@ steps:
 notes: Windows 11 自带 OpenSSH 客户端，终端里直接 ssh 用户名@服务器 也能连，PuTTY/FinalShell 是图形化替代。
 """,
             ["machine-learning.yaml"] = """
-# 课程包（draft）：Conda 环境管理 + 镜像配置 + PyTorch/Jupyter 步骤，GPU 路线有指引。
+# 课程包（draft）：Conda 环境管理 + 镜像配置 + PyTorch/Jupyter 步骤，GPU 路线有指引，教程已配好。
 id: machine-learning
 name: 人工智能 / 机器学习
 category: data-ai
@@ -675,10 +1520,30 @@ tools:
     verify:
       command: conda --version
       expect: 'conda'
+    shortcut: Anaconda Prompt
+    guide:
+      tutorial_url: https://docs.conda.io/projects/conda/en/stable/user-guide/getting-started.html
+      tutorial_title: conda 官方入门（stable 版文档，对应当前发行版）
+      diagram: terminal
+      steps:
+        - 从开始菜单打开「Anaconda Prompt」，本课的 conda 命令都在这里敲
+        - 建实验环境：conda create -n ml python=3.12，然后 conda activate ml
+        - 看当前有哪些环境：conda env list，前面的星号是正在用的
+      note: conda 官方 stable 文档对应当前发行版本，与你装的一致。
   - name: Anaconda
     purpose: 全家桶替代：自带几百个科学计算包，体积大但省事（与 Miniconda 二选一）
     winget: Anaconda.Anaconda3
     required: false
+    shortcut: Anaconda Navigator
+    guide:
+      tutorial_url: https://docs.anaconda.com/
+      tutorial_title: Anaconda 官方文档（跟随最新版）
+      diagram: editor
+      steps:
+        - 打开 Anaconda Navigator，左侧 Environments 是环境列表
+        - 点 Create 新建环境并勾选 Python 版本，相当于图形版的 conda create
+        - 首页的 JupyterLab / Notebook 图标点 Launch 就能打开写实验
+      note: Anaconda 官方文档对应当前发行版，与你装的一致。
   - name: VS Code
     purpose: 写实验代码、跑 Jupyter 的编辑器
     winget: Microsoft.VisualStudioCode
@@ -686,14 +1551,44 @@ tools:
     verify:
       command: code --version
       expect: '\d+\.\d+'
+    shortcut: Visual Studio Code
+    guide:
+      tutorial_url: https://code.visualstudio.com/docs
+      tutorial_title: VS Code 官方文档（跟随最新版）
+      diagram: editor
+      steps:
+        - 打开 VS Code，装「Python」和「Jupyter」两个插件
+        - 新建文件改后缀为 .ipynb 就是笔记本，右上角选内核时选你的 conda 环境
+        - 每个单元格写一段代码按 Shift+Enter 逐段运行，结果直接显示在下方
+      note: VS Code 是持续更新的软件，官方文档始终对应最新版界面。
   - name: PyCharm Community
     purpose: 编辑器替代（与 VS Code 二选一）
     winget: JetBrains.PyCharm.Community
     required: false
+    shortcut: PyCharm
+    guide:
+      tutorial_url: https://www.jetbrains.com/help/pycharm/getting-started.html
+      tutorial_title: JetBrains 官方入门（跟随 PyCharm 最新版）
+      diagram: ide
+      steps:
+        - 打开 PyCharm 新建项目，解释器选 conda 建好的那个环境
+        - 右键项目 → New → Python File 写训练脚本，点右上角三角运行
+        - 下方 Python Console 可以随时敲一行代码试结果
+      note: PyCharm 是持续更新的软件，官方入门始终对应最新版界面。
   - name: CUDA Toolkit
     purpose: GPU 加速前提：有 NVIDIA 显卡且想用 GPU 跑 PyTorch 时装（版本要和 PyTorch 对应）
     manual: 到 NVIDIA 官网下载 CUDA Toolkit（新手建议装 PyTorch 官网当前推荐的版本，如 12.x），装完重启电脑。
     required: false
+    shortcut: none
+    guide:
+      tutorial_url: https://docs.nvidia.com/cuda/
+      tutorial_title: NVIDIA CUDA 官方文档
+      diagram: terminal
+      steps:
+        - 装完重启，终端输入 nvcc --version，能出版本号说明驱动链通了
+        - 再在 Python 里验证：import torch 后 print(torch.cuda.is_available()) 返回 True
+        - 版本对不上是 GPU 跑不起来的头号原因，PyTorch 和 CUDA 版本按官网表格配对
+      note: CUDA 官方文档按版本组织，装的时候选了哪个版本就看哪个版本的文档。
 steps:
   - type: command
     run: conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
@@ -706,7 +1601,7 @@ steps:
 notes: 最后一步装的是 CPU 版 PyTorch（约 200MB）。有 N 卡的同学：先装 CUDA，再把最后一步换成 PyTorch 官网给出的 GPU 版命令。验证：python -c "import torch; print(torch.__version__, torch.cuda.is_available())"。
 """,
             ["math-modeling.yaml"] = """
-# 课程包（draft）：建模全套：数值计算（Octave/Python/R）+ 论文写作（LaTeX）。
+# 课程包（draft）：建模全套：数值计算（Octave/Python/R）+ 论文写作（LaTeX），教程已配好。
 id: math-modeling
 name: 数学建模
 category: electives
@@ -717,10 +1612,30 @@ tools:
     purpose: MATLAB 的免费替代：语法基本一致，数值计算实验够用
     manual: 到 GNU Octave 官网下载 Windows 安装版（也可用老师发的版本），安装时一路默认即可。
     required: true
+    shortcut: GNU Octave
+    guide:
+      tutorial_url: https://docs.octave.org/latest/
+      tutorial_title: GNU Octave 官方文档（latest 版）
+      diagram: ide
+      steps:
+        - 打开 Octave GUI，下方命令行窗口直接敲：A = [1 2; 3 4] 建矩阵，inv(A) 求逆
+        - 脚本存成 .m 文件，点运行按钮整段执行，和 MATLAB 习惯一样
+        - 画图用 plot(x, y)，图会弹出来，再用 File 菜单导出成图片插进论文
+      note: Octave 官方 latest 文档对应当前发行版，与你装的一致。
   - name: MATLAB
     purpose: 建模竞赛的主力软件：学校有机房版或校园授权的按指引装（个人付费版很贵，不必自购）
     manual: 优先用学校机房或学校提供的正版授权；MathWorks 官网可申请学生版试用。已装 Octave 的可先用它练手。
     required: false
+    shortcut: MATLAB
+    guide:
+      tutorial_url: https://www.mathworks.com/help/matlab/getting-started-with-matlab.html
+      tutorial_title: MathWorks 官方 MATLAB 入门（跟随当前版）
+      diagram: ide
+      steps:
+        - 打开后中间是命令行，先敲 A = [1 2; 3 4] 和 plot 试两条，确认能用
+        - 新建脚本（.m）写模型代码，点「运行」整段执行，右侧工作区能看到所有变量的值
+        - 论文要用的图在图窗里「文件 → 另存为」导出 PNG，分辨率够交作业
+      note: MATLAB 帮助对应当前发行版；学校授权装的哪个版本，帮助里就切到哪个版本看。
   - name: Miniconda
     purpose: Python 路线：numpy/scipy/pandas 做建模和数据处理越来越主流
     winget: Anaconda.Miniconda3
@@ -728,40 +1643,110 @@ tools:
     verify:
       command: conda --version
       expect: 'conda'
+    shortcut: Anaconda Prompt
+    guide:
+      tutorial_url: https://docs.conda.io/projects/conda/en/stable/user-guide/getting-started.html
+      tutorial_title: conda 官方入门（stable 版文档，对应当前发行版）
+      diagram: terminal
+      steps:
+        - 在 Anaconda Prompt 里 conda create -n model python=3.12 建个建模专用环境
+        - conda activate model 后 pip install numpy scipy pandas matplotlib 一次装齐
+        - 之后每个赛题一个文件夹，代码和数据都放里面，不串环境
+      note: conda 官方 stable 文档对应当前发行版本，与你装的一致。
   - name: R 语言
     purpose: 统计建模路线：统计类赛题和统计课常用
     winget: RProject.R
     required: false
+    shortcut: R
+    guide:
+      tutorial_url: https://cran.r-project.org/doc/manuals/r-release/R-intro.html
+      tutorial_title: 《R 导论》官方手册（r-release，对应当前发行版）
+      diagram: terminal
+      steps:
+        - 打开 RGui，控制台里敲 x <- c(1,2,3) 回车，再敲 mean(x) 立刻出结果
+        - 装包用 install.packages("ggplot2")，加载用 library(ggplot2)
+        - 脚本在文件菜单新建，Ctrl+R 逐行运行（或配合 RStudio 用）
+      note: r-release 手册永远对应当前正式发行版 R，与你装的版本自动一致。
   - name: RStudio
     purpose: R 的图形化开发环境（配合上面的 R 使用）
     winget: Posit.RStudio
     required: false
+    shortcut: RStudio
+    guide:
+      tutorial_url: https://docs.posit.co/ide/user/
+      tutorial_title: RStudio 官方文档（跟随最新版）
+      diagram: ide
+      steps:
+        - 打开后四宫格：左上写脚本、左下控制台、右上变量环境、右下图和文件
+        - 脚本里选中几行按 Ctrl+Enter 只跑这几行，调试模型最常用
+        - 右下 Plots 区看图，Export 导出给论文用
+      note: RStudio 持续更新，官方文档对应最新版界面。
   - name: MiKTeX
     purpose: LaTeX 排版：写竞赛论文和课程论文，公式排版最专业
     winget: MiKTeX.MiKTeX
     required: false
+    shortcut: TeXworks
+    guide:
+      tutorial_url: https://miktex.org/howto/install-miktex
+      tutorial_title: MiKTeX 官方安装与使用说明
+      diagram: editor
+      steps:
+        - 装好打开 TeXworks，新建文档把老师给的论文模板 .tex 打开
+        - 点绿色三角编译，第一次缺宏包会弹窗问是否安装，选允许（这就是 MiKTeX 的自动补包）
+        - 右侧预览区就是生成的 PDF，改一处编一次对照
+      note: MiKTeX 是滚动更新的发行方式，官方说明对应当前版本。
   - name: VS Code
     purpose: 写 Python 和 LaTeX 的编辑器
     winget: Microsoft.VisualStudioCode
     required: false
+    shortcut: Visual Studio Code
+    guide:
+      tutorial_url: https://code.visualstudio.com/docs
+      tutorial_title: VS Code 官方文档（跟随最新版）
+      diagram: editor
+      steps:
+        - 打开赛题文件夹，Python 和 LaTeX 文件放一起管理
+        - LaTeX 写作用「LaTeX Workshop」插件，保存自动编译、右侧预览
+        - 算完的图用相对路径插进 .tex，整个文件夹打包就能交给队友
+      note: VS Code 是持续更新的软件，官方文档始终对应最新版界面。
   - name: SPSS
     purpose: 统计分析菜单式软件：统计课程或社科类赛题偶尔指定
     manual: 优先用学校机房版（商业授权）；个人学习可用 PSPP（免费替代，官网下载）先练操作。
     required: false
+    shortcut: none
+    guide:
+      tutorial_url: https://www.gnu.org/software/pspp/manual/
+      tutorial_title: PSPP 官方手册（免费替代，操作与 SPSS 基本一致）
+      diagram: database
+      steps:
+        - 先练免费的 PSPP：打开后在变量视图定义变量名和类型，再回数据视图录入
+        - 分析菜单里选「描述统计」跑一遍，结果出现在输出窗口
+        - 机房 SPSS 的菜单位置和 PSPP 几乎一一对应，练熟了直接迁移
+      note: 用 PSPP 的手册练 SPSS 的操作是行业常见做法，核心统计流程两个软件一致。
 notes: 数学建模竞赛拼的是组队和论文，不是软件版本——工具够用就行，别在环境上耗太久。Octave 与 MATLAB 语法八成相通，代码迁移成本很低。
 """,
             ["mobile-development.yaml"] = """
-# 课程包（draft）：Android Studio 主线 + 跨端工具（uni-app/Flutter）指引 + 真机投屏。
+# 课程包（draft）：Android Studio 主线 + 跨端工具（uni-app/Flutter）指引 + 真机投屏，教程已配好。
 id: mobile-development
 name: 移动应用开发
 category: engineering
-summary: Android Studio 是主线（含模拟器）；做微信小程序/跨端方向的同学看补充工具。
+summary: Android Studio 是主线（含模拟器）；做微信小程序/跨端方向的同学看备注里的补充工具。
 status: draft
 tools:
   - name: Android Studio
     purpose: 安卓开发官方 IDE：写代码、拖界面、跑模拟器都在它里面（体积大，首次启动还要下 SDK）
     winget: Google.AndroidStudio
     required: true
+    shortcut: Android Studio
+    guide:
+      tutorial_url: https://developer.android.google.cn/studio/intro
+      tutorial_title: Android Studio 官方中文文档（跟随最新版）
+      diagram: ide
+      steps:
+        - 第一次打开按向导走：选 Standard，SDK 和模拟器会自动下载（几个 GB，找网络好的时候）
+        - 点 New Project → Empty Views Activity，起好名字点 Finish，等右下角进度跑完
+        - 打开 activity_main.xml 是拖界面的地方，MainActivity 是写逻辑的地方；点上方绿三角选模拟器运行
+      note: Android Studio 持续更新，谷歌官方中文文档对应最新版界面。给的链接是官方中文站。
   - name: JDK 17
     purpose: 某些构建脚本和跨端框架（如 React Native）需要独立 JDK；Android Studio 自带一份，这个是补充
     winget: Microsoft.OpenJDK.17
@@ -772,18 +1757,58 @@ tools:
     env:
       JAVA_HOME: "{install_dir}"
       path_additions: ["{install_dir}\\bin"]
+    shortcut: none
+    guide:
+      tutorial_url: https://docs.oracle.com/en/java/javase/17/
+      tutorial_title: Oracle 官方文档（Java SE 17 版）
+      diagram: terminal
+      steps:
+        - 终端输入 java -version，显示 17.x 即就绪
+        - 只有命令行构建（gradlew）或 React Native 才用这份独立 JDK
+        - Android Studio 里一般用它自带的 JDK，不用改设置
+      note: 教程对应 JDK 17：链接是 17 的官方文档专区。
   - name: HBuilderX
     purpose: uni-app 跨端开发：国内课程和微信小程序常用（需官网下载）
     manual: 到 DCloud 官网下载 HBuilderX 标准版解压即用；微信小程序方向再装「微信开发者工具」（微信官方下载页）。
     required: false
+    shortcut: HBuilderX
+    guide:
+      tutorial_url: https://hx.dcloud.net.cn/
+      tutorial_title: HBuilderX 官方文档
+      diagram: ide
+      steps:
+        - 解压后双击 HBuilderX.exe，文件 → 新建 → 项目 → uni-app，选默认模板
+        - 在 pages/index/index.vue 里改文字，顶部「运行 → 运行到浏览器」看效果
+        - 做微信小程序选「运行到小程序模拟器」，第一次要先在设置里填开发者工具路径
+      note: HBuilderX 官方文档对应当前发行版。
   - name: Flutter SDK
     purpose: 跨端框架方向：老师用 Flutter 时按指引装
     manual: 到 Flutter 官网下载 Windows 版 zip，解压到安装位置下并把 bin 目录加进 PATH，再运行 flutter doctor 按提示补齐缺项。
     required: false
+    shortcut: none
+    guide:
+      tutorial_url: https://docs.flutter.cn/get-started/install/windows
+      tutorial_title: Flutter 官方中文安装指南（跟随稳定版）
+      diagram: terminal
+      steps:
+        - 解压并配好 PATH 后，终端运行 flutter doctor，它会逐项告诉你还差什么
+        - doctor 里的 Android toolchain 打勾，需要先装好本课的 Android Studio
+        - flutter create myapp 建项目，cd 进去 flutter run 就能在模拟器跑起来
+      note: Flutter 官方中文文档跟随当前稳定版，与你下载的版本一致。
   - name: scrcpy
     purpose: 真机投屏与控制：演示作业、调真机比模拟器直观得多
     winget: Genymobile.scrcpy
     required: false
+    shortcut: none
+    guide:
+      tutorial_url: https://github.com/Genymobile/scrcpy
+      tutorial_title: scrcpy 官方仓库（含完整用法）
+      diagram: terminal
+      steps:
+        - 手机打开「开发者选项 → USB 调试」，数据线连电脑并在手机上允许调试
+        - 终端输入 scrcpy 回车，手机画面就投到电脑上，鼠标能直接操作
+        - 关掉投屏窗口或拔线就结束；加 --record 文件名.mp4 还能顺带录屏交作业
+      note: scrcpy 官方仓库文档对应当前发行版。
   - name: Git
     purpose: 版本管理
     winget: Git.Git
@@ -791,10 +1816,20 @@ tools:
     verify:
       command: git --version
       expect: 'git version'
+    shortcut: Git Bash
+    guide:
+      tutorial_url: https://git-scm.com/book/zh/v2
+      tutorial_title: 《Pro Git》官方中文版（Git 官方推荐）
+      diagram: terminal
+      steps:
+        - 先设置身份：git config --global user.name / user.email 各设一次
+        - 项目文件夹 git init 后，每完成一个页面就 commit 一次
+        - UI 改崩了靠 git 回退，比在 Android Studio 里翻撤销历史靠谱
+      note: Git 命令行多年保持一致，官方中文书对应你装的版本。
 notes: Android Studio 第一次打开会向导式下载 SDK 和模拟器镜像（几个 GB），找个网络好的时候做；模拟器卡的话，插数据线用真机调试更流畅。
 """,
             ["network-security.yaml"] = """
-# 课程包（draft）：安全课工具链：虚拟机 + 抓包 + 扫描 + Web 安全 + 密码学经典工具，全在隔离环境里练。
+# 课程包（draft）：安全课工具链：虚拟机 + 抓包 + 扫描 + Web 安全 + 密码学经典工具，全在隔离环境里练，教程已配好。
 id: network-security
 name: 网络安全
 category: electives
@@ -805,14 +1840,44 @@ tools:
     purpose: 搭隔离实验环境的地基：Kali 和靶机都跑在里面
     winget: Oracle.VirtualBox
     required: true
+    shortcut: Oracle VM VirtualBox
+    guide:
+      tutorial_url: https://www.virtualbox.org/manual/
+      tutorial_title: VirtualBox 官方用户手册（跟随最新版）
+      diagram: vm
+      steps:
+        - 选中虚拟机 → 设置 → 网络，把网卡改成「仅主机网络」或 NAT 网络，别用桥接练攻击工具
+        - Kali 和靶机都设成同一种网络模式，它们之间互相能 ping 通就行
+        - 每台机装好先拍快照，实验做坏了一键还原
+      note: VirtualBox 官方手册对应当前发行版，与你装的一致。
   - name: Kali Linux
     purpose: 渗透测试系统：自带几百个安全工具（在虚拟机里装，或用 WSL 版）
     manual: 到 Kali 官网下载 VirtualBox 专用镜像导入 VirtualBox；或在 Microsoft Store 装 Kali Linux（WSL 版）。默认账号 kali/kali。
     required: true
+    shortcut: none
+    guide:
+      tutorial_url: https://www.kali.org/docs/introduction/
+      tutorial_title: Kali Linux 官方文档（入门）
+      diagram: terminal
+      steps:
+        - 导入镜像后用 kali/kali 登录，先执行 sudo apt update 更新软件源
+        - 工具都在左上角的应用菜单里按分类放好，也可以终端输工具名直接启动
+        - 第一条练手命令：在终端对靶机 IP 执行 ping 和 nmap，确认两台机互通
+      note: Kali 官方文档对应当前滚动发行版，与你下载的镜像一致。
   - name: Wireshark
     purpose: 抓包分析：理解协议和攻击流量
     winget: WiresharkFoundation.Wireshark
     required: true
+    shortcut: Wireshark
+    guide:
+      tutorial_url: https://www.wireshark.org/docs/wsug_html_chunked/
+      tutorial_title: Wireshark 官方用户手册（跟随最新版）
+      diagram: ide
+      steps:
+        - 在 Kali 或靶机里操作时同步开 Wireshark 抓包，选两台机共同在的那块网卡
+        - 过滤栏输入目标 IP：ip.addr == 靶机IP，只看实验流量
+        - 右键任意包 → 追踪 → TCP 流，能完整看到一次交互的来回报文
+      note: Wireshark 官方手册对应当前发行版，与你装的一致。
   - name: Nmap
     purpose: 端口扫描与主机发现的经典工具
     winget: Insecure.Nmap
@@ -820,18 +1885,48 @@ tools:
     verify:
       command: nmap --version
       expect: 'Nmap version'
+    shortcut: Zenmap
+    guide:
+      tutorial_url: https://nmap.org/book/man.html
+      tutorial_title: Nmap 官方参考手册
+      diagram: terminal
+      steps:
+        - 只在自己的实验网段练：nmap 靶机IP 看它开了哪些端口
+        - nmap -sV 靶机IP 能进一步识别每个端口跑的服务和版本
+        - 图形版 Zenmap 在开始菜单里，命令会自动拼好，适合对照学习参数
+      note: Nmap 官方手册对应当前发行版，与你装的一致。
   - name: Burp Suite Community
     purpose: Web 安全测试：抓改 HTTP 请求，Web 实验必备
     winget: PortSwigger.BurpSuite.Community
     required: false
+    shortcut: Burp Suite Community Edition
+    guide:
+      tutorial_url: https://portswigger.com/burp/documentation/desktop/getting-started
+      tutorial_title: PortSwigger 官方入门（Burp Suite，跟随最新版）
+      diagram: browser
+      steps:
+        - 打开 Burp 一路默认建临时项目，Proxy 页点 Open Browser 用它自带浏览器访问靶场
+        - 在自带浏览器里的操作都会出现在 Proxy → HTTP history 里
+        - 选中一条请求右键 Send to Repeater，就能改参数重发——Web 实验的核心玩法
+      note: Burp 持续更新，官方入门对应最新版界面。浏览器代理、证书等进阶配置看官方入门的后半部分。
   - name: John the Ripper
     purpose: 密码哈希破解经典工具：密码学与口令安全实验常用（只在实验环境练）
     manual: 到 openwall 官网下载 John the Ripper 的 Windows 版压缩包解压即用；实验靶机里通常也预装了 hashcat，可二选一。
     required: false
+    shortcut: none
+    guide:
+      tutorial_url: https://www.openwall.com/john/doc/
+      tutorial_title: John the Ripper 官方文档
+      diagram: terminal
+      steps:
+        - 把实验给的哈希按每行一条存进 hash.txt
+        - 在 John 目录执行 john hash.txt，它会用自带字典先跑一轮
+        - 跑完用 john --show hash.txt 看破出来的明文；中途按 Ctrl+C，下次会自动续跑
+      note: John 官方文档对应当前发行版；实验用法只限老师提供的哈希与靶机。
 notes: 所有攻击性工具只许在自己的虚拟机和靶场环境里用，扫描或攻击别人的网络是违法的——这点老师上课也会强调。虚拟机网卡建议用「仅主机」或「NAT 网络」模式做实验。
 """,
             ["operating-systems.yaml"] = """
-# 课程包（draft）：虚拟机双选择 + WSL2 路线 + 终端，待实机验证。
+# 课程包（draft）：虚拟机双选择 + WSL2 路线 + 终端，教程已配好，待实机验证。
 id: operating-systems
 name: 操作系统
 category: systems
@@ -842,14 +1937,44 @@ tools:
     purpose: 免费虚拟机：在里面装 Ubuntu 做实验（推荐路线）
     winget: Oracle.VirtualBox
     required: true
+    shortcut: Oracle VM VirtualBox
+    guide:
+      tutorial_url: https://www.virtualbox.org/manual/
+      tutorial_title: VirtualBox 官方用户手册（跟随最新版）
+      diagram: vm
+      steps:
+        - 打开 VirtualBox，点「新建」，名字填 Ubuntu，类型 Linux，版本 Ubuntu (64-bit)
+        - 内存给 2-4GB，硬盘选「现在创建虚拟硬盘」给 25GB 以上
+        - 建好后点「启动」，第一次会让选 Ubuntu 的 ISO 镜像，选完按提示安装系统
+      note: VirtualBox 官方手册对应当前发行版，与你装的一致。
   - name: VMware Workstation Pro
     purpose: 虚拟机替代：性能更好，现已免费（与 VirtualBox 二选一）
     winget: VMware.WorkstationPro
     required: false
+    shortcut: VMware Workstation
+    guide:
+      tutorial_url: https://docs.vmware.com/en/VMware-Workstation-Pro/index.html
+      tutorial_title: VMware Workstation Pro 官方文档
+      diagram: vm
+      steps:
+        - 打开后点「创建新的虚拟机」→ 典型 → 选 Ubuntu 的 ISO 镜像
+        - 设置用户名密码后一路下一步，磁盘给 25GB 以上
+        - 点「开启此虚拟机」，等 Ubuntu 装完，第一次先做一次快照方便回滚
+      note: 官方文档对应当前 Workstation Pro 版本线。
   - name: Windows Terminal
     purpose: 用 WSL 路线时的终端
     winget: Microsoft.WindowsTerminal
     required: false
+    shortcut: Terminal
+    guide:
+      tutorial_url: https://learn.microsoft.com/zh-cn/windows/terminal/
+      tutorial_title: 微软官方 Windows Terminal 文档（中文）
+      diagram: terminal
+      steps:
+        - 打开 Windows Terminal，点标签页旁的下拉箭头，能选 PowerShell、cmd 和 Ubuntu(WSL)
+        - Ctrl+Shift+T 新建标签，装了 WSL 后默认会多出 Ubuntu 一项
+        - 点下拉箭头 → 设置，可以改字体大小和配色，看着舒服最重要
+      note: 微软官方文档对应当前发布的 Terminal 版本。
   - name: Git
     purpose: 拉取实验框架代码（如 xv6、Nachos）时常用
     winget: Git.Git
@@ -857,6 +1982,16 @@ tools:
     verify:
       command: git --version
       expect: 'git version'
+    shortcut: Git Bash
+    guide:
+      tutorial_url: https://git-scm.com/book/zh/v2
+      tutorial_title: 《Pro Git》官方中文版（Git 官方推荐）
+      diagram: terminal
+      steps:
+        - 先设置身份：git config --global user.name / user.email 各设一次
+        - 老师给仓库地址时用 git clone 地址 一条命令拉到本地
+        - 每次实验做完 commit 一次，代码写坏了能随时回到上一个版本
+      note: Git 命令行多年保持一致，官方中文书对应你装的版本。
 steps:
   - type: feature
     name: wsl
@@ -867,7 +2002,7 @@ steps:
 notes: WSL2 路线更轻量，适合只做命令行实验；要装图形界面或做内核实验，用虚拟机路线。内存 8GB 的电脑给虚拟机分 2GB、16GB 分 4GB 比较合适。
 """,
             ["python-programming.yaml"] = """
-# 课程包（draft）：Python 多版本 + 发行版/编辑器替代选项，待实机验证。
+# 课程包（draft）：Python 多版本（每个版本配同版本官方中文教程）+ 发行版/编辑器替代选项，待实机验证。
 id: python-programming
 name: Python 程序设计
 category: programming
@@ -877,6 +2012,7 @@ tools:
   - name: Python
     purpose: Python 解释器本体。按课程要求选版本，不确定选推荐的 3.12
     required: true
+    shortcut: IDLE
     default_version: "3.12"
     versions:
       - label: "3.11"
@@ -884,28 +2020,85 @@ tools:
         verify:
           command: python --version
           expect: 'Python 3\.11'
+        guide:
+          tutorial_url: https://docs.python.org/zh-cn/3.11/tutorial/index.html
+          tutorial_title: Python 官方中文教程（3.11 版）
+          diagram: terminal
+          steps:
+            - 终端输入 python --version，应显示 Python 3.11.x
+            - 输入 python 进入交互模式，打 print("你好") 按回车，立即能看到输出
+            - 输入 exit() 退出；写好的 .py 文件用 python 文件名.py 运行
+          note: 教程对应 Python 3.11：链接里的版本号就是 3.11，不会跳到别的版本。
       - label: "3.12"
         winget: Python.Python.3.12
         verify:
           command: python --version
           expect: 'Python 3\.12'
+        guide:
+          tutorial_url: https://docs.python.org/zh-cn/3.12/tutorial/index.html
+          tutorial_title: Python 官方中文教程（3.12 版）
+          diagram: terminal
+          steps:
+            - 终端输入 python --version，应显示 Python 3.12.x
+            - 输入 python 进入交互模式，打 print("你好") 按回车，立即能看到输出
+            - 输入 exit() 退出；写好的 .py 文件用 python 文件名.py 运行
+          note: 教程对应 Python 3.12：链接里的版本号就是 3.12，不会跳到别的版本。
       - label: "3.13"
         winget: Python.Python.3.13
         verify:
           command: python --version
           expect: 'Python 3\.13'
+        guide:
+          tutorial_url: https://docs.python.org/zh-cn/3.13/tutorial/index.html
+          tutorial_title: Python 官方中文教程（3.13 版）
+          diagram: terminal
+          steps:
+            - 终端输入 python --version，应显示 Python 3.13.x
+            - 输入 python 进入交互模式（3.13 的交互界面带颜色和高亮，比旧版更好用）
+            - 输入 exit() 退出；写好的 .py 文件用 python 文件名.py 运行
+          note: 教程对应 Python 3.13：链接里的版本号就是 3.13，不会跳到别的版本。
   - name: PyCharm Community
     purpose: 写 Python 代码的主力编辑器（社区版免费）
     winget: JetBrains.PyCharm.Community
     required: true
+    shortcut: PyCharm
+    guide:
+      tutorial_url: https://www.jetbrains.com/help/pycharm/getting-started.html
+      tutorial_title: JetBrains 官方入门（跟随 PyCharm 最新版）
+      diagram: ide
+      steps:
+        - 打开 PyCharm，点 New Project，新建项目时解释器选刚装的 Python
+        - 在左侧项目树右键 → New → Python File，起名 hello
+        - 写 print("你好")，点右上角绿色三角运行，下方控制台看输出
+      note: PyCharm 是持续更新的软件，官方入门始终对应最新版界面。
   - name: VS Code
     purpose: 轻量替代编辑器（与 PyCharm 二选一即可）
     winget: Microsoft.VisualStudioCode
     required: false
+    shortcut: Visual Studio Code
+    guide:
+      tutorial_url: https://code.visualstudio.com/docs
+      tutorial_title: VS Code 官方文档（跟随最新版）
+      diagram: editor
+      steps:
+        - 打开 VS Code，用「文件 → 打开文件夹」打开代码文件夹
+        - 左侧插件市场搜索安装「Python」插件（微软官方）
+        - 新建 hello.py，写好后点右上角三角运行
+      note: VS Code 是持续更新的软件，官方文档始终对应最新版界面。
   - name: Thonny
     purpose: 新手向编辑器替代：自带 Python、界面极简，零基础第一课用它最省心
     winget: Thonny.Thonny
     required: false
+    shortcut: Thonny
+    guide:
+      tutorial_url: https://thonny.org/
+      tutorial_title: Thonny 官网（自带图文介绍）
+      diagram: editor
+      steps:
+        - 打开 Thonny，上半区就是写代码的地方，写 print("你好")
+        - 按 F5 或点绿色运行按钮，下半区的 Shell 里看输出
+        - 想看变量变化：菜单「视图 → 变量」，运行后每个变量的值都列着
+      note: Thonny 界面多年保持极简布局，官网介绍与你装的版本一致。
   - name: Miniconda
     purpose: 环境管理替代方案：后续上机器学习课、需要隔离多套环境时选它（与官方 Python 可共存）
     winget: Anaconda.Miniconda3
@@ -913,13 +2106,23 @@ tools:
     verify:
       command: conda --version
       expect: 'conda'
+    shortcut: Anaconda Prompt
+    guide:
+      tutorial_url: https://docs.conda.io/projects/conda/en/stable/user-guide/getting-started.html
+      tutorial_title: conda 官方入门（stable 版文档，对应当前发行版）
+      diagram: terminal
+      steps:
+        - 从开始菜单打开「Anaconda Prompt」再敲命令，conda 保证能找到
+        - conda create -n myenv python=3.12 创建一个独立环境
+        - conda activate myenv 进入环境，conda deactivate 退出
+      note: conda 官方 stable 文档对应当前发行版本，与你装的一致。
 steps:
   - type: command
     run: python -m pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
 notes: 官方 Python 安装时务必勾选「Add python.exe to PATH」（winget 官方包默认处理），验证步骤会自动确认。
 """,
             ["software-engineering.yaml"] = """
-# 课程包（draft）：软工实训协作全家桶：版本管理 + 接口调试（含国产替代）+ 画图 + 文档。
+# 课程包（draft）：软工实训协作全家桶：版本管理 + 接口调试（含国产替代）+ 画图 + 文档，教程已配好。
 id: software-engineering
 name: 软件工程 / 项目实训
 category: engineering
@@ -933,6 +2136,16 @@ tools:
     verify:
       command: git --version
       expect: 'git version'
+    shortcut: Git Bash
+    guide:
+      tutorial_url: https://git-scm.com/book/zh/v2
+      tutorial_title: 《Pro Git》官方中文版（Git 官方推荐）
+      diagram: terminal
+      steps:
+        - 先设置身份：git config --global user.name "你的名字"、user.email "你的邮箱"
+        - 拉团队仓库：git clone 仓库地址；每天开工先 git pull
+        - 提交节奏：git add . → git commit -m "做了什么" → git push，说明要写人话
+      note: Git 命令行多年保持一致，官方中文书对应你装的版本。
   - name: VS Code
     purpose: 通用编辑器
     winget: Microsoft.VisualStudioCode
@@ -940,18 +2153,58 @@ tools:
     verify:
       command: code --version
       expect: '\d+\.\d+'
+    shortcut: Visual Studio Code
+    guide:
+      tutorial_url: https://code.visualstudio.com/docs
+      tutorial_title: VS Code 官方文档（跟随最新版）
+      diagram: editor
+      steps:
+        - 用「打开文件夹」打开整个项目仓库，一次看全貌
+        - 左侧第三个图标是源代码管理，能可视化看谁改了哪些行
+        - 插件按项目语言装，其他的先别贪多
+      note: VS Code 是持续更新的软件，官方文档始终对应最新版界面。
   - name: Postman
     purpose: 接口调试：联调后端接口时用
     winget: Postman.Postman
     required: true
+    shortcut: Postman
+    guide:
+      tutorial_url: https://learning.postman.com/docs/introduction/overview/
+      tutorial_title: Postman 官方学习中心（跟随最新版）
+      diagram: editor
+      steps:
+        - 新建请求，先把后端给的接口地址填上，点 Send 看返回
+        - 需要登录态的接口在 Authorization 或 Headers 里带上 token
+        - 把调通的请求保存进 Collection，就是全组的接口说明书
+      note: Postman 是持续更新的软件，官方学习中心对应最新版界面。
   - name: Apifox
     purpose: 接口调试国产替代：自带接口文档和 Mock，团队协作更方便（与 Postman 二选一或都装）
     manual: 到 Apifox 官网下载 Windows 版安装；用手机号/邮箱注册即可免费使用基础功能。
     required: false
+    shortcut: Apifox
+    guide:
+      tutorial_url: https://docs.apifox.com/
+      tutorial_title: Apifox 官方文档（跟随最新版）
+      diagram: editor
+      steps:
+        - 登录后新建项目，把后端接口按模块建好目录
+        - 在接口页填地址和参数点「运行」，返回区能看到格式化好的 JSON
+        - 开启云端 Mock 后，前端不用等后端就能先拿假数据联调页面
+      note: Apifox 持续更新，官方文档对应最新版界面。
   - name: GitHub Desktop
     purpose: Git 图形客户端：不熟命令行时用按钮也能完成提交、拉取（可选）
     winget: GitHub.GitHubDesktop
     required: false
+    shortcut: GitHub Desktop
+    guide:
+      tutorial_url: https://docs.github.com/zh/desktop
+      tutorial_title: GitHub Desktop 官方文档（中文）
+      diagram: editor
+      steps:
+        - 登录 GitHub 账号后，File → Clone repository 选团队仓库拉到本地
+        - 改完文件左侧会列出变动，写一句 Summary 点 Commit 提交
+        - 顶部 Push origin 上传，Fetch/Pull 拉队友的更新
+      note: GitHub 官方文档对应当前 Desktop 版本。
   - name: GitHub CLI
     purpose: 命令行管理仓库、PR、Issue（可选）
     winget: GitHub.cli
@@ -959,22 +2212,62 @@ tools:
     verify:
       command: gh --version
       expect: 'gh version'
+    shortcut: none
+    guide:
+      tutorial_url: https://cli.github.com/manual/
+      tutorial_title: GitHub CLI 官方手册（跟随最新版）
+      diagram: terminal
+      steps:
+        - 第一次运行 gh auth login 按提示用浏览器登录授权
+        - gh repo clone 组织/仓库 拉代码；gh pr create 建合并请求
+        - gh issue list 看任务列表，和课程项目的分工表对上
+      note: GitHub CLI 官方手册对应当前发行版。
   - name: draw.io
     purpose: 画 UML、ER 图、流程图的工具（软工文档必备）
     winget: JGraph.Draw
     required: false
+    shortcut: draw.io
+    guide:
+      tutorial_url: https://www.drawio.com/doc/
+      tutorial_title: draw.io 官方文档
+      diagram: editor
+      steps:
+        - 打开后选空白图，左侧是图形库，拖到画布上就能用
+        - 画类图：左侧「UML」分类里有现成的类框，填上类名、属性、方法
+        - 画完用「文件 → 导出为 PNG」插进课程设计文档里
+      note: draw.io 官方文档对应当前发行版，基本操作多年稳定。
   - name: XMind
     purpose: 思维导图：梳理需求和功能结构时用
     manual: 到 XMind 官网下载桌面版，免费版足够课程文档使用。
     required: false
+    shortcut: XMind
+    guide:
+      tutorial_url: https://xmind.cn/
+      tutorial_title: XMind 官网（含新手引导）
+      diagram: editor
+      steps:
+        - 新建导图，中心主题写项目名，Tab 键加子主题、Enter 加同级
+        - 把功能模块按一级、二级拆开，就是需求分析的第一版结构图
+        - 导出图片后贴进需求文档，比纯文字清楚得多
+      note: XMind 基本操作在当前版本保持一致，官网有图文引导。
   - name: 7-Zip
     purpose: 解压各种格式的作业包和素材包
     winget: 7zip.7zip
     required: false
+    shortcut: 7-Zip File Manager
+    guide:
+      tutorial_url: https://www.7-zip.org/
+      tutorial_title: 7-Zip 官网
+      diagram: generic
+      steps:
+        - 任何压缩包右键 → 7-Zip → 解压到当前文件夹
+        - 交作业打包时右键文件夹 → 7-Zip → 添加到压缩包，格式选 zip 兼容性最好
+        - 中文文件名乱码时，在 7-Zip 主界面里打开压缩包再解压
+      note: 7-Zip 操作方式多年稳定，步骤适用于当前版本。
 notes: 装完 Git 先在终端里执行 git config --global user.name 和 user.email 设置身份，第一次提交前必须做。
 """,
             ["web-frontend.yaml"] = """
-# 课程包（draft）：Node 双版本 + 编辑器 + 浏览器 + 小程序工具指引，待实机验证。
+# 课程包（draft）：Node 双版本（教程按版本对齐）+ 编辑器 + 浏览器 + 小程序工具指引，待实机验证。
 id: web-frontend
 name: Web 前端开发
 category: programming
@@ -984,6 +2277,7 @@ tools:
   - name: Node.js
     purpose: 前端运行时与包管理（npm）。不确定选 LTS 长期支持版
     required: true
+    shortcut: none
     default_version: "LTS 20"
     versions:
       - label: "LTS 20"
@@ -991,11 +2285,29 @@ tools:
         verify:
           command: node --version
           expect: 'v20\.'
+        guide:
+          tutorial_url: https://nodejs.org/docs/latest-v20.x/api/documentation.html
+          tutorial_title: Node.js 官方文档（v20 LTS 版）
+          diagram: terminal
+          steps:
+            - 终端输入 node -v 显示 v20.x、npm -v 有版本号，说明装好了
+            - 在项目文件夹执行 npm init -y 生成 package.json
+            - 装包用 npm install 包名（已自动配国内镜像，速度快）
+          note: 教程对应 Node 20 LTS：文档链接就是 latest-v20.x 这一支。
       - label: "最新版"
         winget: OpenJS.NodeJS
         verify:
           command: node --version
           expect: 'v\d+\.'
+        guide:
+          tutorial_url: https://nodejs.org/docs/latest/api/documentation.html
+          tutorial_title: Node.js 官方文档（最新版）
+          diagram: terminal
+          steps:
+            - 终端输入 node -v 和 npm -v，都有版本号说明装好了
+            - 在项目文件夹执行 npm init -y 生成 package.json
+            - 装包用 npm install 包名（已自动配国内镜像，速度快）
+          note: 你选的是最新版，文档链接跟随官方 latest，与你装的版本一致。
   - name: VS Code
     purpose: 前端主力编辑器
     winget: Microsoft.VisualStudioCode
@@ -1003,6 +2315,16 @@ tools:
     verify:
       command: code --version
       expect: '\d+\.\d+'
+    shortcut: Visual Studio Code
+    guide:
+      tutorial_url: https://code.visualstudio.com/docs
+      tutorial_title: VS Code 官方文档（跟随最新版）
+      diagram: editor
+      steps:
+        - 打开 VS Code，「文件 → 打开文件夹」选中项目文件夹
+        - 装「Live Server」插件，右键 HTML 文件选 Open with Live Server，改代码自动刷新页面
+        - 写 CSS/JS 时把鼠标悬停在属性上就有中文提示说明
+      note: VS Code 是持续更新的软件，官方文档始终对应最新版界面。
   - name: Git
     purpose: 版本管理
     winget: Git.Git
@@ -1010,14 +2332,44 @@ tools:
     verify:
       command: git --version
       expect: 'git version'
+    shortcut: Git Bash
+    guide:
+      tutorial_url: https://git-scm.com/book/zh/v2
+      tutorial_title: 《Pro Git》官方中文版（Git 官方推荐）
+      diagram: terminal
+      steps:
+        - 先设置身份：git config --global user.name / user.email 各设一次
+        - 项目文件夹里 git init 初始化
+        - 日常三连：git add . → git commit -m "说明" → git push
+      note: Git 命令行多年保持一致，官方中文书对应你装的版本。
   - name: Google Chrome
     purpose: 调试页面用的浏览器（已有可不装）
     winget: Google.Chrome
     required: false
+    shortcut: Google Chrome
+    guide:
+      tutorial_url: https://developer.chrome.com/docs/devtools
+      tutorial_title: Chrome 开发者工具官方文档（跟随最新版）
+      diagram: browser
+      steps:
+        - 在页面上按 F12 打开开发者工具，这是前端调试的主战场
+        - 「元素」面板点左上角箭头再点页面元素，直接定位到它的 HTML 和 CSS
+        - 「控制台」面板里输入 JS 表达式回车，立即能看到结果，报错也在这里看
+      note: Chrome 持续更新，DevTools 官方文档对应最新版界面。
   - name: 微信开发者工具
     purpose: 课程涉及微信小程序时需要（写小程序、预览调试）
     manual: 到微信官方「开发者工具」页面下载稳定版安装；用微信扫码登录后即可新建小程序项目。
     required: false
+    shortcut: 微信开发者工具
+    guide:
+      tutorial_url: https://developers.weixin.qq.com/miniprogram/dev/devtools/devtools.html
+      tutorial_title: 微信官方开发者工具文档
+      diagram: ide
+      steps:
+        - 打开后用微信扫码登录，点「导入项目」或新建一个小程序项目（AppID 可选测试号）
+        - 左边是模拟器预览，中间写 wxml/wxss/js，保存后预览自动刷新
+        - 点上方「预览」生成二维码，用手机微信扫开在真机上看效果
+      note: 微信官方文档对应当前发布的开发者工具版本。
 steps:
   - type: command
     run: npm config set registry https://registry.npmmirror.com

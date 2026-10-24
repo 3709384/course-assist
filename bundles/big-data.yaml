@@ -1,4 +1,4 @@
-# 课程包（draft）：大数据课以虚拟机+手动部署为主，本包配齐基础并给出 Hadoop/Spark 的环境变量。
+# 课程包（draft）：大数据课以虚拟机+手动部署为主，本包配齐基础并给出 Hadoop/Spark 的环境变量，教程已配好。
 id: big-data
 name: 大数据技术
 category: data-ai
@@ -15,10 +15,30 @@ tools:
     env:
       JAVA_HOME: "{install_dir}"
       path_additions: ["{install_dir}\\bin"]
+    shortcut: none
+    guide:
+      tutorial_url: https://docs.oracle.com/javase/8/
+      tutorial_title: Oracle 官方文档（Java SE 8 版）
+      diagram: terminal
+      steps:
+        - 终端输入 java -version，显示 1.8.x 就对了（这门课必须是 8）
+        - 再输入 echo %JAVA_HOME%，应指向刚装的 JDK 目录，Hadoop 靠它找 Java
+        - 之后所有 Hadoop 命令都要在 JAVA_HOME 正确的前提下运行
+      note: 教程对应 JDK 8：链接是 8 的官方文档专区。
   - name: VirtualBox
     purpose: 多数学校的 Hadoop 集群实验在虚拟机里搭（1 主 2 从）
     winget: Oracle.VirtualBox
     required: true
+    shortcut: Oracle VM VirtualBox
+    guide:
+      tutorial_url: https://www.virtualbox.org/manual/
+      tutorial_title: VirtualBox 官方用户手册（跟随最新版）
+      diagram: vm
+      steps:
+        - 先建一台装好 Ubuntu 的虚拟机并把 Hadoop 在单机模式跑通
+        - 关机后右键这台机 → 复制，克隆出另外两台（记得选重新生成 MAC）
+        - 三台机器改好主机名和固定 IP 并互相能 ping 通，集群骨架就齐了
+      note: VirtualBox 官方手册对应当前发行版，与你装的一致。
   - name: Hadoop
     purpose: 大数据核心框架：从 Apache 官网或学校镜像下载 hadoop 3.3.x 的 tar.gz，解压到本工具的安装目录
     manual: 到 Apache Hadoop 官网下载 hadoop-3.3.x.tar.gz，解压到软件为它预留的目录（安装位置下的 Hadoop 文件夹）；在 Windows 原生跑需要额外补 winutils，按老师指引操作。多数课程在 Linux 虚拟机里部署，Windows 这份可作备用。
@@ -26,18 +46,58 @@ tools:
     env:
       HADOOP_HOME: "{install_dir}"
       path_additions: ["{install_dir}\\bin"]
+    shortcut: none
+    guide:
+      tutorial_url: https://hadoop.apache.org/docs/stable/
+      tutorial_title: Apache Hadoop 官方文档（stable 版，对应 3.x 稳定版）
+      diagram: terminal
+      steps:
+        - 解压并配好后先进单机验证：hdfs dfs -mkdir /input 能执行不报错
+        - 伪分布式按官方文档改 core-site.xml、hdfs-site.xml 后 start-dfs.sh 启动
+        - 浏览器打开 localhost:9870 能看到 NameNode 页面就是起来了
+      note: 官方 stable 文档对应当前 3.x 稳定版，与课程主流用的版本一致。
   - name: Spark
     purpose: 进阶框架：课程涉及 Spark 时，在 Hadoop 之后按指引部署
     manual: 到 Apache Spark 官网下载与 Hadoop 版本匹配的 spark-3.x-bin-hadoop3.tgz，解压到安装位置下，并把 SPARK_HOME 指到该目录（可在下方备注基础上手动添加环境变量）。
     required: false
+    shortcut: none
+    guide:
+      tutorial_url: https://spark.apache.org/docs/latest/
+      tutorial_title: Apache Spark 官方文档（latest 版）
+      diagram: terminal
+      steps:
+        - 解压后进 bin 目录执行 spark-shell，能进入 scala> 提示符就是装好了
+        - 先跑自带例子：run-example SparkPi 10，下方会打印出 π 的近似值
+        - 写 Python 版用 pyspark 命令，接口和 spark-shell 类似
+      note: Spark 官方 latest 文档对应当前发行版，与你下载的版本一致。
   - name: FinalShell
     purpose: SSH 连虚拟机集群 + 传文件，国产工具上手快
     manual: 到 FinalShell 官网下载安装包，免费版足够课程使用。
     required: false
+    shortcut: FinalShell
+    guide:
+      tutorial_url: https://www.hostbuf.com/
+      tutorial_title: FinalShell 官网（使用说明）
+      diagram: editor
+      steps:
+        - 新建三个 SSH 连接，分别对应集群的三台虚拟机
+        - 双击连接名登录，下方文件区直接拖拽分发安装包
+        - 三个连接开成分页，改配置时来回切换不用来回登录
+      note: FinalShell 操作方式在当前版本线保持一致，官网有图文说明。
   - name: WinSCP
     purpose: 往虚拟机/服务器传安装包和数据文件
     winget: WinSCP.WinSCP
     required: false
+    shortcut: WinSCP
+    guide:
+      tutorial_url: https://winscp.net/eng/docs/guide_begin
+      tutorial_title: WinSCP 官方新手指南
+      diagram: editor
+      steps:
+        - 新建会话填虚拟机 IP、用户名密码后登录
+        - 把 hadoop 的 tar.gz 从左边拖到右边就是上传
+        - 大文件传一半别关窗口，底部有进度条
+      note: WinSCP 官方指南对应当前发行版界面。
 steps:
   - type: manual
     title: 集群实验建议：一台虚拟机装好并调通后，关机克隆出另外两台再改主机名和 IP，比从头装三遍快得多

@@ -1,4 +1,4 @@
-# 课程包（draft）：Docker Desktop 主线（带验证）+ WSL2 + 镜像加速指引 + K8s 入门工具。
+# 课程包（draft）：Docker Desktop 主线（带验证）+ WSL2 + 镜像加速指引 + K8s 入门工具，教程已配好。
 id: cloud-containers
 name: 云计算与容器
 category: engineering
@@ -12,10 +12,30 @@ tools:
     verify:
       command: docker --version
       expect: 'Docker version'
+    shortcut: Docker Desktop
+    guide:
+      tutorial_url: https://docs.docker.com/get-started/
+      tutorial_title: Docker 官方上手教程（跟随最新版）
+      diagram: ide
+      steps:
+        - 打开 Docker Desktop，等左下角变绿（引擎启动完成）再敲命令
+        - 终端执行 docker run hello-world，看到欢迎文字说明引擎正常
+        - 主界面 Containers 页能看正在跑的容器，Images 页管理镜像；练习常用 docker ps、docker images 两条命令
+      note: Docker Desktop 持续更新，官方上手教程对应最新版界面。
   - name: Windows Terminal
     purpose: 敲 docker / kubectl 命令的终端
     winget: Microsoft.WindowsTerminal
     required: false
+    shortcut: Terminal
+    guide:
+      tutorial_url: https://learn.microsoft.com/zh-cn/windows/terminal/
+      tutorial_title: 微软官方 Windows Terminal 文档（中文）
+      diagram: terminal
+      steps:
+        - 打开后默认是 PowerShell，docker 命令直接在这里敲
+        - Ctrl+Shift+T 开新标签，一个看日志一个敲命令
+        - 命令太长记不住时，↑方向键翻历史命令
+      note: 微软官方文档对应当前发布的 Terminal 版本。
   - name: VS Code
     purpose: 写 Dockerfile 和 YAML 配置的编辑器
     winget: Microsoft.VisualStudioCode
@@ -23,10 +43,30 @@ tools:
     verify:
       command: code --version
       expect: '\d+\.\d+'
+    shortcut: Visual Studio Code
+    guide:
+      tutorial_url: https://code.visualstudio.com/docs
+      tutorial_title: VS Code 官方文档（跟随最新版）
+      diagram: editor
+      steps:
+        - 打开放 Dockerfile 的文件夹，装官方「Docker」插件，写 Dockerfile 有提示
+        - YAML 文件注意缩进只能用空格，插件会帮你标红错误缩进
+        - 下方终端直接执行 docker build，不用切换窗口
+      note: VS Code 是持续更新的软件，官方文档始终对应最新版界面。
   - name: kubectl
     purpose: Kubernetes 命令行：学到 K8s 章节时需要（Docker Desktop 也可自带一份）
     manual: 按 Kubernetes 官网「在 Windows 上安装 kubectl」的指引下载 kubectl.exe 放进 PATH 目录；或在 Docker Desktop 设置里启用 Kubernetes 后使用其自带版本。
     required: false
+    shortcut: none
+    guide:
+      tutorial_url: https://kubernetes.io/zh-cn/docs/tasks/tools/
+      tutorial_title: Kubernetes 官方中文文档（工具安装与使用）
+      diagram: terminal
+      steps:
+        - 先在 Docker Desktop 设置 → Kubernetes 里勾选 Enable Kubernetes 并应用，等它变绿
+        - 终端执行 kubectl get nodes，应显示一个 Ready 状态的节点
+        - 练手三连：kubectl create deployment hello --image=nginx → kubectl get pods → kubectl delete deployment hello
+      note: Kubernetes 官方中文文档按当前版本维护，与你装的 kubectl 一致。
 steps:
   - type: feature
     name: wsl

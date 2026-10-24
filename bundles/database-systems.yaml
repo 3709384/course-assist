@@ -1,4 +1,4 @@
-# 课程包（draft）：MySQL 主线 + PostgreSQL/SQLite 替代与附加工具，待实机验证。
+# 课程包（draft）：MySQL 主线 + PostgreSQL/SQLite 替代与附加工具，教程均对应所装版本，待实机验证。
 id: database-systems
 name: 数据库系统
 category: data-ai
@@ -10,32 +10,112 @@ tools:
     winget: Oracle.MySQL
     version: ">=8.0"
     required: true
+    shortcut: none
+    guide:
+      tutorial_url: https://dev.mysql.com/doc/refman/8.0/en/
+      tutorial_title: MySQL 8.0 官方手册
+      diagram: terminal
+      steps:
+        - MySQL 是后台服务，没有主界面：装完它就自动在后台运行了
+        - 用下面的 DBeaver 或 Workbench 连它：地址 localhost、端口 3306、用户 root、密码是安装时你设的那个
+        - 终端输入 mysql -u root -p 也可以登录，输完密码进 mysql> 提示符就是成功
+      note: 教程对应 MySQL 8.0：手册链接就是 8.0 的专区。
   - name: DBeaver Community
     purpose: 图形化连数据库、写 SQL、看表结构（免费，替代收费的 Navicat）
     winget: DBeaver.DBeaver
     required: true
+    shortcut: DBeaver
+    guide:
+      tutorial_url: https://dbeaver.com/docs/dbeaver/
+      tutorial_title: DBeaver 官方文档（跟随最新版）
+      diagram: database
+      steps:
+        - 打开 DBeaver，左上角插头图标 → 新建连接 → 选 MySQL → 下一步
+        - 填 localhost、3306、root 和安装 MySQL 时设的密码，点「测试连接」，通了点完成（第一次会让下载驱动，同意即可）
+        - 点连接名左侧三角展开，就能看到表；右键连接 → SQL 编辑器，写 SELECT 就能查
+      note: DBeaver 是持续更新的软件，官方文档对应最新版界面。
   - name: MySQL Workbench
     purpose: MySQL 官方图形工具：建模和 ER 图更顺手（与 DBeaver 二选一或都装）
     winget: Oracle.MySQLWorkbench
     required: false
+    shortcut: MySQL Workbench
+    guide:
+      tutorial_url: https://dev.mysql.com/doc/workbench/en/
+      tutorial_title: MySQL Workbench 官方文档（对应 8.0 系列）
+      diagram: database
+      steps:
+        - 打开 Workbench，首页会自动列出本机连接，点它并输入 root 密码
+        - 左侧 SCHEMAS 区右键 → Create Schema 建自己的数据库
+        - 上方查询标签页写 SQL，点闪电图标执行，下方看结果表格
+      note: Workbench 与 MySQL 8.0 配套，文档对应 8.0 系列。
   - name: PostgreSQL 16
     purpose: 替代数据库：课程使用 PostgreSQL 时选它
     winget: PostgreSQL.PostgreSQL.16
     required: false
+    shortcut: pgAdmin
+    guide:
+      tutorial_url: https://www.postgresql.org/docs/16/tutorial.html
+      tutorial_title: PostgreSQL 16 官方教程
+      diagram: database
+      steps:
+        - 装完从开始菜单打开 pgAdmin 4，首次要设一个主密码（记牢）
+        - 左侧 Servers 会自动出现 PostgreSQL 16，点开输入安装时给 postgres 用户设的密码
+        - 右键 Databases → Create 新建数据库；选中库后点顶部「查询工具」写 SQL
+      note: 教程对应 PostgreSQL 16：链接就是 16 版的官方教程。
   - name: SQLite
     purpose: 轻量数据库：免安装服务，练 SQL 语法和嵌入式场景常用
     winget: SQLite.SQLite
     required: false
+    shortcut: none
+    guide:
+      tutorial_url: https://sqlite.org/docs.html
+      tutorial_title: SQLite 官方文档
+      diagram: terminal
+      steps:
+        - 终端输入 sqlite3 test.db 就创建并打开一个数据库文件（不存在会自动建）
+        - 输入 .tables 看有哪些表，写 SQL 以分号结尾回车执行
+        - 输入 .quit 退出；数据库就是那个 .db 文件，拷走就能带走
+      note: SQLite 命令行各版本用法一致，官方文档适用你装的版本。
   - name: Redis
     purpose: 高年级/实训拓展：缓存与键值数据库。Windows 下建议通过 Docker 或 WSL 运行，按指引操作
     manual: 从 Docker Desktop 拉取 redis 镜像运行，或在 WSL 的 Ubuntu 里执行 sudo apt install redis-server。
     required: false
+    shortcut: none
+    guide:
+      tutorial_url: https://redis.io/docs/latest/get-started/
+      tutorial_title: Redis 官方上手指南（跟随最新版）
+      diagram: terminal
+      steps:
+        - 按左侧手动指引先把 Redis 跑起来（Docker 或 WSL 里）
+        - 另开终端输入 redis-cli，连上后打 ping，返回 PONG 就是通了
+        - 试三条命令：set name "xiaoming"、get name、keys *
+      note: Redis 官方入门文档跟随最新发行版，与你拉到的镜像版本一致。
   - name: MongoDB Compass
     purpose: NoSQL 方向：MongoDB 的图形客户端（课程涉及文档数据库时选）
     winget: MongoDB.Compass
     required: false
+    shortcut: MongoDB Compass
+    guide:
+      tutorial_url: https://www.mongodb.com/docs/compass/current/
+      tutorial_title: MongoDB Compass 官方文档（current 版）
+      diagram: database
+      steps:
+        - 打开 Compass，连接字符串保持默认 mongodb://localhost:27017，点 Connect
+        - 左侧点「+」新建数据库和集合（collection，相当于关系型的表）
+        - 选中集合后点 ADD DATA → Insert Document 插入一条 JSON 数据试试
+      note: Compass 官方 current 文档对应当前发行版，与你装的一致。
   - name: SQL Server Express
     purpose: 替代数据库：使用微软教材/国产化替代教材的学校可能指定它（免费版够用）
     manual: 到微软官网下载 SQL Server Express 安装包，并另装 SSMS 管理工具（同页面有下载入口）。
     required: false
+    shortcut: Microsoft SQL Server Management Studio
+    guide:
+      tutorial_url: https://learn.microsoft.com/zh-cn/sql/ssms/sql-server-management-studio-ssms
+      tutorial_title: 微软官方 SSMS 文档（中文，跟随最新版）
+      diagram: database
+      steps:
+        - 先按指引装好 SQL Server Express，再装 SSMS 并打开它
+        - 连接框里服务器名称填 localhost\SQLEXPRESS，身份验证选 Windows 身份验证，点连接
+        - 左侧展开「数据库」，右键 → 新建查询，写 SQL 点「执行」
+      note: SSMS 是持续更新的官方工具，微软文档对应最新版。
 notes: MySQL 安装过程中设置的 root 密码请务必记牢，实验课每次都要用。

@@ -1,4 +1,4 @@
-# 课程包（draft）：建模全套：数值计算（Octave/Python/R）+ 论文写作（LaTeX）。
+# 课程包（draft）：建模全套：数值计算（Octave/Python/R）+ 论文写作（LaTeX），教程已配好。
 id: math-modeling
 name: 数学建模
 category: electives
@@ -9,10 +9,30 @@ tools:
     purpose: MATLAB 的免费替代：语法基本一致，数值计算实验够用
     manual: 到 GNU Octave 官网下载 Windows 安装版（也可用老师发的版本），安装时一路默认即可。
     required: true
+    shortcut: GNU Octave
+    guide:
+      tutorial_url: https://docs.octave.org/latest/
+      tutorial_title: GNU Octave 官方文档（latest 版）
+      diagram: ide
+      steps:
+        - 打开 Octave GUI，下方命令行窗口直接敲：A = [1 2; 3 4] 建矩阵，inv(A) 求逆
+        - 脚本存成 .m 文件，点运行按钮整段执行，和 MATLAB 习惯一样
+        - 画图用 plot(x, y)，图会弹出来，再用 File 菜单导出成图片插进论文
+      note: Octave 官方 latest 文档对应当前发行版，与你装的一致。
   - name: MATLAB
     purpose: 建模竞赛的主力软件：学校有机房版或校园授权的按指引装（个人付费版很贵，不必自购）
     manual: 优先用学校机房或学校提供的正版授权；MathWorks 官网可申请学生版试用。已装 Octave 的可先用它练手。
     required: false
+    shortcut: MATLAB
+    guide:
+      tutorial_url: https://www.mathworks.com/help/matlab/getting-started-with-matlab.html
+      tutorial_title: MathWorks 官方 MATLAB 入门（跟随当前版）
+      diagram: ide
+      steps:
+        - 打开后中间是命令行，先敲 A = [1 2; 3 4] 和 plot 试两条，确认能用
+        - 新建脚本（.m）写模型代码，点「运行」整段执行，右侧工作区能看到所有变量的值
+        - 论文要用的图在图窗里「文件 → 另存为」导出 PNG，分辨率够交作业
+      note: MATLAB 帮助对应当前发行版；学校授权装的哪个版本，帮助里就切到哪个版本看。
   - name: Miniconda
     purpose: Python 路线：numpy/scipy/pandas 做建模和数据处理越来越主流
     winget: Anaconda.Miniconda3
@@ -20,24 +40,84 @@ tools:
     verify:
       command: conda --version
       expect: 'conda'
+    shortcut: Anaconda Prompt
+    guide:
+      tutorial_url: https://docs.conda.io/projects/conda/en/stable/user-guide/getting-started.html
+      tutorial_title: conda 官方入门（stable 版文档，对应当前发行版）
+      diagram: terminal
+      steps:
+        - 在 Anaconda Prompt 里 conda create -n model python=3.12 建个建模专用环境
+        - conda activate model 后 pip install numpy scipy pandas matplotlib 一次装齐
+        - 之后每个赛题一个文件夹，代码和数据都放里面，不串环境
+      note: conda 官方 stable 文档对应当前发行版本，与你装的一致。
   - name: R 语言
     purpose: 统计建模路线：统计类赛题和统计课常用
     winget: RProject.R
     required: false
+    shortcut: R
+    guide:
+      tutorial_url: https://cran.r-project.org/doc/manuals/r-release/R-intro.html
+      tutorial_title: 《R 导论》官方手册（r-release，对应当前发行版）
+      diagram: terminal
+      steps:
+        - 打开 RGui，控制台里敲 x <- c(1,2,3) 回车，再敲 mean(x) 立刻出结果
+        - 装包用 install.packages("ggplot2")，加载用 library(ggplot2)
+        - 脚本在文件菜单新建，Ctrl+R 逐行运行（或配合 RStudio 用）
+      note: r-release 手册永远对应当前正式发行版 R，与你装的版本自动一致。
   - name: RStudio
     purpose: R 的图形化开发环境（配合上面的 R 使用）
     winget: Posit.RStudio
     required: false
+    shortcut: RStudio
+    guide:
+      tutorial_url: https://docs.posit.co/ide/user/
+      tutorial_title: RStudio 官方文档（跟随最新版）
+      diagram: ide
+      steps:
+        - 打开后四宫格：左上写脚本、左下控制台、右上变量环境、右下图和文件
+        - 脚本里选中几行按 Ctrl+Enter 只跑这几行，调试模型最常用
+        - 右下 Plots 区看图，Export 导出给论文用
+      note: RStudio 持续更新，官方文档对应最新版界面。
   - name: MiKTeX
     purpose: LaTeX 排版：写竞赛论文和课程论文，公式排版最专业
     winget: MiKTeX.MiKTeX
     required: false
+    shortcut: TeXworks
+    guide:
+      tutorial_url: https://miktex.org/howto/install-miktex
+      tutorial_title: MiKTeX 官方安装与使用说明
+      diagram: editor
+      steps:
+        - 装好打开 TeXworks，新建文档把老师给的论文模板 .tex 打开
+        - 点绿色三角编译，第一次缺宏包会弹窗问是否安装，选允许（这就是 MiKTeX 的自动补包）
+        - 右侧预览区就是生成的 PDF，改一处编一次对照
+      note: MiKTeX 是滚动更新的发行方式，官方说明对应当前版本。
   - name: VS Code
     purpose: 写 Python 和 LaTeX 的编辑器
     winget: Microsoft.VisualStudioCode
     required: false
+    shortcut: Visual Studio Code
+    guide:
+      tutorial_url: https://code.visualstudio.com/docs
+      tutorial_title: VS Code 官方文档（跟随最新版）
+      diagram: editor
+      steps:
+        - 打开赛题文件夹，Python 和 LaTeX 文件放一起管理
+        - LaTeX 写作用「LaTeX Workshop」插件，保存自动编译、右侧预览
+        - 算完的图用相对路径插进 .tex，整个文件夹打包就能交给队友
+      note: VS Code 是持续更新的软件，官方文档始终对应最新版界面。
   - name: SPSS
     purpose: 统计分析菜单式软件：统计课程或社科类赛题偶尔指定
     manual: 优先用学校机房版（商业授权）；个人学习可用 PSPP（免费替代，官网下载）先练操作。
     required: false
+    shortcut: none
+    guide:
+      tutorial_url: https://www.gnu.org/software/pspp/manual/
+      tutorial_title: PSPP 官方手册（免费替代，操作与 SPSS 基本一致）
+      diagram: database
+      steps:
+        - 先练免费的 PSPP：打开后在变量视图定义变量名和类型，再回数据视图录入
+        - 分析菜单里选「描述统计」跑一遍，结果出现在输出窗口
+        - 机房 SPSS 的菜单位置和 PSPP 几乎一一对应，练熟了直接迁移
+      note: 用 PSPP 的手册练 SPSS 的操作是行业常见做法，核心统计流程两个软件一致。
 notes: 数学建模竞赛拼的是组队和论文，不是软件版本——工具够用就行，别在环境上耗太久。Octave 与 MATLAB 语法八成相通，代码迁移成本很低。

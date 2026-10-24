@@ -1,4 +1,4 @@
-# 课程包（draft）：Node 双版本 + 编辑器 + 浏览器 + 小程序工具指引，待实机验证。
+# 课程包（draft）：Node 双版本（教程按版本对齐）+ 编辑器 + 浏览器 + 小程序工具指引，待实机验证。
 id: web-frontend
 name: Web 前端开发
 category: programming
@@ -8,6 +8,7 @@ tools:
   - name: Node.js
     purpose: 前端运行时与包管理（npm）。不确定选 LTS 长期支持版
     required: true
+    shortcut: none
     default_version: "LTS 20"
     versions:
       - label: "LTS 20"
@@ -15,11 +16,29 @@ tools:
         verify:
           command: node --version
           expect: 'v20\.'
+        guide:
+          tutorial_url: https://nodejs.org/docs/latest-v20.x/api/documentation.html
+          tutorial_title: Node.js 官方文档（v20 LTS 版）
+          diagram: terminal
+          steps:
+            - 终端输入 node -v 显示 v20.x、npm -v 有版本号，说明装好了
+            - 在项目文件夹执行 npm init -y 生成 package.json
+            - 装包用 npm install 包名（已自动配国内镜像，速度快）
+          note: 教程对应 Node 20 LTS：文档链接就是 latest-v20.x 这一支。
       - label: "最新版"
         winget: OpenJS.NodeJS
         verify:
           command: node --version
           expect: 'v\d+\.'
+        guide:
+          tutorial_url: https://nodejs.org/docs/latest/api/documentation.html
+          tutorial_title: Node.js 官方文档（最新版）
+          diagram: terminal
+          steps:
+            - 终端输入 node -v 和 npm -v，都有版本号说明装好了
+            - 在项目文件夹执行 npm init -y 生成 package.json
+            - 装包用 npm install 包名（已自动配国内镜像，速度快）
+          note: 你选的是最新版，文档链接跟随官方 latest，与你装的版本一致。
   - name: VS Code
     purpose: 前端主力编辑器
     winget: Microsoft.VisualStudioCode
@@ -27,6 +46,16 @@ tools:
     verify:
       command: code --version
       expect: '\d+\.\d+'
+    shortcut: Visual Studio Code
+    guide:
+      tutorial_url: https://code.visualstudio.com/docs
+      tutorial_title: VS Code 官方文档（跟随最新版）
+      diagram: editor
+      steps:
+        - 打开 VS Code，「文件 → 打开文件夹」选中项目文件夹
+        - 装「Live Server」插件，右键 HTML 文件选 Open with Live Server，改代码自动刷新页面
+        - 写 CSS/JS 时把鼠标悬停在属性上就有中文提示说明
+      note: VS Code 是持续更新的软件，官方文档始终对应最新版界面。
   - name: Git
     purpose: 版本管理
     winget: Git.Git
@@ -34,14 +63,44 @@ tools:
     verify:
       command: git --version
       expect: 'git version'
+    shortcut: Git Bash
+    guide:
+      tutorial_url: https://git-scm.com/book/zh/v2
+      tutorial_title: 《Pro Git》官方中文版（Git 官方推荐）
+      diagram: terminal
+      steps:
+        - 先设置身份：git config --global user.name / user.email 各设一次
+        - 项目文件夹里 git init 初始化
+        - 日常三连：git add . → git commit -m "说明" → git push
+      note: Git 命令行多年保持一致，官方中文书对应你装的版本。
   - name: Google Chrome
     purpose: 调试页面用的浏览器（已有可不装）
     winget: Google.Chrome
     required: false
+    shortcut: Google Chrome
+    guide:
+      tutorial_url: https://developer.chrome.com/docs/devtools
+      tutorial_title: Chrome 开发者工具官方文档（跟随最新版）
+      diagram: browser
+      steps:
+        - 在页面上按 F12 打开开发者工具，这是前端调试的主战场
+        - 「元素」面板点左上角箭头再点页面元素，直接定位到它的 HTML 和 CSS
+        - 「控制台」面板里输入 JS 表达式回车，立即能看到结果，报错也在这里看
+      note: Chrome 持续更新，DevTools 官方文档对应最新版界面。
   - name: 微信开发者工具
     purpose: 课程涉及微信小程序时需要（写小程序、预览调试）
     manual: 到微信官方「开发者工具」页面下载稳定版安装；用微信扫码登录后即可新建小程序项目。
     required: false
+    shortcut: 微信开发者工具
+    guide:
+      tutorial_url: https://developers.weixin.qq.com/miniprogram/dev/devtools/devtools.html
+      tutorial_title: 微信官方开发者工具文档
+      diagram: ide
+      steps:
+        - 打开后用微信扫码登录，点「导入项目」或新建一个小程序项目（AppID 可选测试号）
+        - 左边是模拟器预览，中间写 wxml/wxss/js，保存后预览自动刷新
+        - 点上方「预览」生成二维码，用手机微信扫开在真机上看效果
+      note: 微信官方文档对应当前发布的开发者工具版本。
 steps:
   - type: command
     run: npm config set registry https://registry.npmmirror.com

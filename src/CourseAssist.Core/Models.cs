@@ -31,6 +31,10 @@ public sealed class ToolDef
     public List<VersionDef> Versions { get; set; } = new();
     public EnvDef? Env { get; set; }
     public string? InstallSubdir { get; set; }
+    public GuideDef? Guide { get; set; }
+    /// <summary>Start-Menu shortcut search hint used to stock the desktop course folder
+    /// after install. "none" means: command-line/service tool, do not create one.</summary>
+    public string? Shortcut { get; set; }
 
     /// <summary>Resolve the effective install source for a chosen version label (or the bundle default).</summary>
     public ResolvedTool Resolve(string? versionLabel)
@@ -41,10 +45,11 @@ public sealed class ToolDef
             var v = Versions.FirstOrDefault(x => string.Equals(x.Label, label, StringComparison.OrdinalIgnoreCase))
                     ?? Versions[0];
             return new ResolvedTool(Name, Purpose, Required, v.Label,
-                v.Winget, v.Download, v.Manual, v.Verify ?? Verify, Env, InstallSubdir);
+                v.Winget, v.Download, v.Manual, v.Verify ?? Verify, Env, InstallSubdir,
+                v.Guide ?? Guide);
         }
         return new ResolvedTool(Name, Purpose, Required, null,
-            Winget, Download, Manual, Verify, Env, InstallSubdir);
+            Winget, Download, Manual, Verify, Env, InstallSubdir, Guide);
     }
 }
 
@@ -55,6 +60,23 @@ public sealed class VersionDef
     public DownloadDef? Download { get; set; }
     public string? Manual { get; set; }
     public VerifyDef? Verify { get; set; }
+    public GuideDef? Guide { get; set; }
+}
+
+/// <summary>Beginner tutorial for a tool (or for one specific version of it).
+/// Version-consistency rule: a guide attached to a version entry must describe exactly
+/// that version, and its official-doc link must point at that version's documentation;
+/// guides for evergreen tools link to the vendor's current docs instead.</summary>
+public sealed class GuideDef
+{
+    /// <summary>Official tutorial/docs URL, version-matched (see rule above).</summary>
+    public string? TutorialUrl { get; set; }
+    public string? TutorialTitle { get; set; }
+    /// <summary>Schematic diagram kind rendered by the app: editor | ide | database | terminal | vm | browser | generic.</summary>
+    public string Diagram { get; set; } = "generic";
+    /// <summary>First-use steps, written against the exact version this guide belongs to.</summary>
+    public List<string> Steps { get; set; } = new();
+    public string? Note { get; set; }
 }
 
 public sealed class DownloadDef
@@ -125,7 +147,8 @@ public sealed record ResolvedTool(
     string? Manual,
     VerifyDef? Verify,
     EnvDef? Env,
-    string? InstallSubdir);
+    string? InstallSubdir,
+    GuideDef? Guide);
 
 public sealed class Catalog
 {

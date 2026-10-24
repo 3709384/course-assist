@@ -1,4 +1,4 @@
-# 课程包（draft）：虚拟机双选择 + WSL2 路线 + 终端，待实机验证。
+# 课程包（draft）：虚拟机双选择 + WSL2 路线 + 终端，教程已配好，待实机验证。
 id: operating-systems
 name: 操作系统
 category: systems
@@ -9,14 +9,44 @@ tools:
     purpose: 免费虚拟机：在里面装 Ubuntu 做实验（推荐路线）
     winget: Oracle.VirtualBox
     required: true
+    shortcut: Oracle VM VirtualBox
+    guide:
+      tutorial_url: https://www.virtualbox.org/manual/
+      tutorial_title: VirtualBox 官方用户手册（跟随最新版）
+      diagram: vm
+      steps:
+        - 打开 VirtualBox，点「新建」，名字填 Ubuntu，类型 Linux，版本 Ubuntu (64-bit)
+        - 内存给 2-4GB，硬盘选「现在创建虚拟硬盘」给 25GB 以上
+        - 建好后点「启动」，第一次会让选 Ubuntu 的 ISO 镜像，选完按提示安装系统
+      note: VirtualBox 官方手册对应当前发行版，与你装的一致。
   - name: VMware Workstation Pro
     purpose: 虚拟机替代：性能更好，现已免费（与 VirtualBox 二选一）
     winget: VMware.WorkstationPro
     required: false
+    shortcut: VMware Workstation
+    guide:
+      tutorial_url: https://docs.vmware.com/en/VMware-Workstation-Pro/index.html
+      tutorial_title: VMware Workstation Pro 官方文档
+      diagram: vm
+      steps:
+        - 打开后点「创建新的虚拟机」→ 典型 → 选 Ubuntu 的 ISO 镜像
+        - 设置用户名密码后一路下一步，磁盘给 25GB 以上
+        - 点「开启此虚拟机」，等 Ubuntu 装完，第一次先做一次快照方便回滚
+      note: 官方文档对应当前 Workstation Pro 版本线。
   - name: Windows Terminal
     purpose: 用 WSL 路线时的终端
     winget: Microsoft.WindowsTerminal
     required: false
+    shortcut: Terminal
+    guide:
+      tutorial_url: https://learn.microsoft.com/zh-cn/windows/terminal/
+      tutorial_title: 微软官方 Windows Terminal 文档（中文）
+      diagram: terminal
+      steps:
+        - 打开 Windows Terminal，点标签页旁的下拉箭头，能选 PowerShell、cmd 和 Ubuntu(WSL)
+        - Ctrl+Shift+T 新建标签，装了 WSL 后默认会多出 Ubuntu 一项
+        - 点下拉箭头 → 设置，可以改字体大小和配色，看着舒服最重要
+      note: 微软官方文档对应当前发布的 Terminal 版本。
   - name: Git
     purpose: 拉取实验框架代码（如 xv6、Nachos）时常用
     winget: Git.Git
@@ -24,6 +54,16 @@ tools:
     verify:
       command: git --version
       expect: 'git version'
+    shortcut: Git Bash
+    guide:
+      tutorial_url: https://git-scm.com/book/zh/v2
+      tutorial_title: 《Pro Git》官方中文版（Git 官方推荐）
+      diagram: terminal
+      steps:
+        - 先设置身份：git config --global user.name / user.email 各设一次
+        - 老师给仓库地址时用 git clone 地址 一条命令拉到本地
+        - 每次实验做完 commit 一次，代码写坏了能随时回到上一个版本
+      note: Git 命令行多年保持一致，官方中文书对应你装的版本。
 steps:
   - type: feature
     name: wsl

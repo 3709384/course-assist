@@ -1,4 +1,4 @@
-# 课程包（draft）：以 MSYS2 工具链提供 flex/bison，ANTLR 路线也备了指引，待实机验证。
+# 课程包（draft）：以 MSYS2 工具链提供 flex/bison，ANTLR 路线也备了指引，教程已配好，待实机验证。
 id: compiler-principles
 name: 编译原理
 category: systems
@@ -9,6 +9,16 @@ tools:
     purpose: 提供 flex、bison、gcc 的 Unix 风格工具链（装完按下面步骤补齐组件）
     winget: MSYS2.MSYS2
     required: true
+    shortcut: MSYS2
+    guide:
+      tutorial_url: https://www.msys2.org/docs/what-is-msys2/
+      tutorial_title: MSYS2 官方文档
+      diagram: terminal
+      steps:
+        - 从开始菜单打开「MSYS2 UCRT64」终端，本课的命令都在这里敲
+        - 先验证工具链：flex --version 和 bison --version 都能输出版本号
+        - 写好 .l 文件执行 flex lexer.l 生成 lex.yy.c，再 gcc lex.yy.c -o lexer 编译运行
+      note: MSYS2 官方文档对应当前发行版，与你装的一致。
   - name: VS Code
     purpose: 写编译器代码的编辑器
     winget: Microsoft.VisualStudioCode
@@ -16,6 +26,16 @@ tools:
     verify:
       command: code --version
       expect: '\d+\.\d+'
+    shortcut: Visual Studio Code
+    guide:
+      tutorial_url: https://code.visualstudio.com/docs
+      tutorial_title: VS Code 官方文档（跟随最新版）
+      diagram: editor
+      steps:
+        - 用「文件 → 打开文件夹」打开你的编译器项目文件夹
+        - .l / .y 文件装个语法高亮插件看起来更清楚（插件市场搜 flex bison）
+        - 下方终端直接开 MSYS2 环境敲 flex/bison 命令，不用另开窗口也行
+      note: VS Code 是持续更新的软件，官方文档始终对应最新版界面。
   - name: JDK 17
     purpose: 课程若用 Java 版工具（如 JFlex/CUP 或 ANTLR）时需要
     winget: Microsoft.OpenJDK.17
@@ -23,10 +43,30 @@ tools:
     verify:
       command: java -version
       expect: '17\.'
+    shortcut: none
+    guide:
+      tutorial_url: https://docs.oracle.com/en/java/javase/17/
+      tutorial_title: Oracle 官方文档（Java SE 17 版）
+      diagram: terminal
+      steps:
+        - 终端输入 java -version，显示 17.x 即就绪
+        - 运行工具 jar 的格式：java -jar 工具.jar 参数
+        - ANTLR 生成代码后用 javac *.java 整体编译
+      note: 教程对应 JDK 17：链接是 17 的官方文档专区。
   - name: ANTLR 4
     purpose: 语法分析生成器替代路线：用语法文件直接生成解析器（Java 路线）
     manual: 到 ANTLR 官网下载 antlr-4.x-complete.jar，放到顺手的目录，并按官网 Quick Start 给它配一个别名命令。
     required: false
+    shortcut: none
+    guide:
+      tutorial_url: https://github.com/antlr/antlr4/blob/master/doc/getting-started.md
+      tutorial_title: ANTLR 官方快速开始（GitHub 仓库文档）
+      diagram: terminal
+      steps:
+        - 按快速开始把 antlr4 命令配好，先写一个最小的 .g4 语法文件
+        - 执行 antlr4 Hello.g4 生成词法/语法分析器代码
+        - 编译后用 grun Hello r -gui 运行，能弹出一棵可视化的语法树
+      note: 这是 ANTLR 官方仓库的当前文档，对应你下载的 4.x 版本。
 steps:
   - type: command
     run: C:\msys64\usr\bin\bash.exe -lc "pacman -S --noconfirm mingw-w64-ucrt-x86_64-gcc flex bison"

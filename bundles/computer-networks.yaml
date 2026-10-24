@@ -1,4 +1,4 @@
-# 课程包（draft）：抓包工具可自动装，网络模拟器多需账号/授权，按指引获取。
+# 课程包（draft）：抓包工具可自动装，网络模拟器多需账号/授权，按指引获取，教程已配好。
 id: computer-networks
 name: 计算机网络
 category: systems
@@ -9,28 +9,98 @@ tools:
     purpose: 抓包分析神器：看懂 TCP 三次握手、DNS、HTTP 都靠它
     winget: WiresharkFoundation.Wireshark
     required: true
+    shortcut: Wireshark
+    guide:
+      tutorial_url: https://www.wireshark.org/docs/wsug_html_chunked/
+      tutorial_title: Wireshark 官方用户手册（跟随最新版）
+      diagram: ide
+      steps:
+        - 打开 Wireshark，首页会列出网卡，双击你正在用的那块（WLAN 或以太网）开始抓包
+        - 在上方过滤栏输入 http 或 dns 再回车，只看这类包，列表立刻清爽
+        - 点任意一行，下方能展开看 Ethernet/IP/TCP/应用层的逐层细节，这就是实验要截图分析的东西
+      note: Wireshark 官方手册对应当前发行版，与你装的一致。
   - name: Cisco Packet Tracer
     purpose: 网络拓扑模拟：配路由器、交换机做实验（需思科账号免费注册）
     manual: 到思科 NetAcad 官网注册账号后免费下载 Packet Tracer，或使用老师发的安装包。
     required: false
+    shortcut: Cisco Packet Tracer
+    guide:
+      tutorial_url: https://www.netacad.com/
+      tutorial_title: 思科 NetAcad（Packet Tracer 官方获取与课程）
+      diagram: editor
+      steps:
+        - 打开后先登录思科账号，点左下角设备区把路由器、交换机、PC 拖到画布上
+        - 点一台设备 → CLI 标签页，就是敲命令配置的地方
+        - 连线时选闪电图标的自动连接，或手选铜线；红色三角变绿说明链路通了
+      note: Packet Tracer 的操作方式在 8.x 各版本一致，实验步骤通用。
   - name: eNSP
     purpose: 华为网络设备模拟器：使用华为教材的学校常用（依赖 WinPcap 与 VirtualBox）
     manual: 从华为企业支持网站或老师处获取 eNSP 安装包，安装前先装好 VirtualBox 与 Wireshark。
     required: false
+    shortcut: eNSP
+    guide:
+      tutorial_url: https://support.huawei.com/enterprise/zh/
+      tutorial_title: 华为企业支持（eNSP 官方资料）
+      diagram: editor
+      steps:
+        - 打开 eNSP，新建拓扑，从左侧把路由器、交换机、PC 拖到画布
+        - 右键设备选「启动」，再右键选「命令行」打开它的配置窗口
+        - 画布上方的连线工具选 Copper 线连接各设备端口
+      note: eNSP 界面长期稳定，步骤适用于学校常用的版本。
   - name: GNS3
     purpose: 更真实的网络拓扑模拟（高年级/自学进阶方向）
     manual: 到 GNS3 官网下载客户端；设备镜像需自行准备（课程一般不强制）。
     required: false
+    shortcut: GNS3
+    guide:
+      tutorial_url: https://docs.gns3.com/
+      tutorial_title: GNS3 官方文档（跟随最新版）
+      diagram: editor
+      steps:
+        - 第一次打开会走本地服务器向导，一路默认即可
+        - 新建项目后，从左侧把路由器拖到画布，右键可启动和打开控制台
+        - 没有设备镜像时先用内置的 VPCS 模拟 PC 练连通
+      note: GNS3 官方文档对应当前发行版。
   - name: PuTTY
     purpose: SSH/Telnet 客户端：连实验服务器和网络设备
     winget: PuTTY.PuTTY
     required: false
+    shortcut: PuTTY
+    guide:
+      tutorial_url: https://the.earth.li/~sgtatham/putty/latest/htmldoc/
+      tutorial_title: PuTTY 官方手册（latest 版）
+      diagram: terminal
+      steps:
+        - 打开 PuTTY，在 Host Name 里填服务器 IP，端口默认 22，连接类型选 SSH
+        - 点 Open，第一次会问是否信任主机密钥，确认后输入用户名密码登录
+        - 常用连接可以填好后在 Saved Sessions 里起名字保存，下次双击就连
+      note: PuTTY 官网 latest 手册对应当前发行版。
   - name: WinSCP
     purpose: 图形化文件传输：往实验服务器传文件
     winget: WinSCP.WinSCP
     required: false
+    shortcut: WinSCP
+    guide:
+      tutorial_url: https://winscp.net/eng/docs/guide_begin
+      tutorial_title: WinSCP 官方新手指南
+      diagram: editor
+      steps:
+        - 打开后点「新建会话」，填服务器 IP、用户名密码，点登录
+        - 界面左边是本地文件夹、右边是服务器，文件直接拖过去就传
+        - 双击右侧的文本文件能直接编辑，保存时自动传回服务器
+      note: WinSCP 官方指南对应当前发行版界面。
   - name: Postman
     purpose: 网络编程实验里调 HTTP 接口用
     winget: Postman.Postman
     required: false
+    shortcut: Postman
+    guide:
+      tutorial_url: https://learning.postman.com/docs/introduction/overview/
+      tutorial_title: Postman 官方学习中心（跟随最新版）
+      diagram: editor
+      steps:
+        - 打开 Postman（可跳过登录用轻量模式），点「+」新建一个请求
+        - 选 GET，在地址栏填一个网址，点 Send，下方就能看到返回的状态码和内容
+        - 把常用的请求 Ctrl+S 保存到一个 Collection 里，下次直接打开用
+      note: Postman 是持续更新的软件，官方学习中心对应最新版界面。
 notes: Wireshark 安装时记得勾选 Npcap，否则抓不到包。

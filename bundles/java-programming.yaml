@@ -1,4 +1,4 @@
-# 课程包（draft）：JDK 四个版本可选，winget 包 ID 待维护者实机验证后升级为 verified。
+# 课程包（draft）：JDK 四个版本可选（每个版本配同版本教程），winget 包 ID 待维护者实机验证后升级为 verified。
 id: java-programming
 name: Java 程序设计
 category: programming
@@ -15,32 +15,90 @@ tools:
         verify:
           command: java -version
           expect: '1\.8\.'
+        guide:
+          tutorial_url: https://docs.oracle.com/javase/8/
+          tutorial_title: Oracle 官方文档（Java SE 8 版）
+          diagram: terminal
+          steps:
+            - 打开终端（Win+R 输入 cmd），输入 java -version，应显示 1.8.x，说明装好了
+            - 新建文件 Hello.java，第一行写 public class Hello {，类名必须和文件名一模一样
+            - 在文件所在目录执行 javac Hello.java 编译，再执行 java Hello 运行
+          note: 教程对应 JDK 8：这个版本的官方文档就是 8 的专区，不会串到新版本。
       - label: "11"
         winget: EclipseAdoptium.Temurin.11.JDK
         verify:
           command: java -version
           expect: '11\.'
+        guide:
+          tutorial_url: https://docs.oracle.com/en/java/javase/11/
+          tutorial_title: Oracle 官方文档（Java SE 11 版）
+          diagram: terminal
+          steps:
+            - 打开终端输入 java -version，应显示 11.x，说明装好了
+            - 新建 Hello.java 写一个 main 方法，javac 编译、java 运行
+            - 11 支持单文件直接运行：java Hello.java 也能跑（不用先 javac）
+          note: 教程对应 JDK 11：链接是 11 的官方文档专区。
       - label: "17"
         winget: Microsoft.OpenJDK.17
         verify:
           command: java -version
           expect: '17\.'
+        guide:
+          tutorial_url: https://docs.oracle.com/en/java/javase/17/
+          tutorial_title: Oracle 官方文档（Java SE 17 版）
+          diagram: terminal
+          steps:
+            - 打开终端输入 java -version，应显示 17.x，说明装好了
+            - 新建 Hello.java 写一个 main 方法，javac 编译、java 运行
+            - 在 IDEA 里新建项目时，项目 SDK 就选这个 17
+          note: 教程对应 JDK 17：链接是 17 的官方文档专区。
       - label: "21"
         winget: Microsoft.OpenJDK.21
         verify:
           command: java -version
           expect: '21\.'
+        guide:
+          tutorial_url: https://docs.oracle.com/en/java/javase/21/
+          tutorial_title: Oracle 官方文档（Java SE 21 版）
+          diagram: terminal
+          steps:
+            - 打开终端输入 java -version，应显示 21.x，说明装好了
+            - 新建 Hello.java 写一个 main 方法，javac 编译、java 运行
+            - 在 IDEA 里新建项目时，项目 SDK 就选这个 21
+          note: 教程对应 JDK 21：链接是 21 的官方文档专区。
     env:
       JAVA_HOME: "{install_dir}"
       path_additions: ["{install_dir}\\bin"]
+    shortcut: none
   - name: IntelliJ IDEA Community
     purpose: 写 Java 代码的主力编辑器（社区版免费）
     winget: JetBrains.IntelliJIDEA.Community
     required: true
+    shortcut: IntelliJ IDEA
+    guide:
+      tutorial_url: https://www.jetbrains.com/help/idea/getting-started.html
+      tutorial_title: JetBrains 官方入门（跟随 IDEA 最新版）
+      diagram: ide
+      steps:
+        - 打开 IDEA，点 New Project，起个名字，SDK 选刚装的 JDK，点 Create
+        - 在左侧项目树右键 src → New → Java Class，起名 Hello
+        - 输入 main 后按回车可自动补全 main 方法；写一句 System.out.println("你好");
+        - 点编辑区上方或行号旁的绿色三角运行，下方控制台看到输出就成功了
+      note: IDEA 是持续更新的软件，本教程链接到官方最新版入门，界面与你装的版本一致。
   - name: VS Code
     purpose: 轻量替代编辑器：习惯轻量编辑器或电脑配置较低时选它（与 IDEA 二选一即可）
     winget: Microsoft.VisualStudioCode
     required: false
+    shortcut: Visual Studio Code
+    guide:
+      tutorial_url: https://code.visualstudio.com/docs
+      tutorial_title: VS Code 官方文档（跟随最新版）
+      diagram: editor
+      steps:
+        - 打开 VS Code，点「文件 → 打开文件夹」选中你的代码文件夹
+        - 左侧插件市场搜索并安装「Extension Pack for Java」
+        - 新建 Hello.java，写好 main 方法后点右上角三角运行
+      note: VS Code 是持续更新的软件，官方文档始终对应最新版界面。
   - name: Apache Maven
     purpose: Java 项目构建与依赖管理（高年级课程与实训常用）
     winget: Apache.Maven
@@ -48,6 +106,16 @@ tools:
     verify:
       command: mvn -version
       expect: 'Apache Maven'
+    shortcut: none
+    guide:
+      tutorial_url: https://maven.apache.org/guides/getting-started/
+      tutorial_title: Maven 官方入门指南
+      diagram: terminal
+      steps:
+        - 终端输入 mvn -version，能显示版本号说明装好了
+        - 一个 Maven 项目的标志是根目录有 pom.xml，在该目录执行 mvn compile 编译
+        - 执行 mvn test 跑测试，mvn package 打包成 jar
+      note: Maven 各 3.x 版本用法一致，官方入门指南适用于你装的版本。
   - name: Git
     purpose: 版本管理：交作业、拉老师代码、做团队项目都要用
     winget: Git.Git
@@ -55,4 +123,14 @@ tools:
     verify:
       command: git --version
       expect: 'git version'
+    shortcut: Git Bash
+    guide:
+      tutorial_url: https://git-scm.com/book/zh/v2
+      tutorial_title: 《Pro Git》官方中文版（Git 官方推荐）
+      diagram: terminal
+      steps:
+        - 先做一次性的身份设置：git config --global user.name "你的名字"，再 git config --global user.email "你的邮箱"
+        - 在代码文件夹里执行 git init 初始化仓库
+        - 日常三连：git add . → git commit -m "说明" → 需要时 git push 上传
+      note: Git 命令行多年保持一致，官方中文书对应你装的版本。
 notes: 部分学校课程指定 JDK 8 或 11，安装时在版本列表里选对应版本即可；多个 JDK 版本可以共存，默认版本由 JAVA_HOME 指向决定。

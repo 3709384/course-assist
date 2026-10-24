@@ -1,4 +1,4 @@
-# 课程包（draft）：嵌入式工具多为厂商软件，需账号/授权，按指引获取；仿真与开源替代也备了。
+# 课程包（draft）：嵌入式工具多为厂商软件，需账号/授权，按指引获取；仿真与开源替代也备了，教程已配好。
 id: embedded-systems
 name: 嵌入式系统
 category: electives
@@ -9,14 +9,44 @@ tools:
     purpose: 图形化配置 STM32 芯片引脚和时钟，自动生成工程代码
     manual: 到 ST 官网注册账号后免费下载 STM32CubeMX 并安装（需登录账号激活）。
     required: true
+    shortcut: STM32CubeMX
+    guide:
+      tutorial_url: https://wiki.st.com/stm32mcu/wiki/STM32CubeMX_introduction
+      tutorial_title: ST 官方 STM32CubeMX 入门（wiki，跟随最新版）
+      diagram: editor
+      steps:
+        - 打开后选 New Project，按你的开发板芯片型号搜并选中它
+        - 在芯片图上点引脚配置功能（比如把某个脚设为 GPIO_Output 点灯用）
+        - Project 页填工程名、工具链选 MDK-ARM，点 GENERATE CODE 生成 Keil 工程
+      note: STM32CubeMX 持续更新，ST 官方 wiki 对应当前版本。
   - name: Keil MDK
     purpose: ARM 官方编译环境：多数 STM32 教材的指定 IDE（社区版有代码大小限制，课程够用）
     manual: 到 Keil 官网下载 MDK-Arm 社区版安装，装完在 Pack Installer 里勾选你开发板对应的芯片支持包。
     required: true
+    shortcut: Keil uVision
+    guide:
+      tutorial_url: https://www.keil.com/support/man/docs/uv4/
+      tutorial_title: Keil µVision 官方手册
+      diagram: ide
+      steps:
+        - 打开 CubeMX 生成的工程（或老师给的工程），左侧是文件树
+        - 点魔术棒图标（Options）确认调试器选了 ST-Link，先别急着改其他项
+        - F7 编译、F8 下载（或工具栏的 LOAD 按钮），开发板跑起来后回来改代码
+      note: µVision 官方手册对应当前 MDK 版本线。
   - name: Arduino IDE
     purpose: Arduino 方向的开发环境：装好就能写、就能烧录
     winget: ArduinoSA.IDE.stable
     required: false
+    shortcut: Arduino IDE
+    guide:
+      tutorial_url: https://docs.arduino.cc/learn/starting-guide/the-arduino-software-ide-v2
+      tutorial_title: Arduino 官方 IDE 2.x 使用指南
+      diagram: ide
+      steps:
+        - 打开后先在 Tools → Board 选你的板子型号，再在 Port 选它占用的串口
+        - 打开示例：文件 → 示例 → Basics → Blink，先烧这个验证链路
+        - 点左上角箭头（上传），下方提示 Done uploading 就是烧好了，板上灯开始闪
+      note: 链接对应 Arduino IDE 2.x——装的就是 2.x 这条线，不会串到老 1.x 的界面。
   - name: VS Code
     purpose: 配合 PlatformIO 插件是更现代的嵌入式开发方式（可选体验）
     winget: Microsoft.VisualStudioCode
@@ -24,14 +54,43 @@ tools:
     verify:
       command: code --version
       expect: '\d+\.\d+'
+    shortcut: Visual Studio Code
+    guide:
+      tutorial_url: https://code.visualstudio.com/docs
+      tutorial_title: VS Code 官方文档（跟随最新版）
+      diagram: editor
+      steps:
+        - 先装 PlatformIO 插件（左侧插件市场搜 PlatformIO IDE），装完重启 VS Code
+        - PlatformIO 首页 → New Project，选板子型号，它自动配好工具链
+        - 底部状态栏的对勾是编译、箭头是烧录、插头图标是串口监视器
+      note: VS Code 是持续更新的软件，官方文档始终对应最新版界面。
   - name: Proteus
     purpose: 电路与单片机仿真：没硬件时先在仿真里跑通逻辑
     manual: 优先用学校机房版或老师提供的安装包；个人可用官网试用版体验。
     required: false
+    shortcut: Proteus
+    guide:
+      tutorial_url: https://www.labcenter.com/
+      tutorial_title: Proteus 官网（Labcenter）
+      diagram: editor
+      steps:
+        - 打开 ISIS 按 P 搜元件（AT89C51、LED、RES 等关键字）放到画布连线
+        - 双击单片机，在 Program File 里选编译好的 .hex
+        - 点左下播放按钮开始仿真，LED 该亮就说明逻辑对了
+      note: Proteus 基本操作在 8.x 各版本一致，官网资料对应当前版本线。
   - name: 串口调试助手
     purpose: 看单片机串口输出、调通信协议
     manual: 使用老师发的串口助手，或在网上搜「SSCOM 串口调试助手」下载绿色版；CH340/CP2102 驱动按开发板芯片型号安装。
     required: false
+    shortcut: none
+    guide:
+      tutorial_title: 串口调试助手通用操作（这类小工具界面都大同小异）
+      diagram: terminal
+      steps:
+        - 先选对串口号（设备管理器里看 CH340 对应的 COM 号）
+        - 波特率和程序里 Serial.begin 设的一致（常见 9600 或 115200），点打开串口
+        - 单片机 printf 的内容会滚在这里，收不到先查波特率和接线 TX/RX 是否交叉
+      note: 串口助手没有统一的官方教程，各版本操作就这三步，学会一次到处通用。
 steps:
   - type: manual
     title: 用 VS Code 路线的同学：装好后在插件市场安装「PlatformIO IDE」，新建工程时它会自动下载工具链

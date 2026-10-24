@@ -148,6 +148,21 @@ public partial class MainWindow : Window
             var status = new TextBlock { Text = "状态：未体检", Margin = new Thickness(0, 3, 0, 0) };
             _statusLabels[tool.Name] = status;
             panel.Children.Add(status);
+            var tutorialButton = new Button
+            {
+                Content = "📖 入门教程（版本对齐）",
+                HorizontalAlignment = HorizontalAlignment.Left,
+                Margin = new Thickness(0, 6, 0, 0),
+                Padding = new Thickness(10, 3, 10, 3),
+            };
+            tutorialButton.Click += (_, _) =>
+            {
+                string? label = null;
+                if (_versionPickers.TryGetValue(tool.Name, out var combo))
+                    label = combo.SelectedItem?.ToString();
+                new TutorialWindow(tool.Resolve(label)) { Owner = this }.ShowDialog();
+            };
+            panel.Children.Add(tutorialButton);
 
             ToolsPanel.Children.Add(new Border
             {
@@ -269,6 +284,22 @@ public partial class MainWindow : Window
             var ok = results.Count(r => r.Outcome is StepOutcome.Succeeded or StepOutcome.Skipped);
             var failed = results.Count(r => r.Outcome == StepOutcome.Failed);
             Log($"执行完毕：完成 {ok} 步，失败 {failed} 步" + (failed > 0 ? "。失败不怕——点「导出诊断报告」发给老师或同学帮你看。" : "。全部搞定！"));
+
+            // 在桌面建「课程名」文件夹，把这门课装好的软件快捷方式放进去，方便初学者找。
+            var shortcutRequests = results
+                .Where(r => r.Outcome is StepOutcome.Succeeded or StepOutcome.Skipped)
+                .Where(r => r.Step.Kind is PlanStepKind.WingetInstall or PlanStepKind.DownloadInstall && r.Step.ToolName is not null)
+                .Select(r => new ShortcutService.Request(
+                    r.Step.ToolName!,
+                    _current.Tools.FirstOrDefault(t => t.Name == r.Step.ToolName)?.Shortcut,
+                    r.Step.Location))
+                .ToList();
+            if (shortcutRequests.Count > 0)
+            {
+                var shortcutLines = await new ShortcutService(_runner)
+                    .PlaceCourseShortcutsAsync(_current.Name, shortcutRequests);
+                foreach (var line in shortcutLines) Log(line);
+            }
             Check_Click(sender, e);
         }
         catch (Exception ex) { Log($"配置过程出错：{ex.Message}"); DiagButton.IsEnabled = true; }
@@ -284,6 +315,8 @@ public partial class MainWindow : Window
             var executor = new InstallExecutor(_runner, _winget, new SystemEnvironmentStore(), _stateStore);
             var lines = await executor.UninstallCourseAsync(_current.Id);
             foreach (var line in lines) Log($"卸载 · {line}");
+            var removed = new ShortcutService(_runner).RemoveCourseFolder(_current.Name);
+            if (removed is not null) Log($"卸载 · {removed}");
         }
         catch (Exception ex) { Log($"卸载出错：{ex.Message}"); }
         finally { SetBusy(false); }

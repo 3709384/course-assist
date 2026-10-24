@@ -1,4 +1,4 @@
-# 课程包（draft）：图形学 = Visual Studio + OpenGL 生态，库用 vcpkg 一键装，另加 Blender 体验。
+# 课程包（draft）：图形学 = Visual Studio + OpenGL 生态，库用 vcpkg 一键装，另加 Blender 体验，教程已配好。
 id: computer-graphics
 name: 计算机图形学
 category: electives
@@ -9,6 +9,16 @@ tools:
     purpose: 图形学实验的主力 IDE（安装时记得勾选「使用 C++ 的桌面开发」工作负载）
     winget: Microsoft.VisualStudio.2022.Community
     required: true
+    shortcut: Visual Studio 2022
+    guide:
+      tutorial_url: https://learn.microsoft.com/zh-cn/visualstudio/get-started/visual-studio-ide?view=vs-2022
+      tutorial_title: 微软官方 VS 2022 入门（中文，对应 2022 版）
+      diagram: ide
+      steps:
+        - 创建新项目选「控制台应用」（C++），先跑通自带示例
+        - 图形学项目要改成窗口程序时，在项目属性 → 链接器 → 系统 → 子系统里选「窗口」
+        - Ctrl+F5 是运行不调试，画窗口的实验用这个，黑框不会一闪而过
+      note: 教程对应 Visual Studio 2022：链接带 view=vs-2022，就是这个大版本的文档。
   - name: CMake
     purpose: 组织图形学工程的构建工具
     winget: Kitware.CMake
@@ -16,6 +26,16 @@ tools:
     verify:
       command: cmake --version
       expect: 'cmake version'
+    shortcut: CMake
+    guide:
+      tutorial_url: https://cmake.org/cmake/help/latest/guide/tutorial/index.html
+      tutorial_title: CMake 官方教程（latest 版文档）
+      diagram: terminal
+      steps:
+        - 用了 vcpkg 的项目，配置时加 -DCMAKE_TOOLCHAIN_FILE=vcpkg路径/scripts/buildsystems/vcpkg.cmake
+        - cmake -B build 生成，cmake --build build 编译，一套命令所有实验通用
+        - 找不到 GLFW 时先检查上面那串 toolchain 参数有没有漏
+      note: CMake 官方 latest 文档对应当前发行版，与你装的版本一致。
   - name: Git
     purpose: 拉取 vcpkg 和课程框架代码
     winget: Git.Git
@@ -23,16 +43,46 @@ tools:
     verify:
       command: git --version
       expect: 'git version'
+    shortcut: Git Bash
+    guide:
+      tutorial_url: https://git-scm.com/book/zh/v2
+      tutorial_title: 《Pro Git》官方中文版（Git 官方推荐）
+      diagram: terminal
+      steps:
+        - 先设置身份：git config --global user.name / user.email 各设一次
+        - 拉 vcpkg 和课程框架都用 git clone 仓库地址
+        - 框架代码拉下来先 commit 一份原版，改崩了能对照
+      note: Git 命令行多年保持一致，官方中文书对应你装的版本。
   - name: vcpkg
     purpose: 微软的 C++ 包管理器：GLFW、GLM 等图形库一条命令安装并自动配好
     manual: 在安装位置下执行 git clone https://github.com/microsoft/vcpkg 并运行 .\\vcpkg\\bootstrap-vcpkg.bat，然后 .\\vcpkg\\vcpkg install glfw3 glm 即可。
     required: false
     env:
       VCPKG_ROOT: "{install_dir}"
+    shortcut: none
+    guide:
+      tutorial_url: https://learn.microsoft.com/zh-cn/vcpkg/get_started/overview
+      tutorial_title: 微软官方 vcpkg 上手文档（中文）
+      diagram: terminal
+      steps:
+        - 按左侧指引 clone 并 bootstrap 之后，先跑 vcpkg install glfw3 glm glad 把常用库装上
+        - 装完执行 vcpkg integrate install，Visual Studio 就能直接 #include <GLFW/glfw3.h>
+        - 查库用 vcpkg search 库名，卸载用 vcpkg remove 库名
+      note: 微软官方 vcpkg 文档对应当前发行版，与你拉的版本一致。
   - name: Blender
     purpose: 三维建模体验：理解顶点、网格、材质这些概念最直观的方式（课外加分项）
     winget: BlenderFoundation.Blender
     required: false
+    shortcut: Blender
+    guide:
+      tutorial_url: https://docs.blender.org/manual/en/latest/getting_started/index.html
+      tutorial_title: Blender 官方手册（latest 版，入门章）
+      diagram: editor
+      steps:
+        - 打开自带一个立方体场景：鼠标中键拖动旋转视角、滚轮缩放——这就是图形学里的视图变换
+        - 选中立方体按 Tab 进编辑模式，能拖它的顶点，看网格怎么变
+        - 右侧属性里给它加个材质改颜色，上方切到渲染预览看光照效果
+      note: Blender 官方 latest 手册对应当前发行版，与你装的一致。
 steps:
   - type: manual
     title: Visual Studio 安装器里务必勾选「使用 C++ 的桌面开发」，没勾的话打开安装器点「修改」补上
