@@ -1,18 +1,33 @@
-# 样例课程包（draft）：结构完整，winget 包 ID 待维护者实机验证后升级为 verified。
+# 样例课程包（draft）：JDK 多版本结构，winget 包 ID 待维护者实机验证后升级为 verified。
 id: java-programming
 name: Java 程序设计
 category: programming
-summary: JDK + IntelliJ IDEA + Maven，Java 入门课的标准三件套。
+summary: JDK（多版本可选）+ IntelliJ IDEA + Maven，装完自动配好 JAVA_HOME。
 status: draft
 tools:
-  - name: OpenJDK 17
-    purpose: Java 开发工具包：编译、运行 Java 程序
-    winget: Microsoft.OpenJDK.17
-    version: ">=17"
+  - name: JDK
+    purpose: Java 开发工具包：编译、运行 Java 程序。按课程要求选版本，不确定选推荐的 17
     required: true
-    verify:
-      command: java -version
-      expect: '17\.'
+    default_version: "17"
+    versions:
+      - label: "8"
+        winget: EclipseAdoptium.Temurin.8.JDK
+        verify:
+          command: java -version
+          expect: '1\.8\.'
+      - label: "17"
+        winget: Microsoft.OpenJDK.17
+        verify:
+          command: java -version
+          expect: '17\.'
+      - label: "21"
+        winget: Microsoft.OpenJDK.21
+        verify:
+          command: java -version
+          expect: '21\.'
+    env:
+      JAVA_HOME: "{install_dir}"
+      path_additions: ["{install_dir}\\bin"]
   - name: IntelliJ IDEA Community
     purpose: 写 Java 代码的主力编辑器（社区版免费）
     winget: JetBrains.IntelliJIDEA.Community
@@ -24,4 +39,4 @@ tools:
     verify:
       command: mvn -version
       expect: 'Apache Maven'
-notes: 部分学校课程指定 JDK 8，体检时会提示并可改选 Temurin 8 的课程包变体（待补充）。
+notes: 部分学校课程指定 JDK 8，安装时在版本列表里选 8 即可；多个 JDK 版本可以共存，默认版本由 JAVA_HOME 指向决定，可在软件内切换。
