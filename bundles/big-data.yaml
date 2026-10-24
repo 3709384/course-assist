@@ -1,4 +1,4 @@
-# 课程包（draft）：大数据课以虚拟机+手动部署为主，本包配齐基础并给出 Hadoop 的环境变量。
+# 课程包（draft）：大数据课以虚拟机+手动部署为主，本包配齐基础并给出 Hadoop/Spark 的环境变量。
 id: big-data
 name: 大数据技术
 category: data-ai
@@ -26,8 +26,19 @@ tools:
     env:
       HADOOP_HOME: "{install_dir}"
       path_additions: ["{install_dir}\\bin"]
+  - name: Spark
+    purpose: 进阶框架：课程涉及 Spark 时，在 Hadoop 之后按指引部署
+    manual: 到 Apache Spark 官网下载与 Hadoop 版本匹配的 spark-3.x-bin-hadoop3.tgz，解压到安装位置下，并把 SPARK_HOME 指到该目录（可在下方备注基础上手动添加环境变量）。
+    required: false
+  - name: FinalShell
+    purpose: SSH 连虚拟机集群 + 传文件，国产工具上手快
+    manual: 到 FinalShell 官网下载安装包，免费版足够课程使用。
+    required: false
   - name: WinSCP
     purpose: 往虚拟机/服务器传安装包和数据文件
     winget: WinSCP.WinSCP
     required: false
-notes: 先确认老师用的是 Hadoop 还是 Spark、版本号是多少，再动手装；集群实验强烈建议组队用同一套版本。
+steps:
+  - type: manual
+    title: 集群实验建议：一台虚拟机装好并调通后，关机克隆出另外两台再改主机名和 IP，比从头装三遍快得多
+notes: 先确认老师用的是 Hadoop 还是 Spark、版本号是多少，再动手装；组队实验务必全组用同一套版本。

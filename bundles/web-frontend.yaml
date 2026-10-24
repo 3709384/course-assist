@@ -1,4 +1,4 @@
-# 课程包（draft）：Node 双版本 + 编辑器 + 浏览器，待实机验证。
+# 课程包（draft）：Node 双版本 + 编辑器 + 浏览器 + 小程序工具指引，待实机验证。
 id: web-frontend
 name: Web 前端开发
 category: programming
@@ -24,6 +24,9 @@ tools:
     purpose: 前端主力编辑器
     winget: Microsoft.VisualStudioCode
     required: true
+    verify:
+      command: code --version
+      expect: '\d+\.\d+'
   - name: Git
     purpose: 版本管理
     winget: Git.Git
@@ -35,7 +38,13 @@ tools:
     purpose: 调试页面用的浏览器（已有可不装）
     winget: Google.Chrome
     required: false
+  - name: 微信开发者工具
+    purpose: 课程涉及微信小程序时需要（写小程序、预览调试）
+    manual: 到微信官方「开发者工具」页面下载稳定版安装；用微信扫码登录后即可新建小程序项目。
+    required: false
 steps:
   - type: command
     run: npm config set registry https://registry.npmmirror.com
-notes: 已自动把 npm 换成国内镜像源，装包快得多。VS Code 建议装「Live Server」插件，改完页面自动刷新。
+  - type: command
+    run: corepack enable
+notes: 已自动把 npm 换成国内镜像源，并启用 Node 自带的 pnpm/yarn 管理器（corepack）。VS Code 建议装「Live Server」插件，改完页面自动刷新。

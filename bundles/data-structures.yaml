@@ -1,4 +1,4 @@
-# 课程包（draft）：数据结构课通常沿用语言课环境，这里按 C / Java / Python 三条线都备一份。
+# 课程包（draft）：数据结构课沿用语言课环境，C / Java / Python 三条线任选其一。
 id: data-structures
 name: 数据结构
 category: programming
@@ -9,6 +9,9 @@ tools:
     purpose: 三条线通用的编辑器
     winget: Microsoft.VisualStudioCode
     required: true
+    verify:
+      command: code --version
+      expect: '\d+\.\d+'
   - name: MinGW-w64 (WinLibs GCC)
     purpose: C 语言线：编译器本体
     winget: BrechtSanders.WinLibs.POSIX.UCRT
@@ -33,6 +36,10 @@ tools:
     verify:
       command: python --version
       expect: 'Python 3\.12'
+  - name: Dev-C++
+    purpose: 机房同款 IDE：学校机房用它的可以在宿舍电脑上装一份保持手感一致
+    winget: Embarcadero.DevCpp
+    required: false
   - name: Git
     purpose: 版本管理：把每次练习代码存档、方便对比修改
     winget: Git.Git

@@ -1,4 +1,4 @@
-# 课程包（draft）：图形学 = Visual Studio + OpenGL 生态，库用 vcpkg 一键装。
+# 课程包（draft）：图形学 = Visual Studio + OpenGL 生态，库用 vcpkg 一键装，另加 Blender 体验。
 id: computer-graphics
 name: 计算机图形学
 category: electives
@@ -29,6 +29,10 @@ tools:
     required: false
     env:
       VCPKG_ROOT: "{install_dir}"
+  - name: Blender
+    purpose: 三维建模体验：理解顶点、网格、材质这些概念最直观的方式（课外加分项）
+    winget: BlenderFoundation.Blender
+    required: false
 steps:
   - type: manual
     title: Visual Studio 安装器里务必勾选「使用 C++ 的桌面开发」，没勾的话打开安装器点「修改」补上

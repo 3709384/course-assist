@@ -1,4 +1,4 @@
-# 课程包（draft）：Docker Desktop 主线 + WSL2 基础，镜像加速按指引配置。
+# 课程包（draft）：Docker Desktop 主线（带验证）+ WSL2 + 镜像加速指引 + K8s 入门工具。
 id: cloud-containers
 name: 云计算与容器
 category: engineering
@@ -9,6 +9,9 @@ tools:
     purpose: 容器引擎 + 管理界面：docker 命令和 Kubernetes 入门都靠它
     winget: Docker.DockerDesktop
     required: true
+    verify:
+      command: docker --version
+      expect: 'Docker version'
   - name: Windows Terminal
     purpose: 敲 docker / kubectl 命令的终端
     winget: Microsoft.WindowsTerminal
@@ -17,9 +20,16 @@ tools:
     purpose: 写 Dockerfile 和 YAML 配置的编辑器
     winget: Microsoft.VisualStudioCode
     required: false
+    verify:
+      command: code --version
+      expect: '\d+\.\d+'
+  - name: kubectl
+    purpose: Kubernetes 命令行：学到 K8s 章节时需要（Docker Desktop 也可自带一份）
+    manual: 按 Kubernetes 官网「在 Windows 上安装 kubectl」的指引下载 kubectl.exe 放进 PATH 目录；或在 Docker Desktop 设置里启用 Kubernetes 后使用其自带版本。
+    required: false
 steps:
   - type: feature
     name: wsl
   - type: manual
     title: 打开 Docker Desktop 设置，在 Docker Engine 配置里加入国内镜像加速地址（如 https://docker.m.daocloud.io），保存并重启 Docker
-notes: 装 Docker Desktop 前确认 BIOS 虚拟化已开启；家庭版 Windows 用 WSL2 后端即可。镜像加速地址会随时间变化，失效时搜「Docker 国内镜像 2026」换最新可用的。
+notes: 装 Docker Desktop 前确认 BIOS 虚拟化已开启；家庭版 Windows 用 WSL2 后端即可。docker 命令要在 Docker Desktop 启动完成后才能用（等右下角鲸鱼图标稳定）。镜像加速地址会随时间变化，失效时搜「Docker 国内镜像」换最新可用的。

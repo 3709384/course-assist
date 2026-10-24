@@ -30,4 +30,12 @@ tools:
     purpose: 高年级/实训拓展：缓存与键值数据库。Windows 下建议通过 Docker 或 WSL 运行，按指引操作
     manual: 从 Docker Desktop 拉取 redis 镜像运行，或在 WSL 的 Ubuntu 里执行 sudo apt install redis-server。
     required: false
+  - name: MongoDB Compass
+    purpose: NoSQL 方向：MongoDB 的图形客户端（课程涉及文档数据库时选）
+    winget: MongoDB.Compass
+    required: false
+  - name: SQL Server Express
+    purpose: 替代数据库：使用微软教材/国产化替代教材的学校可能指定它（免费版够用）
+    manual: 到微软官网下载 SQL Server Express 安装包，并另装 SSMS 管理工具（同页面有下载入口）。
+    required: false
 notes: MySQL 安装过程中设置的 root 密码请务必记牢，实验课每次都要用。

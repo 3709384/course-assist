@@ -1,4 +1,4 @@
-# 课程包（draft）：Java Web 全家桶：JDK 多版本 + IDEA + Maven + 数据库 + Tomcat 指引。
+# 课程包（draft）：Java Web 全家桶：JDK 多版本 + IDEA + Maven（含环境变量）+ 数据库 + Tomcat/Redis 指引。
 id: java-web
 name: Java Web 开发
 category: engineering
@@ -60,6 +60,10 @@ tools:
     purpose: 调试自己写的接口
     winget: Postman.Postman
     required: false
+  - name: Redis
+    purpose: 进阶章节（缓存/会话）常用：Windows 下走 Docker 或 WSL 运行
+    manual: 用 Docker Desktop 拉取 redis 镜像运行，或在 WSL 的 Ubuntu 里执行 sudo apt install redis-server。
+    required: false
   - name: Node.js LTS
     purpose: 前后端分离项目的前端部分要用
     winget: OpenJS.NodeJS.LTS
@@ -67,4 +71,7 @@ tools:
     verify:
       command: node --version
       expect: 'v\d+\.'
-notes: Maven 建议在 settings.xml 里配阿里云镜像仓库，下载依赖会快很多（网上搜「Maven 阿里云镜像」按教程改一处即可）。
+steps:
+  - type: manual
+    title: 给 Maven 配国内镜像：打开 Maven 安装目录下 conf/settings.xml，在 mirrors 里加入阿里云镜像（搜「Maven 阿里云镜像」复制官方给的那段），拉依赖会快很多
+notes: Spring Boot 项目跑不起来先看三件事：JDK 版本、数据库密码、端口被占用——九成问题在这三处。

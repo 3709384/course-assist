@@ -37,6 +37,15 @@ public sealed class SystemProcessRunner : IProcessRunner
             UseShellExecute = false,
             CreateNoWindow = true,
         };
+        // Refresh PATH from the registry so tools installed minutes ago (in this same
+        // session) resolve for verify commands and follow-up steps.
+        if (OperatingSystem.IsWindows())
+        {
+            var machine = Environment.GetEnvironmentVariable("PATH", EnvironmentVariableTarget.Machine) ?? "";
+            var user = Environment.GetEnvironmentVariable("PATH", EnvironmentVariableTarget.User) ?? "";
+            var merged = string.Join(";", new[] { machine, user }.Where(s => s.Length > 0));
+            if (merged.Length > 0) psi.Environment["PATH"] = merged;
+        }
         using var process = new Process { StartInfo = psi };
         process.Start();
         var stdout = process.StandardOutput.ReadToEndAsync(ct);

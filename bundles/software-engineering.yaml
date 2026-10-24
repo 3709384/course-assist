@@ -1,4 +1,4 @@
-# 课程包（draft）：软工实训的协作全家桶：版本管理 + 接口调试 + 画图 + 编辑器。
+# 课程包（draft）：软工实训协作全家桶：版本管理 + 接口调试（含国产替代）+ 画图 + 文档。
 id: software-engineering
 name: 软件工程 / 项目实训
 category: engineering
@@ -16,10 +16,17 @@ tools:
     purpose: 通用编辑器
     winget: Microsoft.VisualStudioCode
     required: true
+    verify:
+      command: code --version
+      expect: '\d+\.\d+'
   - name: Postman
     purpose: 接口调试：联调后端接口时用
     winget: Postman.Postman
     required: true
+  - name: Apifox
+    purpose: 接口调试国产替代：自带接口文档和 Mock，团队协作更方便（与 Postman 二选一或都装）
+    manual: 到 Apifox 官网下载 Windows 版安装；用手机号/邮箱注册即可免费使用基础功能。
+    required: false
   - name: GitHub Desktop
     purpose: Git 图形客户端：不熟命令行时用按钮也能完成提交、拉取（可选）
     winget: GitHub.GitHubDesktop
@@ -34,6 +41,10 @@ tools:
   - name: draw.io
     purpose: 画 UML、ER 图、流程图的工具（软工文档必备）
     winget: JGraph.Draw
+    required: false
+  - name: XMind
+    purpose: 思维导图：梳理需求和功能结构时用
+    manual: 到 XMind 官网下载桌面版，免费版足够课程文档使用。
     required: false
   - name: 7-Zip
     purpose: 解压各种格式的作业包和素材包

@@ -1,4 +1,4 @@
-# 课程包（draft）：虚拟机双选择 + WSL2 路线，待实机验证。
+# 课程包（draft）：虚拟机双选择 + WSL2 路线 + 终端，待实机验证。
 id: operating-systems
 name: 操作系统
 category: systems
@@ -13,6 +13,10 @@ tools:
     purpose: 虚拟机替代：性能更好，现已免费（与 VirtualBox 二选一）
     winget: VMware.WorkstationPro
     required: false
+  - name: Windows Terminal
+    purpose: 用 WSL 路线时的终端
+    winget: Microsoft.WindowsTerminal
+    required: false
   - name: Git
     purpose: 拉取实验框架代码（如 xv6、Nachos）时常用
     winget: Git.Git
@@ -25,4 +29,6 @@ steps:
     name: wsl
   - type: manual
     title: 在虚拟机里新建 Ubuntu 22.04 虚拟机（镜像从 Ubuntu 官网或学校镜像站下载），或在 WSL 中执行 wsl --install -d Ubuntu
-notes: WSL2 路线更轻量，适合只做命令行实验；要装图形界面或做内核实验，用虚拟机路线。装虚拟机前先在 BIOS 里确认虚拟化（VT-x/AMD-V）已开启。
+  - type: manual
+    title: 若虚拟机提示虚拟化不可用：重启进 BIOS 开启 VT-x/AMD-V，并关闭 Windows 的 Hyper-V 冲突项（按报错信息处理）
+notes: WSL2 路线更轻量，适合只做命令行实验；要装图形界面或做内核实验，用虚拟机路线。内存 8GB 的电脑给虚拟机分 2GB、16GB 分 4GB 比较合适。

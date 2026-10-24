@@ -1,8 +1,8 @@
-# 课程包（draft）：Android Studio 主线 + 国产跨端工具指引，待实机验证。
+# 课程包（draft）：Android Studio 主线 + 跨端工具（uni-app/Flutter）指引 + 真机投屏。
 id: mobile-development
 name: 移动应用开发
 category: engineering
-summary: Android Studio 是主线（含模拟器）；做微信小程序/跨端方向的同学看备注里的补充工具。
+summary: Android Studio 是主线（含模拟器）；做微信小程序/跨端方向的同学看补充工具。
 status: draft
 tools:
   - name: Android Studio
@@ -22,6 +22,14 @@ tools:
   - name: HBuilderX
     purpose: uni-app 跨端开发：国内课程和微信小程序常用（需官网下载）
     manual: 到 DCloud 官网下载 HBuilderX 标准版解压即用；微信小程序方向再装「微信开发者工具」（微信官方下载页）。
+    required: false
+  - name: Flutter SDK
+    purpose: 跨端框架方向：老师用 Flutter 时按指引装
+    manual: 到 Flutter 官网下载 Windows 版 zip，解压到安装位置下并把 bin 目录加进 PATH，再运行 flutter doctor 按提示补齐缺项。
+    required: false
+  - name: scrcpy
+    purpose: 真机投屏与控制：演示作业、调真机比模拟器直观得多
+    winget: Genymobile.scrcpy
     required: false
   - name: Git
     purpose: 版本管理

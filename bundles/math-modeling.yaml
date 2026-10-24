@@ -1,4 +1,4 @@
-# 课程包（draft）：建模三件套方向：数值计算（Octave/Python）+ 论文写作（LaTeX）。
+# 课程包（draft）：建模全套：数值计算（Octave/Python/R）+ 论文写作（LaTeX）。
 id: math-modeling
 name: 数学建模
 category: electives
@@ -20,6 +20,14 @@ tools:
     verify:
       command: conda --version
       expect: 'conda'
+  - name: R 语言
+    purpose: 统计建模路线：统计类赛题和统计课常用
+    winget: RProject.R
+    required: false
+  - name: RStudio
+    purpose: R 的图形化开发环境（配合上面的 R 使用）
+    winget: Posit.RStudio
+    required: false
   - name: MiKTeX
     purpose: LaTeX 排版：写竞赛论文和课程论文，公式排版最专业
     winget: MiKTeX.MiKTeX
@@ -27,5 +35,9 @@ tools:
   - name: VS Code
     purpose: 写 Python 和 LaTeX 的编辑器
     winget: Microsoft.VisualStudioCode
+    required: false
+  - name: SPSS
+    purpose: 统计分析菜单式软件：统计课程或社科类赛题偶尔指定
+    manual: 优先用学校机房版（商业授权）；个人学习可用 PSPP（免费替代，官网下载）先练操作。
     required: false
 notes: 数学建模竞赛拼的是组队和论文，不是软件版本——工具够用就行，别在环境上耗太久。Octave 与 MATLAB 语法八成相通，代码迁移成本很低。

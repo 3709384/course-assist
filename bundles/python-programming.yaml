@@ -33,6 +33,10 @@ tools:
     purpose: 轻量替代编辑器（与 PyCharm 二选一即可）
     winget: Microsoft.VisualStudioCode
     required: false
+  - name: Thonny
+    purpose: 新手向编辑器替代：自带 Python、界面极简，零基础第一课用它最省心
+    winget: Thonny.Thonny
+    required: false
   - name: Miniconda
     purpose: 环境管理替代方案：后续上机器学习课、需要隔离多套环境时选它（与官方 Python 可共存）
     winget: Anaconda.Miniconda3

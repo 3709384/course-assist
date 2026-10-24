@@ -1,4 +1,4 @@
-# 课程包（draft）：WSL2 轻量路线 + 终端/远程工具，待实机验证。
+# 课程包（draft）：WSL2 轻量路线 + 终端/远程工具全套，待实机验证。
 id: linux-systems
 name: Linux 系统
 category: systems
@@ -13,10 +13,21 @@ tools:
     purpose: SSH 客户端经典款：连学校服务器（已有其他 SSH 工具可不装）
     winget: PuTTY.PuTTY
     required: false
+  - name: FinalShell
+    purpose: 国产 SSH 工具替代：自带文件管理和服务器监控，学生里很流行
+    manual: 到 FinalShell 官网下载安装包；免费版功能足够课程使用。
+    required: false
   - name: WinSCP
     purpose: 图形化传文件到 Linux 服务器
     winget: WinSCP.WinSCP
     required: false
+  - name: Git
+    purpose: Windows 侧自带 OpenSSH 之外的补充：拉代码、配密钥都用得上
+    winget: Git.Git
+    required: false
+    verify:
+      command: git --version
+      expect: 'git version'
   - name: VirtualBox
     purpose: 需要完整桌面版 Ubuntu 或课程指定虚拟机时选它
     winget: Oracle.VirtualBox
@@ -24,4 +35,6 @@ tools:
 steps:
   - type: feature
     name: wsl
-notes: 启用 WSL 后在终端执行 wsl --install -d Ubuntu 装好发行版，并按提示创建 Linux 用户名和密码（这个密码是 sudo 密码，记牢）。
+  - type: manual
+    title: WSL 装好后第一次打开 Ubuntu 会让你创建 Linux 用户名和密码，这个密码是 sudo 密码，务必记牢
+notes: Windows 11 自带 OpenSSH 客户端，终端里直接 ssh 用户名@服务器 也能连，PuTTY/FinalShell 是图形化替代。

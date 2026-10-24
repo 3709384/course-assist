@@ -13,8 +13,16 @@ tools:
     purpose: RISC-V 汇编模拟器：体系结构实验常用（需要 Java）
     manual: 到 GitHub 的 TheThirdOne/rars 项目 Releases 页下载 rars 的 jar 包，用 java -jar 运行，或使用老师发的版本。
     required: false
+  - name: MARS (MIPS 模拟器)
+    purpose: MIPS 汇编模拟器：用 MIPS 教材的学校常用（需要 Java）
+    manual: 到密苏里州立大学的 MARS 官网页面下载 Mars.jar，用 java -jar Mars.jar 运行，或使用老师发的版本。
+    required: false
+  - name: Proteus
+    purpose: 电路仿真（偏硬件方向的学校使用，商业软件，学校一般有授权或机房版）
+    manual: 优先用学校机房版或老师提供的安装包；个人学习可用官网试用版。
+    required: false
   - name: JDK 17
-    purpose: 上面两个模拟器的运行基础（没装 Java 的先装它）
+    purpose: 上面几个模拟器的运行基础（没装 Java 的先装它）
     winget: Microsoft.OpenJDK.17
     required: false
     verify:
@@ -24,4 +32,4 @@ tools:
     purpose: 写汇编和实验报告时的编辑器
     winget: Microsoft.VisualStudioCode
     required: false
-notes: 这门课各学校用的模拟器差别很大（MARS、RARS、Logisim、Proteus 都有），以老师指定为准，本包覆盖最常见的两种。
+notes: 这门课各学校用的模拟器差别很大（MARS、RARS、Logisim、Proteus 都有），以老师指定为准，本包覆盖最常见的几种。

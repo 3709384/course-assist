@@ -1,4 +1,4 @@
-# 课程包（draft）：以 MSYS2 工具链提供 flex/bison，待实机验证。
+# 课程包（draft）：以 MSYS2 工具链提供 flex/bison，ANTLR 路线也备了指引，待实机验证。
 id: compiler-principles
 name: 编译原理
 category: systems
@@ -13,6 +13,9 @@ tools:
     purpose: 写编译器代码的编辑器
     winget: Microsoft.VisualStudioCode
     required: true
+    verify:
+      command: code --version
+      expect: '\d+\.\d+'
   - name: JDK 17
     purpose: 课程若用 Java 版工具（如 JFlex/CUP 或 ANTLR）时需要
     winget: Microsoft.OpenJDK.17
@@ -20,7 +23,11 @@ tools:
     verify:
       command: java -version
       expect: '17\.'
+  - name: ANTLR 4
+    purpose: 语法分析生成器替代路线：用语法文件直接生成解析器（Java 路线）
+    manual: 到 ANTLR 官网下载 antlr-4.x-complete.jar，放到顺手的目录，并按官网 Quick Start 给它配一个别名命令。
+    required: false
 steps:
   - type: command
     run: C:\msys64\usr\bin\bash.exe -lc "pacman -S --noconfirm mingw-w64-ucrt-x86_64-gcc flex bison"
-notes: 如果 MSYS2 装到了别的盘，把步骤里的路径换成实际的 msys64 目录。ANTLR 路线的同学只需 JDK + VS Code，再按官网指引下载 antlr 的 jar 包。
+notes: 如果 MSYS2 装到了别的盘，把步骤里的路径换成实际的 msys64 目录。装完在 MSYS2 终端里输入 flex --version 验证工具链。

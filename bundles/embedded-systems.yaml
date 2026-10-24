@@ -1,4 +1,4 @@
-# 课程包（draft）：嵌入式工具多为厂商软件，需账号/授权，按指引获取；开源替代也备了。
+# 课程包（draft）：嵌入式工具多为厂商软件，需账号/授权，按指引获取；仿真与开源替代也备了。
 id: embedded-systems
 name: 嵌入式系统
 category: electives
@@ -21,8 +21,18 @@ tools:
     purpose: 配合 PlatformIO 插件是更现代的嵌入式开发方式（可选体验）
     winget: Microsoft.VisualStudioCode
     required: false
+    verify:
+      command: code --version
+      expect: '\d+\.\d+'
+  - name: Proteus
+    purpose: 电路与单片机仿真：没硬件时先在仿真里跑通逻辑
+    manual: 优先用学校机房版或老师提供的安装包；个人可用官网试用版体验。
+    required: false
   - name: 串口调试助手
     purpose: 看单片机串口输出、调通信协议
     manual: 使用老师发的串口助手，或在网上搜「SSCOM 串口调试助手」下载绿色版；CH340/CP2102 驱动按开发板芯片型号安装。
     required: false
+steps:
+  - type: manual
+    title: 用 VS Code 路线的同学：装好后在插件市场安装「PlatformIO IDE」，新建工程时它会自动下载工具链
 notes: 插上开发板没反应，八成是缺 USB 转串口驱动（CH340 最常见），先查驱动再怀疑代码。ST-Link 驱动装 STM32CubeMX 时会顺带装上。

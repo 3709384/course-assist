@@ -1,4 +1,4 @@
-# 课程包（draft）：安全课工具链：虚拟机 + 抓包 + 扫描 + Web 安全，全在隔离环境里练。
+# 课程包（draft）：安全课工具链：虚拟机 + 抓包 + 扫描 + Web 安全 + 密码学经典工具，全在隔离环境里练。
 id: network-security
 name: 网络安全
 category: electives
@@ -28,4 +28,8 @@ tools:
     purpose: Web 安全测试：抓改 HTTP 请求，Web 实验必备
     winget: PortSwigger.BurpSuite.Community
     required: false
-notes: 所有攻击性工具只许在自己的虚拟机和靶场环境里用，扫描别人的网络是违法的——这点老师上课也会强调。
+  - name: John the Ripper
+    purpose: 密码哈希破解经典工具：密码学与口令安全实验常用（只在实验环境练）
+    manual: 到 openwall 官网下载 John the Ripper 的 Windows 版压缩包解压即用；实验靶机里通常也预装了 hashcat，可二选一。
+    required: false
+notes: 所有攻击性工具只许在自己的虚拟机和靶场环境里用，扫描或攻击别人的网络是违法的——这点老师上课也会强调。虚拟机网卡建议用「仅主机」或「NAT 网络」模式做实验。
