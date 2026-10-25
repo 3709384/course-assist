@@ -413,7 +413,8 @@ public sealed class Preflight
 /// <summary>把一次运行的结果整理成可导出的诊断报告（发给老师/同学或附到 Issue）。</summary>
 public static class DiagnosticsReport
 {
-    public static string Build(string courseName, IReadOnlyList<StepResult> results, IReadOnlyList<PreflightItem>? preflight = null)
+    public static string Build(string courseName, IReadOnlyList<StepResult> results, IReadOnlyList<PreflightItem>? preflight = null,
+        IReadOnlyList<string>? sessionLog = null)
     {
         var sb = new StringBuilder();
         sb.AppendLine("# Course Assist 诊断报告");
@@ -442,6 +443,16 @@ public static class DiagnosticsReport
             sb.AppendLine($"- {mark} {r.Step.Title}：{r.Detail}");
         }
         sb.AppendLine();
+        if (sessionLog is { Count: > 0 })
+        {
+            // The full session log carries the self-heal narrative — the decisive
+            // evidence when an install stopped before any step could run.
+            sb.AppendLine("## 本次运行日志（原文）");
+            sb.AppendLine("```");
+            foreach (var line in sessionLog) sb.AppendLine(line);
+            sb.AppendLine("```");
+            sb.AppendLine();
+        }
         sb.AppendLine("把这份报告发给老师、同学，或附到 GitHub Issue 里，别人就能帮你定位问题。");
         return sb.ToString();
     }

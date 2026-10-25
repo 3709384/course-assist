@@ -61,10 +61,21 @@ public sealed class SelfHealService
         Directory.CreateDirectory(dir);
 
         // Latest App Installer bundle from the official winget-cli releases.
-        var bundleUrl = await FindLatestBundleUrlAsync(ct);
+        // If the GitHub API is unreachable (common on flaky networks), fall back to
+        // Microsoft's own short link, which redirects to the same bundle.
+        string bundleUrl;
+        try
+        {
+            bundleUrl = await FindLatestBundleUrlAsync(ct);
+        }
+        catch (Exception)
+        {
+            log("官方发布接口暂时连不上，改走微软短链接 aka.ms/getwinget…");
+            bundleUrl = "https://aka.ms/getwinget";
+        }
         var bundle = Path.Combine(dir, "AppInstaller.msixbundle");
         log("正在下载应用安装程序（约几十 MB，视网速等待一会儿）…");
-        await DownloadAsync(bundleUrl, bundle, ct);
+        await DownloadAsync(bundleUrl, bundle, ct, log);
 
         // Dependencies of the bundle (x64 / ARM64).
         var arch = RuntimeInformation.ProcessArchitecture;
@@ -73,11 +84,11 @@ public sealed class SelfHealService
             : ("https://aka.ms/Microsoft.VCLibs.x64.14.00.Desktop.appx", "tools/AppX/x64/Release/Microsoft.UI.Xaml.2.8.appx");
 
         var vclibs = Path.Combine(dir, "VCLibs.appx");
-        await DownloadAsync(vclibsUrl, vclibs, ct);
+        await DownloadAsync(vclibsUrl, vclibs, ct, log);
 
         var xaml = Path.Combine(dir, "UI.Xaml.appx");
         var nupkg = Path.Combine(dir, "UI.Xaml.zip");
-        await DownloadAsync("https://www.nuget.org/api/v2/package/Microsoft.UI.Xaml/2.8.6", nupkg, ct);
+        await DownloadAsync("https://www.nuget.org/api/v2/package/Microsoft.UI.Xaml/2.8.6", nupkg, ct, log);
         using (var zip = ZipFile.OpenRead(nupkg))
         {
             var entry = zip.Entries.FirstOrDefault(e => e.FullName.Equals(xamlArchPath, StringComparison.OrdinalIgnoreCase))
@@ -111,11 +122,24 @@ public sealed class SelfHealService
         throw new InvalidOperationException("官方最新版里没找到应用安装程序安装包");
     }
 
-    private static async Task DownloadAsync(string url, string file, CancellationToken ct)
+    private static async Task DownloadAsync(string url, string file, CancellationToken ct, Action<string>? log = null)
     {
-        await using var stream = await Http.GetStreamAsync(url, ct);
-        await using var fs = File.Create(file);
-        await stream.CopyToAsync(fs, ct);
+        // One automatic retry: a single dropped connection should not fail the heal.
+        for (var attempt = 1; ; attempt++)
+        {
+            try
+            {
+                await using var stream = await Http.GetStreamAsync(url, ct);
+                await using var fs = File.Create(file);
+                await stream.CopyToAsync(fs, ct);
+                return;
+            }
+            catch (Exception) when (attempt < 2)
+            {
+                try { File.Delete(file); } catch { /* partial file cleanup is best-effort */ }
+                log?.Invoke("下载中断，正在重试一次…");
+            }
+        }
     }
 
     /// <summary>Pick a different install root when the chosen one is unwritable or the

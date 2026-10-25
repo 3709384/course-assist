@@ -304,6 +304,7 @@ public partial class MainWindow : Window
         try
         {
             var preflight = await RunPreflightAsync(root);
+            string? wingetHealDetail = null;
             if (preflight.Any(p => !p.Passed))
             {
                 // 产品原则：发现问题先自己修，不把问题甩给用户。
@@ -314,6 +315,7 @@ public partial class MainWindow : Window
                     if (item.Name.Contains("winget"))
                     {
                         var heal = await healer.EnsureWingetAsync(m => Log($"修复 · {m}"));
+                        if (!heal.Fixed) wingetHealDetail = heal.Detail;
                         Log($"修复 · winget：{(heal.Fixed ? "✅ 已解决" : "❌ " + heal.Detail)}", heal.Fixed ? LogKind.Success : LogKind.Error);
                     }
                     else if (item.Name.Contains("可写") || item.Name.Contains("磁盘"))
@@ -332,7 +334,9 @@ public partial class MainWindow : Window
             var critical = preflight.Where(p => !p.Passed && (p.Name.Contains("winget") || p.Name.Contains("可写") || p.Name.Contains("系统"))).ToList();
             if (critical.Count > 0)
             {
-                Log("自动修复后仍有问题没能解决，已停止。点「导出诊断报告」发给老师或同学，他们能帮你看。");
+                Log("自动修复后仍有问题没能解决，已停止。"
+                    + (wingetHealDetail is not null ? $"原因：{wingetHealDetail}。" : "")
+                    + "把日志往上滚能看到修复全过程；点「导出诊断报告」发给老师或同学，他们能帮你看。", LogKind.Error);
                 DiagButton.IsEnabled = true;
                 return;
             }
@@ -427,7 +431,9 @@ public partial class MainWindow : Window
     private void Diag_Click(object sender, RoutedEventArgs e)
     {
         if (_current is null) return;
-        var report = DiagnosticsReport.Build(_current.Name, _lastResults ?? [], _lastPreflight);
+        var sessionLog = LogList.Items.OfType<ListBoxItem>()
+            .Select(i => i.Content?.ToString() ?? "").ToList();
+        var report = DiagnosticsReport.Build(_current.Name, _lastResults ?? [], _lastPreflight, sessionLog);
         var dialog = new SaveFileDialog
         {
             Filter = "Markdown 文件|*.md",
